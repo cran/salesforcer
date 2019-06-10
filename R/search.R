@@ -3,18 +3,19 @@
 #' Searches for records in your organization’s data.
 #' 
 #' @importFrom jsonlite toJSON fromJSON
-#' @importFrom httr content
+#' @importFrom dplyr as_tibble rename rename_at select matches starts_with vars everything tibble
+#' @importFrom readr cols type_convert col_guess
+#' @importFrom purrr map_df 
 #' @importFrom xml2 xml_ns_strip xml_find_all
-#' @importFrom purrr map_df
-#' @importFrom dplyr as_tibble rename rename_at select matches starts_with funs vars everything
-#' @importFrom readr type_convert
+#' @importFrom httr content
 #' @param search_string character; string to search using parameterized search 
 #' or SOSL. Note that is_sosl must be set to TRUE and the string valid in order 
 #' to perform a search using SOSL.
 #' @param is_sosl logical; indicating whether or not to try the string as SOSL
+#' @template guess_types
 #' @template api_type
 #' @param parameterized_search_options \code{list}; a list of parameters for 
-#' controlling the search if not using SOSL. If using SOSL this is ignored.
+#' controlling the search if not using SOSL. If using SOSL this argument is ignored.
 #' @template verbose
 #' @param ... arguments to be used to form the parameterized search options argument 
 #' if it is not supplied directly.
@@ -41,6 +42,7 @@
 #' @export
 sf_search <- function(search_string,
                       is_sosl = FALSE,
+                      guess_types = TRUE,
                       api_type = c("REST", "SOAP", "Bulk 1.0", "Bulk 2.0"),
                       parameterized_search_options = list(...),
                       verbose = FALSE, 
@@ -50,10 +52,8 @@ sf_search <- function(search_string,
   
   # REST implementation
   if(which_api == "REST"){
-    
     if(is_sosl){
       target_url <- make_search_url(search_string)
-      if(verbose) message(target_url)
       httr_response <- rGET(url = target_url,
                             headers = c("Accept"="application/json", 
                                         "Content-Type"="application/json"))
@@ -62,46 +62,53 @@ sf_search <- function(search_string,
                                               parameterized_search_options)
       parameterized_search_control <- c(list(q=search_string), parameterized_search_control)
       target_url <- make_parameterized_search_url()
-      if(verbose) message(target_url)
+      request_body <- toJSON(parameterized_search_control,
+                             auto_unbox = TRUE)
       httr_response <- rPOST(url = target_url,
                              headers = c("Accept"="application/json", 
                                          "Content-Type"="application/json"),
-                             body = toJSON(parameterized_search_control,
-                                           auto_unbox = TRUE))
+                             body = request_body)
+    }
+    if(verbose){
+      make_verbose_httr_message(httr_response$request$method,
+                                httr_response$request$url, 
+                                httr_response$request$headers, 
+                                prettify(request_body))
     }
     catch_errors(httr_response)
     response_parsed <- content(httr_response, "text", encoding="UTF-8")
     resultset <- fromJSON(response_parsed, flatten=TRUE)$searchRecords
-    if(length(resultset)>0){
+    if(length(resultset) > 0){
       suppressMessages(
         resultset <- resultset %>% 
-          rename(sobject = `attributes.type`) %>%
-          select(-matches("^attributes\\.")) %>%
-          type_convert() %>% 
-          as_tibble()
+          rename(sObject = `attributes.type`) %>%
+          select(-matches("^attributes\\."))
       ) 
     } else {
-      resultset <- NULL
+      resultset <- tibble()
     }
   } else if(which_api == "SOAP"){
-    
     # TODO: should SOAP only take SOSL?
     if(!is_sosl){
       stop(paste("The SOAP API only takes SOSL formatted search strings.", 
-                 "Set is_sosl=TRUE or Use \"REST\" if trying to do a free text search"))
+                 "Set is_sosl=TRUE or set api_type='REST' if trying to do a free text search"))
     }
     r <- make_soap_xml_skeleton()
     xml_dat <- build_soap_xml_from_list(input_data = search_string,
                                         operation = "search",
-                                        root=r)
+                                        root = r)
+    request_body <- as(xml_dat, "character")
     base_soap_url <- make_base_soap_url()
-    if(verbose) {
-      message(base_soap_url)
-    }
     httr_response <- rPOST(url = base_soap_url,
                            headers = c("SOAPAction"="search",
                                        "Content-Type"="text/xml"),
-                           body = as(xml_dat, "character"))
+                           body = request_body)
+    if(verbose){
+      make_verbose_httr_message(httr_response$request$method,
+                                httr_response$request$url, 
+                                httr_response$request$headers, 
+                                request_body)
+    }
     catch_errors(httr_response)
     response_parsed <- content(httr_response, encoding="UTF-8")
     resultset <- response_parsed %>%
@@ -111,14 +118,12 @@ sf_search <- function(search_string,
       suppressMessages(
         resultset <- resultset %>%
           map_df(xml_nodeset_to_df) %>%
-          rename(sobject=`sf:type`) %>%
+          rename(sObject = `sf:type`) %>%
           rename_at(.vars = vars(starts_with("sf:")), 
-                    .funs = funs(sub("^sf:", "", .))) %>%
-          select(-matches("Id1")) %>%
-          type_convert()
+                    .funs = list(~sub("^sf:", "", .)))
       )
     } else {
-      resultset <- NULL
+      resultset <- tibble()
     }
   } else if(which_api == "Bulk 1.0"){
     stop("SOSL is not supported in Bulk API. For retrieving a large number of records use SOQL (queries) instead.")
@@ -127,9 +132,15 @@ sf_search <- function(search_string,
   } else {
     stop("Unknown API type")
   }
-  if(!is.null(resultset)){
-    resultset <- resultset %>%
-      select(sobject, everything())
+  if(nrow(resultset) > 0){
+    resultset <- resultset %>% 
+      as_tibble() %>%
+      # reorder because the REST API does it differently
+      select(sObject, everything())
+      if(guess_types){
+        resultset <- resultset %>%
+          type_convert(col_types = cols(.default = col_guess()))
+      }
   }
   return(resultset)
 }
@@ -167,8 +178,7 @@ parameterized_search_control <- function(objects = NULL,
                                          fields_scope = c("ALL", "NAME", "EMAIL", "PHONE" ,"SIDEBAR"),
                                          fields = NULL,
                                          overall_limit = 2000,
-                                         spell_correction = TRUE
-                                         ){
+                                         spell_correction = TRUE){
   
   which_fields_scope <- match.arg(fields_scope)
   

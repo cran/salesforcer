@@ -14,14 +14,15 @@ returned by \link{sf_create_job_bulk}}
 \item{batch_id}{character; the Salesforce Id assigned assigned to a submitted 
 batch as returned by \link{sf_create_batches_bulk}}
 
-\item{api_type}{character; one of "REST", "SOAP", or "Bulk" indicating 
-which API to use when making the request}
+\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
+"Chatter" indicating which API to use when making the request}
 
 \item{verbose}{logical; do you want informative messages?}
 }
 \value{
-A \code{tbl_df}, formatted by salesforce, with information containing the success or failure or certain rows in a submitted batch, 
-unless the operation was query, then it is a data.frame containing the result_id for retrieving the recordset.
+A \code{tbl_df}, formatted by Salesforce, with information containing 
+the success or failure or certain rows in a submitted batch, unless the operation 
+was query, then it is a data.frame containing the result_id for retrieving the recordset.
 }
 \description{
 This function returns detailed (row-by-row) information on an existing batch

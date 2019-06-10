@@ -4,8 +4,8 @@
 \alias{sf_retrieve}
 \title{Retrieve Records By Id}
 \usage{
-sf_retrieve(ids, fields, object_name, api_type = c("REST", "SOAP", "Bulk 1.0",
-  "Bulk 2.0"), verbose = FALSE)
+sf_retrieve(ids, fields, object_name, api_type = c("REST", "SOAP",
+  "Bulk 1.0", "Bulk 2.0"), control = list(...), ..., verbose = FALSE)
 }
 \arguments{
 \item{ids}{\code{vector}, \code{matrix}, \code{data.frame}, or 
@@ -18,8 +18,14 @@ on the records}
 \item{object_name}{character; the name of one Salesforce objects that the 
 function is operating against (e.g. "Account", "Contact", "CustomObject__c")}
 
-\item{api_type}{character; one of "REST", "SOAP", or "Bulk" indicating 
-which API to use when making the request}
+\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
+"Chatter" indicating which API to use when making the request}
+
+\item{control}{\code{list}; a list of parameters for controlling the behavior of 
+the API call being used. For more information of what parameters are available 
+look at the documentation for \code{\link{sf_control}}}
+
+\item{...}{arguments passed to \code{\link{sf_control}}}
 
 \item{verbose}{logical; do you want informative messages?}
 }

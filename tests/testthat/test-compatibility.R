@@ -68,7 +68,8 @@ test_that("testing rforcecom.create compatibility", {
   expect_equal(nrow(result1), nrow(result2))
   
   # clean up
-  delete_result1 <- sf_delete(ids=c(result1$id, result2$id), object)
+  delete_result1 <- sf_delete(ids=c(as.character(result1$id), 
+                                    as.character(result2$id)), object_name = object)
 })
 
 test_that("testing rforcecom.delete compatibility", {
@@ -108,37 +109,39 @@ test_that("testing rforcecom.update compatibility", {
 test_that("testing rforcecom.upsert compatibility", {
   
   object <- "Contact"
-  this_external_id <- "TestUpsert1"
+  prefix <- paste0("Compatib-", as.integer(runif(1,1,100000)), "-")
+  this_external_id1 <- paste0(prefix, letters[1])
   new_contact <- c(FirstName="Test", 
                    LastName="Contact-Upsert-Compatibility", 
-                   My_External_Id__c=this_external_id)
-  create_result1 <- sf_create(new_contact, "Contact")
+                   My_External_Id__c = this_external_id1)
+  create_result1 <- sf_create(input_data = new_contact, object_name = "Contact")
   fields <- c(FirstName="Test", 
               LastName="Contact-Upsert-Compatibility2")
-  result1 <- RForcecom::rforcecom.upsert(session, 
-                                         objectName=object, 
-                                         externalIdField="My_External_Id__c", 
-                                         externalId = this_external_id,
-                                         fields)
-  
-  this_external_id <- "TestUpsert2"
-  new_contact <- c(FirstName="Test", 
-                   LastName="Contact-Upsert-Compatibility", 
-                   My_External_Id__c=this_external_id)
+  suppressWarnings(
+    result1 <- RForcecom::rforcecom.upsert(session, 
+                                           objectName = object, 
+                                           externalIdField = "My_External_Id__c", 
+                                           externalId = this_external_id1,
+                                           fields)
+  )
+  this_external_id2 <- paste0(prefix, letters[2])
+  new_contact <- c(FirstName = "Test", 
+                   LastName = "Contact-Upsert-Compatibility", 
+                   My_External_Id__c = this_external_id2)
   create_result2 <- sf_create(new_contact, "Contact")
   fields <- c(FirstName="Test", 
               LastName="Contact-Upsert-Compatibility2")
   suppressWarnings(
     result2 <- salesforcer::rforcecom.upsert(session, 
-                                             objectName=object, 
-                                             externalIdField="My_External_Id__c", 
-                                             externalId = this_external_id,
+                                             objectName = object, 
+                                             externalIdField = "My_External_Id__c", 
+                                             externalId = this_external_id2,
                                              fields)
   )
-  
-  expect_null(result1)
-  expect_equal(result1, result2)
-  
+  expect_is(result1, "data.frame")
+  expect_is(result2, "data.frame")
+  expect_equal(sort(names(result1)), sort(names(result2)))
+  expect_equal(nrow(result1), nrow(result2))
   # clean up
   delete_result1 <- sf_delete(ids=c(create_result1$id, create_result2$id), object)
 })
@@ -171,6 +174,19 @@ test_that("testing rforcecom.search compatibility", {
   expect_null(result1)
   # rforcecom.search has a bug that wont return right data
   expect_is(result2, "data.frame")
+})
+
+test_that("testing rforcecom.getObjectDescription compatibility", {
+  
+  result1 <- RForcecom::rforcecom.getObjectDescription(session, objectName="Account")
+  result2 <- salesforcer::rforcecom.getObjectDescription(session, objectName="Account")
+  
+  expect_is(result1, "data.frame")
+  expect_is(result2, "data.frame")
+  # same number of fields
+  expect_equal(nrow(result1), nrow(result2))
+  # same names of the fields
+  expect_equal(sort(as.character(result1$name)), sort(result2$name))
 })
 
 # not exported?

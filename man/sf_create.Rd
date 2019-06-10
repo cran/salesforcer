@@ -4,8 +4,8 @@
 \alias{sf_create}
 \title{Create Records}
 \usage{
-sf_create(input_data, object_name, all_or_none = FALSE, api_type = c("SOAP",
-  "REST", "Bulk 1.0", "Bulk 2.0"), ..., verbose = FALSE)
+sf_create(input_data, object_name, api_type = c("SOAP", "REST",
+  "Bulk 1.0", "Bulk 2.0"), control = list(...), ..., verbose = FALSE)
 }
 \arguments{
 \item{input_data}{\code{named vector}, \code{matrix}, \code{data.frame}, or 
@@ -14,13 +14,15 @@ sf_create(input_data, object_name, all_or_none = FALSE, api_type = c("SOAP",
 \item{object_name}{character; the name of one Salesforce objects that the 
 function is operating against (e.g. "Account", "Contact", "CustomObject__c")}
 
-\item{all_or_none}{logical; allows a call to roll back all changes unless all 
-records are processed successfully}
+\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
+"Chatter" indicating which API to use when making the request}
 
-\item{api_type}{character; one of "REST", "SOAP", or "Bulk" indicating 
-which API to use when making the request}
+\item{control}{\code{list}; a list of parameters for controlling the behavior of 
+the API call being used. For more information of what parameters are available 
+look at the documentation for \code{\link{sf_control}}}
 
-\item{...}{Other arguments passed on to \code{\link{sf_bulk_operation}}.}
+\item{...}{arguments passed to \code{\link{sf_control}} or further downstream 
+to \code{\link{sf_bulk_operation}}}
 
 \item{verbose}{logical; do you want informative messages?}
 }
@@ -30,12 +32,26 @@ which API to use when making the request}
 \description{
 Adds one or more new records to your organization’s data.
 }
+\note{
+Because the SOAP and REST calls chunk data into batches of 200 records 
+the AllOrNoneHeader will only apply to the success or failure of every batch 
+of records and not all records submitted to the function.
+}
 \examples{
 \dontrun{
-n <- 3
+n <- 2
 new_contacts <- tibble(FirstName = rep("Test", n),
                        LastName = paste0("Contact", 1:n))
-new_contacts_result <- sf_create(new_contacts, object_name="Contact")
-new_contacts_result <- sf_create(new_contacts, object_name="Contact", api_type="REST")
+new_recs1 <- sf_create(new_contacts, object_name = "Contact")
+
+# add control to allow the creation of records that violate a duplicate rules
+new_recs2 <- sf_create(new_contacts, object_name = "Contact", 
+                       DuplicateRuleHeader=list(allowSave=TRUE,
+                                                includeRecordDetails=FALSE,
+                                                runAsCurrentUser=TRUE))
+                                                  
+# example using the Bulk 1.0 API to insert records
+new_recs3 <- sf_create(new_contacts, object_name = "Contact", 
+                       api_type = "Bulk 1.0")
 }
 }

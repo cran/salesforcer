@@ -4,8 +4,8 @@
 \alias{sf_query_result_bulk}
 \title{Retrieving the Results of a Bulk Query Batch in a Bulk API Job}
 \usage{
-sf_query_result_bulk(job_id, batch_id, result_id, api_type = c("Bulk 1.0"),
-  verbose = FALSE)
+sf_query_result_bulk(job_id, batch_id, result_id, guess_types = TRUE,
+  api_type = c("Bulk 1.0"), verbose = FALSE)
 }
 \arguments{
 \item{job_id}{character; the Salesforce Id assigned to a submitted job as 
@@ -16,13 +16,17 @@ batch as returned by \link{sf_create_batches_bulk}}
 
 \item{result_id}{a character string returned from \link{sf_batch_details_bulk} when a query has completed and specifies how to get the recordset}
 
-\item{api_type}{character; one of "REST", "SOAP", or "Bulk" indicating 
-which API to use when making the request}
+\item{guess_types}{logical; indicating whether or not to use \code{col_guess()} 
+to try and cast the data returned in the query recordset. TRUE uses \code{col_guess()} 
+and FALSE returns all values as character strings.}
+
+\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
+"Chatter" indicating which API to use when making the request}
 
 \item{verbose}{logical; do you want informative messages?}
 }
 \value{
-A \code{tbl_df}, formatted by salesforce, containing query results
+A \code{tbl_df}, formatted by Salesforce, containing query results
 }
 \description{
 This function returns the row-level recordset of a bulk query
@@ -30,9 +34,9 @@ which has already been submitted to Bulk API Job and has Completed state
 }
 \examples{
 \dontrun{
-my_query <- "SELECT Id, Name FROM Account LIMIT 10"
-job_info <- sf_create_job_bulk(operation='query', object='Account')
-query_info <- sf_submit_query_bulk(job_id=job_info$id, soql=my_query)
+my_query <- "SELECT Id, Name FROM Account LIMIT 1000"
+job_info <- sf_create_job_bulk(operation = 'query', object = 'Account')
+query_info <- sf_submit_query_bulk(job_id = job_info$id, soql = my_query)
 result <- sf_batch_details_bulk(job_id = query_info$jobId,
                                 batch_id = query_info$id)
 recordset <- sf_query_result_bulk(job_id = query_info$jobId,

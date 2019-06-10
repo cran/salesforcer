@@ -11,13 +11,13 @@ sf_get_job_bulk(job_id, api_type = c("Bulk 1.0", "Bulk 2.0"),
 \item{job_id}{character; the Salesforce Id assigned to a submitted job as 
 returned by \link{sf_create_job_bulk}}
 
-\item{api_type}{character; one of "REST", "SOAP", or "Bulk" indicating 
-which API to use when making the request}
+\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
+"Chatter" indicating which API to use when making the request}
 
 \item{verbose}{logical; do you want informative messages?}
 }
 \value{
-A \code{list} of parameters defining the details of the specified job id
+A \code{tbl_df} of parameters defining the details of the specified job id
 }
 \description{
 This function retrieves details about a Job in the Salesforce Bulk API

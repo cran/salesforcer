@@ -123,7 +123,7 @@ rforcecom.create <- function(session, objectName, fields){
   .Deprecated("sf_create")
   
   fields <- as.data.frame(as.list(fields), stringsAsFactors = FALSE)
-  created_records <- sf_create(input_data=fields, object_name=objectName)
+  created_records <- sf_create(input_data = fields, object_name = objectName)
   
   result <- created_records %>% 
     select(id, success) %>%
@@ -148,8 +148,7 @@ rforcecom.update <- function(session, objectName, id, fields){
 
   fields <- as.data.frame(as.list(fields), stringsAsFactors = FALSE)
   fields$id <- id
-  updated_records <- sf_update(fields, object_name=objectName)
-  
+  updated_records <- sf_update(fields, object_name = objectName)
   # rforcecom.update returns NULL if successful??
   return(NULL)
 }
@@ -165,8 +164,7 @@ rforcecom.delete <- function(session, objectName, id){
   
   .Deprecated("sf_delete")
   
-  deleted_records <- sf_delete(id, object_name=objectName)
-  
+  deleted_records <- sf_delete(id, object_name = objectName)
   # rforcecom.delete returns NULL if successful??
   return(NULL)
 }
@@ -191,9 +189,8 @@ rforcecom.upsert <- function(session, objectName,
   upserted_records <- sf_upsert(input_data = fields, 
                                 object_name = objectName, 
                                 external_id_fieldname = externalIdField)
-  
-  # rforcecom.upsert returns NULL if successful??
-  return(NULL)
+  res <- as.data.frame(upserted_records, stringsAsFactors = FALSE)
+  return(res)
 }
 
 #' salesforcer's backwards compatible version of rforcecom.search
@@ -267,6 +264,27 @@ rforcecom.retrieve <- function(session, objectName,
   # Send a query
   resultSet <- sf_query(soql=soqlQuery)
   return(resultSet)
+}
+
+#' salesforcer's backwards compatible version of rforcecom.getObjectDescription
+#'
+#' @importFrom purrr map_df
+#' @template session 
+#' @template objectName
+#' @return Object descriptions
+#' @note This function returns a data.frame with one row per field for an object.
+#' @export
+rforcecom.getObjectDescription <- function(session, objectName){
+  
+  .Deprecated("sf_describe_objects")
+
+  obj_dat <- sf_describe_objects(object_names = objectName, 
+                                 api_type="SOAP")[[1]]
+  
+  obj_fields <- map_df(obj_dat[names(obj_dat) == "fields"], 
+                       as.data.frame, 
+                       stringsAsFactors=FALSE)
+  return(obj_fields)
 }
 
 #' Run Bulk Action

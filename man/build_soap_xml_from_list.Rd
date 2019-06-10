@@ -5,9 +5,11 @@
 \title{Build XML Request Body}
 \usage{
 build_soap_xml_from_list(input_data, operation = c("create", "retrieve",
-  "update", "upsert", "delete", "search", "query", "queryMore",
-  "describeSObjects"), object_name = NULL, fields = NULL,
-  external_id_fieldname = NULL, root_name = NULL, ns = c(character(0)),
+  "update", "upsert", "delete", "undelete", "emptyRecycleBin",
+  "getDeleted", "getUpdated", "search", "query", "queryMore", "merge",
+  "describeSObjects", "setPassword", "resetPassword", "findDuplicates",
+  "findDuplicatesByIds"), object_name = NULL, fields = NULL,
+  external_id_fieldname = NULL, root_name = NULL, ns = character(0),
   root = NULL)
 }
 \arguments{

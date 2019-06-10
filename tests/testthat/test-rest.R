@@ -9,7 +9,7 @@ test_that("testing REST API Functionality", {
   prefix <- paste0("REST-", as.integer(runif(1,1,100000)), "-")
   new_contacts <- tibble(FirstName = rep("Test", n),
                          LastName = paste0("Contact-Create-", 1:n), 
-                         My_External_Id__c=paste0(prefix, letters[1:n]))
+                         My_External_Id__c = paste0(prefix, letters[1:n]))
   # sf_create ------------------------------------------------------------------  
   created_records <- sf_create(new_contacts, "Contact", api_type="REST")
   expect_is(created_records, "tbl_df")
@@ -33,7 +33,7 @@ test_that("testing REST API Functionality", {
   # sf_search ------------------------------------------------------------------
   searched_records <- sf_search(my_sosl, is_sosl=TRUE, api_type="REST") 
   expect_is(searched_records, "tbl_df")
-  expect_equal(names(searched_records), c("sobject", "Id", "FirstName", "LastName", "My_External_Id__c"))
+  expect_equal(names(searched_records), c("sObject", "Id", "FirstName", "LastName", "My_External_Id__c"))
   expect_equal(nrow(searched_records), 3)
   
   my_soql <- sprintf("SELECT Id, 
@@ -64,12 +64,12 @@ test_that("testing REST API Functionality", {
   upserted_contacts <- bind_rows(queried_records %>% select(-Id), new_record)
 
   # sf_upsert ------------------------------------------------------------------
-  upserted_records <- sf_upsert(input_data=upserted_contacts, 
-                                object_name="Contact", 
-                                external_id_fieldname="My_External_Id__c", 
+  upserted_records <- sf_upsert(input_data = upserted_contacts, 
+                                object_name = "Contact", 
+                                external_id_fieldname = "My_External_Id__c", 
                                 api_type = "REST")
   expect_is(upserted_records, "tbl_df")
-  expect_equal(names(upserted_records), c("id", "success", "errors"))
+  expect_equal(names(upserted_records), c("id", "success", "errors", "created"))
   expect_equal(nrow(upserted_records), nrow(upserted_records))
   
   # sf_delete ------------------------------------------------------------------

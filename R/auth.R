@@ -59,7 +59,7 @@
 #' # log in using basic authentication (username-password)
 #' sf_auth(username = "test@gmail.com", 
 #'         password = "test_password", 
-#'         security_token = )
+#'         security_token = "test_token")
 #' 
 #' # log in using OAuth 2.0
 #' # Via brower or refresh of .httr-oauth-salesforcer
@@ -129,7 +129,7 @@ sf_auth <- function(username = NULL,
                                 redirect_uri = callback_url)
       
       sf_oauth_endpoints <- oauth_endpoint(request = NULL,
-                                           base_url = "https://login.salesforce.com/services/oauth2",
+                                           base_url = sprintf("%s/services/oauth2", login_url),
                                            authorize = "authorize", access = "token", revoke = "revoke")
       
       sf_token <- oauth2.0_token(endpoint = sf_oauth_endpoints,
