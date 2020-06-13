@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Steven M. Mortimer" />
 
@@ -19,10 +19,10 @@
 
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
@@ -32,14 +32,16 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -48,9 +50,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -81,7 +83,29 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
 </style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
 
 
 
@@ -95,9 +119,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -266,8 +287,12 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
+
+
+
 
 </head>
 
@@ -277,8 +302,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 <h1 class="title toc-ignore">Passing Control Args</h1>
-<h4 class="author"><em>Steven M. Mortimer</em></h4>
-<h4 class="date"><em>2019-06-08</em></h4>
+<h4 class="author">Steven M. Mortimer</h4>
+<h4 class="date">2019-06-08</h4>
 
 
 <div id="TOC">
@@ -294,37 +319,37 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="the-new-control-argument" class="section level3">
 <h3>The new control argument</h3>
 <p>This new feature can be seen in the <code>sf_create</code> (and many other functions) as <code>control=list(...)</code>. The dots mean that you can pass any number of controls directly into the function. For example, the following code will create a record, but prevent its creation from showing up in the Chatter feeds by setting the <code>DisableFeedTrackingHeader</code>.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">new_contact &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName =</span> <span class="st">&quot;Test&quot;</span>, <span class="dt">LastName =</span> <span class="st">&quot;Contact-Create&quot;</span>)</a>
-<a class="sourceLine" id="cb1-2" title="2">record &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contact,</a>
-<a class="sourceLine" id="cb1-3" title="3">                    <span class="dt">object_name =</span> <span class="st">&quot;Contact&quot;</span>,</a>
-<a class="sourceLine" id="cb1-4" title="4">                    <span class="dt">DisableFeedTrackingHeader =</span> <span class="kw">list</span>(<span class="dt">disableFeedTracking =</span> <span class="ot">TRUE</span>), </a>
-<a class="sourceLine" id="cb1-5" title="5">                    <span class="dt">api_type =</span> <span class="st">&quot;SOAP&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>new_contact &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName =</span> <span class="st">&quot;Test&quot;</span>, <span class="dt">LastName =</span> <span class="st">&quot;Contact-Create&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>record &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contact,</span>
+<span id="cb1-3"><a href="#cb1-3"></a>                    <span class="dt">object_name =</span> <span class="st">&quot;Contact&quot;</span>,</span>
+<span id="cb1-4"><a href="#cb1-4"></a>                    <span class="dt">DisableFeedTrackingHeader =</span> <span class="kw">list</span>(<span class="dt">disableFeedTracking =</span> <span class="ot">TRUE</span>), </span>
+<span id="cb1-5"><a href="#cb1-5"></a>                    <span class="dt">api_type =</span> <span class="st">&quot;SOAP&quot;</span>)</span></code></pre></div>
 <p>You will notice that the argument <code>DisableFeedTrackingHeader</code> can be included right into the function without any documentation existing for it in the <code>sf_create</code> function. This is because the dots (<code>...</code>) allow you to pass over a dozen different control parameters and that documentation would be tedious to create and maintain over multiple functions in the package. However, you will notice in the documentation entry for the <code>control</code> argument there is a link to a function called <code>sf_control</code> which you can use to directly to pass into <code>control</code> or simply to review its documentation of all the possible control parameters and their defaults. This is where you can review the various control options in more detail before trying to set them.</p>
 <p>You may have also noticed that the argument <a href="https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_header_disablefeedtracking.htm" target="_blank">DisableFeedTrackingHeader</a> was formatted as a list with an element inside called <code>disableFeedTracking</code> set to <code>TRUE</code>. This may seem redundant but there are two reasons for this. First, this is exactly how the Salesforce APIs documents these options, which are typically referred to as “headers” because they are passed as a named header of the HTTP request and then the header fields and values are provided for that header. Second, some headers have multiple fields and values so a list is the only way to provide multiple named fields and values under a single header entity. For example, the <a href="https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_header_duplicateruleheader.htm" target="_blank">DuplicateRuleHeader</a>, which controls whether the duplicate rules can be overridden when inserting records from the API, has three fields: <code>allowSave</code>, <code>includeRecordDetails</code>, and <code>runAsCurrentUser</code>. Supplying all three requires a list-like structure, which may seem redundant in other cases, but is necessary to follow.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">new_contact &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName =</span> <span class="st">&quot;Test&quot;</span>, <span class="dt">LastName =</span> <span class="st">&quot;Contact-Create&quot;</span>)</a>
-<a class="sourceLine" id="cb2-2" title="2">record &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contact,</a>
-<a class="sourceLine" id="cb2-3" title="3">                    <span class="dt">object_name =</span> <span class="st">&quot;Contact&quot;</span>,</a>
-<a class="sourceLine" id="cb2-4" title="4">                    <span class="dt">DuplicateRuleHeader =</span> <span class="kw">list</span>(<span class="dt">allowSave =</span> <span class="ot">TRUE</span>, </a>
-<a class="sourceLine" id="cb2-5" title="5">                                               <span class="dt">includeRecordDetails =</span> <span class="ot">FALSE</span>, </a>
-<a class="sourceLine" id="cb2-6" title="6">                                               <span class="dt">runAsCurrentUser =</span> <span class="ot">TRUE</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>new_contact &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName =</span> <span class="st">&quot;Test&quot;</span>, <span class="dt">LastName =</span> <span class="st">&quot;Contact-Create&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>record &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contact,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>                    <span class="dt">object_name =</span> <span class="st">&quot;Contact&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4"></a>                    <span class="dt">DuplicateRuleHeader =</span> <span class="kw">list</span>(<span class="dt">allowSave =</span> <span class="ot">TRUE</span>, </span>
+<span id="cb2-5"><a href="#cb2-5"></a>                                               <span class="dt">includeRecordDetails =</span> <span class="ot">FALSE</span>, </span>
+<span id="cb2-6"><a href="#cb2-6"></a>                                               <span class="dt">runAsCurrentUser =</span> <span class="ot">TRUE</span>))</span></code></pre></div>
 <p>Finally, you will notice in the example call that the <code>api_type</code> argument is set to “SOAP”. This is because the <code>DisableFeedTrackingHeader</code> is a control that is only available when making calls via the SOAP API. You will receive a warning when trying to set control parameters for APIs or operations that do not recognize that control. For example, the following code tries to set the <code>BatchRetryHeader</code> for a call to the SOAP API which does not acknowledge that control. That control is only used with the Bulk 1.0 API since its records as submitted in batches and automatic retry can be controlled.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">new_contact &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName =</span> <span class="st">&quot;Test&quot;</span>, <span class="dt">LastName =</span> <span class="st">&quot;Contact-Create&quot;</span>)</a>
-<a class="sourceLine" id="cb3-2" title="2">record &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contact,</a>
-<a class="sourceLine" id="cb3-3" title="3">                    <span class="dt">object_name =</span> <span class="st">&quot;Contact&quot;</span>,</a>
-<a class="sourceLine" id="cb3-4" title="4">                    <span class="dt">BatchRetryHeader =</span> <span class="kw">list</span>(<span class="st">`</span><span class="dt">Sforce-Disable-Batch-Retry</span><span class="st">`</span> =<span class="st"> </span><span class="ot">FALSE</span>), </a>
-<a class="sourceLine" id="cb3-5" title="5">                    <span class="dt">api_type =</span> <span class="st">&quot;SOAP&quot;</span>)</a>
-<a class="sourceLine" id="cb3-6" title="6"><span class="co">#&gt; Warning in filter_valid_controls(supplied_arguments, api_type = api_type):</span></a>
-<a class="sourceLine" id="cb3-7" title="7"><span class="co">#&gt; Ignoring the following controls which are not used in the SOAP API:</span></a>
-<a class="sourceLine" id="cb3-8" title="8"><span class="co">#&gt; BatchRetryHeader</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>new_contact &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName =</span> <span class="st">&quot;Test&quot;</span>, <span class="dt">LastName =</span> <span class="st">&quot;Contact-Create&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>record &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contact,</span>
+<span id="cb3-3"><a href="#cb3-3"></a>                    <span class="dt">object_name =</span> <span class="st">&quot;Contact&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4"></a>                    <span class="dt">BatchRetryHeader =</span> <span class="kw">list</span>(<span class="st">`</span><span class="dt">Sforce-Disable-Batch-Retry</span><span class="st">`</span> =<span class="st"> </span><span class="ot">FALSE</span>), </span>
+<span id="cb3-5"><a href="#cb3-5"></a>                    <span class="dt">api_type =</span> <span class="st">&quot;SOAP&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; Warning in filter_valid_controls(supplied_arguments, api_type = api_type):</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; Ignoring the following controls which are not used in the SOAP API:</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; BatchRetryHeader</span></span></code></pre></div>
 </div>
 <div id="creating-the-control-argument-with-sf_control" class="section level3">
 <h3>Creating the control argument with sf_control</h3>
 <p>If this type of control structure is new to you, take a look at the documentation for the <code>glm</code> and <code>glm.control</code> functions. The way these two functions behave is exactly how functions like <code>sf_create</code> and <code>sf_control</code> work with each other. As demonstrated above you can pass any number of arbitrary controls into the function and they are all gathered up into the control by <code>control = list(...)</code>. However, you can specify the control directly like this:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1">new_contact &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName =</span> <span class="st">&quot;Test&quot;</span>, <span class="dt">LastName =</span> <span class="st">&quot;Contact-Create&quot;</span>)</a>
-<a class="sourceLine" id="cb4-2" title="2">records &lt;-<span class="st"> </span><span class="kw">sf_query</span>(<span class="st">&quot;SELECT Id, Name FROM Account LIMIT 1000&quot;</span>,</a>
-<a class="sourceLine" id="cb4-3" title="3">                    <span class="dt">object_name =</span> <span class="st">&quot;Account&quot;</span>,</a>
-<a class="sourceLine" id="cb4-4" title="4">                    <span class="dt">control =</span> <span class="kw">sf_control</span>(<span class="dt">QueryOptions =</span> <span class="kw">list</span>(<span class="dt">batchSize =</span> <span class="dv">100</span>)), </a>
-<a class="sourceLine" id="cb4-5" title="5">                    <span class="dt">api_type =</span> <span class="st">&quot;SOAP&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>new_contact &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName =</span> <span class="st">&quot;Test&quot;</span>, <span class="dt">LastName =</span> <span class="st">&quot;Contact-Create&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>records &lt;-<span class="st"> </span><span class="kw">sf_query</span>(<span class="st">&quot;SELECT Id, Name FROM Account LIMIT 1000&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3"></a>                    <span class="dt">object_name =</span> <span class="st">&quot;Account&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4"></a>                    <span class="dt">control =</span> <span class="kw">sf_control</span>(<span class="dt">QueryOptions =</span> <span class="kw">list</span>(<span class="dt">batchSize =</span> <span class="dv">100</span>)), </span>
+<span id="cb4-5"><a href="#cb4-5"></a>                    <span class="dt">api_type =</span> <span class="st">&quot;SOAP&quot;</span>)</span></code></pre></div>
 </div>
 <div id="backwards-compatibility-for-all_or_none-and-other-named-arguments" class="section level3">
 <h3>Backwards compatibility for all_or_none and other named arguments</h3>
@@ -342,6 +367,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </ul>
 </div>
 
+
+
+<!-- code folding -->
 
 
 <!-- dynamically load mathjax for compatibility with self-contained -->

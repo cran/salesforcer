@@ -4,10 +4,20 @@
 \alias{sf_get_all_jobs_bulk}
 \title{Get All Bulk API Jobs}
 \usage{
-sf_get_all_jobs_bulk(next_records_url = NULL, api_type = c("Bulk 2.0"),
-  verbose = FALSE)
+sf_get_all_jobs_bulk(
+  parameterized_search_list = list(isPkChunkingEnabled = NULL, jobType = NULL),
+  next_records_url = NULL,
+  api_type = c("Bulk 2.0"),
+  verbose = FALSE
+)
 }
 \arguments{
+\item{parameterized_search_list}{list; a list of parameters to be added as part 
+of the URL query string (i.e. after a question mark ("?") so that the result 
+only returns information about jobs that meet that specific criteria. For 
+more information, read the note below and/or the Salesforce documentation 
+\href{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/get_all_jobs.htm}{here}.}
+
 \item{next_records_url}{character (leave as NULL); a string used internally 
 by the function to paginate through to more records until complete}
 
@@ -20,12 +30,24 @@ by the function to paginate through to more records until complete}
 A \code{tbl_df} of parameters defining the details of all bulk jobs
 }
 \description{
-This function retrieves details about all Bulk 2.0 jobs in the org.
+This function retrieves details about all Bulk jobs in the org.
+}
+\note{
+parameterized_search_list elements that can be set to filter the results:
+\itemize{
+  \item{isPkChunkingEnabled}{A logical either TRUE or FALSE. TRUE only returns 
+  information about jobs where PK Chunking has been enabled.}
+  \item{jobType}{A character string to return jobs matching the specified type. 
+  Must be one of: "BigObjectIngest", "Classic", "V2QIngest". Classic corresponds 
+  to Bulk 1.0 API jobs and V2Ingest corresponds to the Bulk 2.0 API jobs.}
+}
 }
 \examples{
 \dontrun{
 job_info <- sf_create_job_bulk('insert', 'Account')
 all_jobs_info <- sf_get_all_jobs_bulk()
+# just the Bulk API 1.0 jobs
+all_jobs_info <- sf_get_all_jobs_bulk(parameterized_search_list=list(jobType='Classic'))
 }
 }
 \references{

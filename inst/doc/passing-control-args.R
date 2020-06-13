@@ -1,4 +1,4 @@
-## ---- echo = FALSE-------------------------------------------------------
+## ---- echo = FALSE------------------------------------------------------------
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -7,22 +7,22 @@ knitr::opts_chunk$set(
   eval = NOT_CRAN
 )
 
-## ----auth, include = FALSE-----------------------------------------------
+## ----auth, include = FALSE----------------------------------------------------
 library(salesforcer)
 token_path <- here::here("tests", "testthat", "salesforcer_token.rds")
 suppressMessages(sf_auth(token = token_path, verbose = FALSE))
 
-## ----sample-create-------------------------------------------------------
+## ----sample-create------------------------------------------------------------
 new_contact <- c(FirstName = "Test", LastName = "Contact-Create")
 record <- sf_create(new_contact,
                     object_name = "Contact",
                     DisableFeedTrackingHeader = list(disableFeedTracking = TRUE), 
                     api_type = "SOAP")
 
-## ---- include = FALSE----------------------------------------------------
+## ---- include = FALSE---------------------------------------------------------
 deleted_records <- sf_delete(record$id)
 
-## ----sample-create-w-duplicate-------------------------------------------
+## ----sample-create-w-duplicate------------------------------------------------
 new_contact <- c(FirstName = "Test", LastName = "Contact-Create")
 record <- sf_create(new_contact,
                     object_name = "Contact",
@@ -30,20 +30,20 @@ record <- sf_create(new_contact,
                                                includeRecordDetails = FALSE, 
                                                runAsCurrentUser = TRUE))
 
-## ---- include = FALSE----------------------------------------------------
+## ---- include = FALSE---------------------------------------------------------
 deleted_records <- sf_delete(record$id)
 
-## ----sample-create-w-warning---------------------------------------------
+## ----sample-create-w-warning--------------------------------------------------
 new_contact <- c(FirstName = "Test", LastName = "Contact-Create")
 record <- sf_create(new_contact,
                     object_name = "Contact",
                     BatchRetryHeader = list(`Sforce-Disable-Batch-Retry` = FALSE), 
                     api_type = "SOAP")
 
-## ---- include = FALSE----------------------------------------------------
+## ---- include = FALSE---------------------------------------------------------
 deleted_records <- sf_delete(record$id)
 
-## ----sample-query--------------------------------------------------------
+## ----sample-query-------------------------------------------------------------
 new_contact <- c(FirstName = "Test", LastName = "Contact-Create")
 records <- sf_query("SELECT Id, Name FROM Account LIMIT 1000",
                     object_name = "Account",

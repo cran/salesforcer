@@ -63,6 +63,8 @@ xml_nodeset_to_df <- function(this_node){
   invisible(capture.output(node_vals <- xmlToList2(as.character(this_node))))
   # replace any NULL list elements with NA so it can be turned into a tbl_df
   node_vals[sapply(node_vals, is.null)] <- NA
+  # remove any duplicated named node elements
+  node_vals <- node_vals[unique(names(node_vals))]  
   # make things tidy so if it's a nested list then that is one row still
   # suppressWarning about tibble::enframe
   suppressWarnings(res <- as_tibble(modify_if(node_vals, ~(length(.x) > 1 | is.list(.x)), list), 
@@ -175,7 +177,7 @@ build_soap_xml_from_list <- function(input_data,
                                                    "delete", "undelete", "emptyRecycleBin", 
                                                    "getDeleted", "getUpdated",
                                                    "search", "query", "queryMore", 
-                                                   "merge", "describeSObjects", 
+                                                   "convertLead", "merge", "describeSObjects", 
                                                    "setPassword", "resetPassword", 
                                                    "findDuplicates", "findDuplicatesByIds"),
                                      object_name = NULL,
@@ -216,10 +218,8 @@ build_soap_xml_from_list <- function(input_data,
   if(which_operation %in% c("getDeleted", "getUpdated")){
     stopifnot(!is.null(object_name))
     type_node <- newXMLNode("sObjectTypeEntityType", object_name, parent = operation_node)
-    this_node <- newXMLNode("startDate", format(input_data$start, "%Y-%m-%dT%H:%M:%S.000Z", tz="UTC"),
-                            parent = operation_node)
-    this_node <- newXMLNode("endDate", format(input_data$end, "%Y-%m-%dT%H:%M:%S.000Z", tz="UTC"),
-                            parent = operation_node)
+    this_node <- newXMLNode("startDate", input_data$start, parent = operation_node)
+    this_node <- newXMLNode("endDate", input_data$end, parent = operation_node)
   } else if(which_operation %in% c("search", "query")){
     element_name <- if(which_operation == "search") "urn:searchString" else "urn:queryString"
     this_node <- newXMLNode(element_name, input_data[1,1],
@@ -267,11 +267,16 @@ build_soap_xml_from_list <- function(input_data,
   } else {
     for(i in 1:nrow(input_data)){
       list <- as.list(input_data[i,,drop=FALSE])
-      this_row_node <- newXMLNode("urn:sObjects", parent = operation_node)
-      # if the body elements are objects we must list the type of object_name 
-      # under each block of XML for the row
-      type_node <- newXMLNode("urn1:type", parent = this_row_node)
-      xmlValue(type_node) <- object_name
+      
+      if(which_operation == "convertLead"){
+        this_row_node <- newXMLNode("urn:LeadConvert", parent = operation_node)
+      } else {
+        this_row_node <- newXMLNode("urn:sObjects", parent = operation_node)
+        # if the body elements are objects we must list the type of object_name 
+        # under each block of XML for the row
+        type_node <- newXMLNode("urn1:type", parent = this_row_node)
+        xmlValue(type_node) <- object_name
+      }
       
       if(length(list) > 0){
         for (i in 1:length(list)){
@@ -284,8 +289,13 @@ build_soap_xml_from_list <- function(input_data,
                                      root = this_node)
           } else {
             if (!is.null(list[[i]])){
-              this_node <- newXMLNode(names(list)[i], parent=this_row_node)
-              xmlValue(this_node) <- list[[i]]
+              if(is.na(list[[i]])){
+                this_node <- newXMLNode("fieldsToNull", parent=this_row_node)
+                xmlValue(this_node) <- names(list)[i]   
+              } else {
+                this_node <- newXMLNode(names(list)[i], parent=this_row_node)
+                xmlValue(this_node) <- list[[i]]                
+              }
             }
           }
         }
@@ -308,6 +318,9 @@ build_soap_xml_from_list <- function(input_data,
 #' definitions of the root node if created
 #' @param root \code{XMLNode}; a node to be used as the root
 #' @return A XML document with the sublist data added
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
 build_metadata_xml_from_list <- function(input_data,
                                          metatype = NULL, 
                                          root_name = NULL, 
@@ -332,6 +345,37 @@ build_metadata_xml_from_list <- function(input_data,
     }
     if (typeof(input_data[[i]]) == "list"){
       build_metadata_xml_from_list(input_data=input_data[[i]], root=this, metatype=NULL)
+    }
+    else {
+      xmlValue(this) <- input_data[[i]]
+    }
+  }
+  return(root)
+}
+
+#' Bulk Binary Attachments Manifest List to XML Converter
+#' 
+#' This function converts a list of data for binary attachments to XML
+#'
+#' @importFrom XML newXMLNode xmlValue<-
+#' @param input_data \code{list}; data to be appended
+#' @param root \code{XMLNode}; a node to be used as the root
+#' @references \url{https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/binary_create_request_file.htm}
+#' @return A XML document with the sublist manifest data added
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
+build_manifest_xml_from_list <- function(input_data, root = NULL){
+  stopifnot(is.list(input_data))
+  if(is.null(root))
+    root <- newXMLNode("sObjects", 
+                       namespaceDefinitions = c("http://www.force.com/2009/06/asyncapi/dataload", 
+                                                "xsi"="http://www.w3.org/2001/XMLSchema-instance"))
+
+  for(i in 1:length(input_data)){
+    this <- newXMLNode(names(input_data)[i], parent = root, suppressNamespaceWarning = TRUE)
+    if (typeof(input_data[[i]]) == "list"){
+      build_manifest_xml_from_list(input_data=input_data[[i]], root=this)
     }
     else {
       xmlValue(this) <- input_data[[i]]

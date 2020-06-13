@@ -74,9 +74,44 @@ get_os <- function(){
 #' @export
 sf_input_data_validation <- function(input_data, operation=''){
   
-  # TODO: Add Automatic date validation
-  # https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/datafiles_date_format.htm
-
+  if(operation == "convertLead"){
+    leadid_col <- grepl("^LEADIDS$|^LEAD_IDS$|^ID$|^IDS$", names(input_data), ignore.case=TRUE)
+    if(any(leadid_col)){
+      names(input_data)[leadid_col] <- "leadId"
+    }
+    input_col_names <- names(input_data)
+    ignoring <- character(0)
+    # convert camelcase if matching
+    other_expected_names <- c("leadId", "convertedStatus", "accountId", 
+                              "contactId", "ownerId", "opportunityId", 
+                              "doNotCreateOpportunity", "opportunityName", 
+                              "overwriteLeadSource", "sendNotificationEmail")
+    for(i in 1:length(input_col_names)){
+      target_col <- (tolower(other_expected_names) == tolower(input_col_names[i]))
+      target_col2 <- (tolower(other_expected_names) == tolower(gsub("[^A-Za-z]", "", 
+                                                                    input_col_names[i])))
+      if(sum(target_col) == 1){
+        names(input_data)[i] <- other_expected_names[which(target_col)]
+      } else if(sum(target_col2) == 1){
+        names(input_data)[i] <- other_expected_names[which(target_col2)]
+      } else {
+        ignoring <- c(ignoring, input_col_names[i])
+      }
+    }
+    
+    if(length(ignoring) > 0){
+      warning(sprintf("Ignoring the following columns: '%s'", 
+                      paste0(ignoring, collapse = "', '")))
+    }
+    input_data <- input_data[names(input_data) %in% other_expected_names]
+    
+    if(!is.data.frame(input_data)){
+      input_data <- as.data.frame(as.list(input_data), stringsAsFactors = FALSE)  
+    }
+    
+    stopifnot(all(c("leadId", "convertedStatus") %in% names(input_data)))
+  }
+  
   if(operation == "merge"){
     # dont try to cast the input for these operations, simply check existence of params
     list_based <- TRUE
@@ -106,46 +141,71 @@ sf_input_data_validation <- function(input_data, operation=''){
     if(operation %in% c("describeSObjects") & ncol(input_data) == 1){
       names(input_data) <- "sObjectType"
     }
-    if(operation %in% c("delete", "undelete", "emptyRecycleBin", 
-                        "retrieve", "findDuplicatesByIds") & ncol(input_data) == 1){
+    if(operation %in% c("delete", "undelete", "emptyRecycleBin", "retrieve", 
+                        "findDuplicatesByIds") & ncol(input_data) == 1){
       names(input_data) <- "Id"
     }
-    if(operation %in% c("delete", "undelete", "emptyRecycleBin", 
+    if(operation %in% c("delete", "undelete", "emptyRecycleBin", "retrieve", 
                         "update", "findDuplicatesByIds")){
       if(any(grepl("^ID$|^IDS$", names(input_data), ignore.case=TRUE))){
         idx <- grep("^ID$|^IDS$", names(input_data), ignore.case=TRUE)
         names(input_data)[idx] <- "Id"
       }
-      stopifnot("Id" %in% names(input_data))
+      if(sum(names(input_data) == "Id") != 1){
+        stop(paste0(sprintf("There are %s columns named 'Id' in the input_data. ", 
+                            sum(names(input_data) == "Id")), 
+                    "Exactly one field must be named 'Id' to specify the Ids affected by this ",
+                    "operation. Please fix and resubmit."))
+      }
+      if(all(is.na(input_data$Id))){
+        stop("All values of in the 'Id' field are missing (NA). Please fix and resubmit.")
+      }
+    }
+    if(operation %in% c("create_attachment", "insert_attachment", "update_attachment")){
+      # Body, ParentId is required (Name will be created from Body if missing)
+      missing_cols <- setdiff(c("Body", "ParentId"), names(input_data))
+      if(length(missing_cols) > 0){
+        stop(sprintf("The following columns are required but missing from the input: %s", 
+                     paste0(missing_cols, collapse = ",")))
+      }
+      # 6/10 Turn off this warning because there could be multiple Attachment object fields that are allowed
+      # # Warn that you can only insert certain columns Name, Body, Description, ParentId, IsPrivate, and OwnerId
+      # not_allowed_cols <- setdiff(names(input_data), c("Name", "Body", "Description", "ParentId", "IsPrivate", "OwnerId"))
+      # if(length(not_allowed_cols) > 0){
+      #   warning(sprintf("The following columns are not allowed and will be dropped: %s",
+      #                   paste0(not_allowed_cols, collapse = ",")))
+      #   input_data <- input_data[, names(input_data) != not_allowed_cols, drop=FALSE]
+      # }
+    }
+    if(operation %in% c("create_document", "insert_document", "update_document")){
+      # Name, FolderId is required and Body or Url
+      missing_cols <- character(0)
+      if("Body" %in% names(input_data)){
+        if("Url" %in% names(input_data)){
+          stop(paste("Both a 'Body' column and a 'Url' column were given.", 
+                     "Specify one or the other, but not both."))
+        }
+      } else {
+        if(!("Url" %in% names(input_data))){
+            message(paste("Neither a 'Body' column or a 'Url' column were given.", 
+                          "Specify one or the other, but not both."))
+            missing_cols <- c("'Body' or 'Url'")
+        }
+      }
+      other_missing_cols <- setdiff(c("Name", "FolderId"), names(input_data))
+      missing_cols <- c(missing_cols, other_missing_cols) 
+      if(length(missing_cols) > 0){
+        stop(sprintf("The following columns are required but missing from the input: %s", 
+                     paste0(missing_cols, collapse = ",")))
+      }
     }
   }
   
+  # automatically convert the date and datetime columns to the format 
+  # required by Salesforce when creating or updating records
+  input_data <- sf_format_time(input_data)
+  
   return(input_data)
-}
-
-#' Download an Attachment
-#' 
-#' This function will allow you to download an attachment to disk based on the 
-#' attachment body, file name, and path.
-#' 
-#' @importFrom httr content
-#' @param body character; a URL path to the body of the attachment in Salesforce, typically 
-#' retrieved via query on the Attachment object
-#' @param name character; the name of the file you would like to save the content to
-#' @param path character; a directory path where to create file, defaults to the current directory.
-#' @examples 
-#' \dontrun{
-#' queried_attachments <- sf_query("SELECT Body, Name 
-#'                                  FROM Attachment 
-#'                                  WHERE ParentId = '0016A0000035mJ5'")
-#' mapply(sf_download_attachment, queried_attachments$Body, queried_attachments$Name)
-#' }
-#' @export 
-sf_download_attachment <- function(body, name, path = "."){
-  resp <- rGET(sprintf("%s%s", salesforcer_state()$instance_url, body))
-  f <- file.path(path, name)
-  writeBin(content(resp, "raw"), f)
-  return(invisible(file.exists(f)))
 }
 
 #' Remove NA Columns Created by Empty Related Entity Values
@@ -189,6 +249,20 @@ remove_empty_linked_object_cols <- function(dat, api_type = c("SOAP", "REST")){
   return(dat)
 }
 
+#' Try to Guess the Object if User Does Not Specify for Bulk Queries
+#' 
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @export
+guess_object_name_from_soql <- function(soql){
+  object_name <- gsub("SELECT (.*) FROM ([A-Za-z_]+)\\b(.*)", "\\2", soql, ignore.case = TRUE)
+  if(is.null(object_name)){
+    stop("The `object_name` argument is NULL. This argument must be provided when using the Bulk APIs.")
+  }
+  message(sprintf("Guessed %s as the object_name from supplied SOQL. Please set `object_name` explicity if this is incorrect because it is required by the Bulk 1.0 API.", object_name))
+  return(object_name)
+}
+
 #' Format Headers for Printing
 #' 
 #' @note This function is meant to be used internally. Only use when debugging.
@@ -204,8 +278,106 @@ format_headers_for_verbose <- function(request_headers){
 #' @keywords internal
 #' @export
 make_verbose_httr_message <- function(method, url, headers = NULL, body = NULL){
-  message(sprintf("%s %s", method, url))
-  if(!is.null(headers)) message(sprintf("\nHeaders\n%s", format_headers_for_verbose(headers)))
-  if(!is.null(body)) message(sprintf("\nBody\n%s", body))
+  message(sprintf("\n--HTTP Request----------------\n%s %s", method, url))
+  if(!is.null(headers)) message(sprintf("--Headers---------------------\n%s", 
+                                        format_headers_for_verbose(headers)))
+  if(!is.null(body)) message(sprintf("--Body------------------------\n%s", 
+                                     body))
   return(invisible())
+}
+
+#' Format Datetimes for Create and Update operations
+#' 
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @importFrom lubridate as_datetime
+#' @keywords internal
+#' @seealso \url{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/datafiles_date_format.htm}
+#' @export
+sf_format_datetime <- function(x){
+  format(as_datetime(x), "%Y-%m-%dT%H:%M:%SZ")  
+}
+
+#' Format Dates for Create and Update operations
+#' 
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
+#' @seealso \url{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/datafiles_date_format.htm}
+#' @export
+sf_format_date <- function(x){
+  x <- as_datetime(format(x, "%Y-%m-%d 00:00:00"), tz=Sys.timezone())
+  sf_format_datetime(x)
+}
+
+sf_format_time <- function (x, ...) {
+  UseMethod("sf_format_time", x)
+}
+
+#' Format all Date and Datetime columns in a list
+#' 
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @importFrom dplyr mutate_if
+#' @importFrom lubridate is.POSIXct is.POSIXlt is.POSIXt is.Date
+#' @keywords internal
+#' @seealso \url{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/datafiles_date_format.htm}
+#' @export
+sf_format_time.list <- function(x){
+  lapply(x, FUN=function(xx){
+    if(is.list(xx)){
+      lapply(xx, sf_format_time)
+    } else {
+      sf_format_time(xx)  
+    }
+  })
+}
+
+#' Format all Date and Datetime columns in a dataset
+#' 
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @importFrom dplyr mutate_if
+#' @importFrom lubridate is.POSIXct is.POSIXlt is.POSIXt is.Date
+#' @keywords internal
+#' @seealso \url{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/datafiles_date_format.htm}
+#' @export
+sf_format_time.data.frame <- function(x){
+  x %>%
+    mutate_if(is.POSIXct, sf_format_datetime) %>% 
+    mutate_if(is.POSIXlt, sf_format_datetime) %>% 
+    mutate_if(is.POSIXt, sf_format_datetime) %>% 
+    mutate_if(is.Date, sf_format_date)
+}
+
+
+#' @export
+sf_format_time.Date <- function(x){ 
+  sf_format_date(x)
+}
+
+#' @export
+sf_format_time.POSIXct <- function(x){ 
+  sf_format_datetime(x)
+}
+
+#' @export
+sf_format_time.POSIXlt <- function(x){ 
+  sf_format_datetime(x)
+}
+
+#' @export
+sf_format_time.POSIXt <- function(x){ 
+  sf_format_datetime(x)
+}
+
+#' @export
+sf_format_time.character <- function(x){ 
+  x
+}
+
+#' @export
+sf_format_time.numeric <- function(x){ 
+  x
+}
+
+#' @export
+sf_format_time.logical <- function(x){ 
+  x
 }

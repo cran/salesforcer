@@ -68,8 +68,9 @@ test_that("testing rforcecom.create compatibility", {
   expect_equal(nrow(result1), nrow(result2))
   
   # clean up
-  delete_result1 <- sf_delete(ids=c(as.character(result1$id), 
-                                    as.character(result2$id)), object_name = object)
+  delete_result1 <- sf_delete(ids=c(as.character(result1[['id']]), 
+                                    as.character(result2[['id']])), 
+                              object_name = object)
 })
 
 test_that("testing rforcecom.delete compatibility", {
@@ -103,7 +104,9 @@ test_that("testing rforcecom.update compatibility", {
   expect_equal(result1, result2)
   
   # clean up
-  delete_result1 <- sf_delete(ids=c(create_result1$id, create_result2$id), object)
+  delete_result2 <- sf_delete(ids=c(create_result1[["id"]], 
+                                    create_result2[["id"]]), 
+                              object_name = object)
 })
 
 test_that("testing rforcecom.upsert compatibility", {
@@ -179,7 +182,7 @@ test_that("testing rforcecom.search compatibility", {
 test_that("testing rforcecom.getObjectDescription compatibility", {
   
   result1 <- RForcecom::rforcecom.getObjectDescription(session, objectName="Account")
-  result2 <- salesforcer::rforcecom.getObjectDescription(session, objectName="Account")
+  suppressWarnings(result2 <- salesforcer::rforcecom.getObjectDescription(session, objectName="Account"))
   
   expect_is(result1, "data.frame")
   expect_is(result2, "data.frame")

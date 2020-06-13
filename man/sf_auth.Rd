@@ -4,12 +4,18 @@
 \alias{sf_auth}
 \title{Log in to Salesforce}
 \usage{
-sf_auth(username = NULL, password = NULL, security_token = NULL,
-  login_url = getOption("salesforcer.login_url"), token = NULL,
+sf_auth(
+  username = NULL,
+  password = NULL,
+  security_token = NULL,
+  login_url = getOption("salesforcer.login_url"),
+  token = NULL,
   consumer_key = getOption("salesforcer.consumer_key"),
   consumer_secret = getOption("salesforcer.consumer_secret"),
   callback_url = getOption("salesforcer.callback_url"),
-  cache = getOption("salesforcer.httr_oauth_cache"), verbose = FALSE)
+  cache = getOption("salesforcer.httr_oauth_cache"),
+  verbose = FALSE
+)
 }
 \arguments{
 \item{username}{Salesforce username, typically an email address}
@@ -19,7 +25,9 @@ sf_auth(username = NULL, password = NULL, security_token = NULL,
 \item{security_token}{Salesforce security token. Note: A new security token is 
 generated whenever your password is changed.}
 
-\item{login_url}{a custom login url; defaults to https://login.salesforce.com}
+\item{login_url}{a custom login url; defaults to https://login.salesforce.com. If 
+needing to log into a sandbox or dev environment then provide its login URL (e.g. 
+https://test.salesforce.com)}
 
 \item{token}{optional; an actual token object or the path to a valid token
 stored as an \code{.rds} file}
@@ -53,8 +61,12 @@ sf_auth(username = "test@gmail.com",
 # Via brower or refresh of .httr-oauth-salesforcer
 sf_auth()
 
+# log in to a Sandbox environment
+# Via brower or refresh of .httr-oauth-salesforcer
+sf_auth(login_url = "https://test.salesforce.com")
+
 # Save token and log in using it
-saveRDS(.state$token, "token.rds")
+saveRDS(salesforcer_state()$token, "token.rds")
 sf_auth(token = "token.rds")
 }
 }

@@ -1,4 +1,4 @@
-## ---- echo = FALSE-------------------------------------------------------
+## ---- echo = FALSE------------------------------------------------------------
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -7,7 +7,7 @@ knitr::opts_chunk$set(
   eval = NOT_CRAN
 )
 
-## ----auth, include = FALSE-----------------------------------------------
+## ----auth, include = FALSE----------------------------------------------------
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressWarnings(suppressMessages(library(here)))
 library(salesforcer)
@@ -17,7 +17,7 @@ username <- salesforcer_test_settings$username
 password <- salesforcer_test_settings$password
 security_token <- salesforcer_test_settings$security_token
 
-## ---- warning=FALSE------------------------------------------------------
+## ---- warning=FALSE-----------------------------------------------------------
 # the RForcecom way
 session1 <- RForcecom::rforcecom.login(username, paste0(password, security_token), 
                                        apiVersion=getOption("salesforcer.api_version"))
@@ -30,12 +30,12 @@ session2 <- salesforcer::rforcecom.login(username, paste0(password, security_tok
 session2['sessionID'] <- "{MASKED}"
 session2
 
-## ---- include=FALSE------------------------------------------------------
+## ---- include=FALSE-----------------------------------------------------------
 # keep using the session, just rename it to "session"
 session <- salesforcer::rforcecom.login(username, paste0(password, security_token), 
                                          apiVersion=getOption("salesforcer.api_version"))
 
-## ---- warning=FALSE------------------------------------------------------
+## ---- warning=FALSE-----------------------------------------------------------
 object <- "Contact"
 fields <- c(FirstName="Test", LastName="Contact-Create-Compatibility")
 
@@ -47,7 +47,7 @@ result1
 result2 <- salesforcer::rforcecom.create(session, objectName=object, fields)
 result2
 
-## ---- warning=FALSE------------------------------------------------------
+## ---- warning=FALSE-----------------------------------------------------------
 n <- 2
 new_contacts <- tibble(FirstName = rep("Test", n),
                        LastName = paste0("Contact-Create-", 1:n))
@@ -66,7 +66,7 @@ rforcecom_results
 salesforcer_results <- sf_create(new_contacts, object_name="Contact")
 salesforcer_results
 
-## ---- warning=FALSE------------------------------------------------------
+## ---- warning=FALSE-----------------------------------------------------------
 this_soql <- "SELECT Id, Email FROM Contact LIMIT 5"
 
 # the RForcecom way
@@ -81,7 +81,7 @@ result2
 salesforcer_results <- sf_query(this_soql)
 salesforcer_results
 
-## ---- warning=FALSE------------------------------------------------------
+## ---- warning=FALSE-----------------------------------------------------------
 # the RForcecom way
 result1 <- RForcecom::rforcecom.getObjectDescription(session, objectName='Account')
 

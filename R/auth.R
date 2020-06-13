@@ -44,7 +44,9 @@
 #' @param password Salesforce password
 #' @param security_token Salesforce security token. Note: A new security token is 
 #' generated whenever your password is changed.
-#' @param login_url a custom login url; defaults to https://login.salesforce.com
+#' @param login_url a custom login url; defaults to https://login.salesforce.com. If 
+#' needing to log into a sandbox or dev environment then provide its login URL (e.g. 
+#' https://test.salesforce.com)
 #' @param token optional; an actual token object or the path to a valid token
 #'   stored as an \code{.rds} file
 #' @param consumer_key,consumer_secret,callback_url the "Consumer Key","Consumer Secret", 
@@ -65,8 +67,12 @@
 #' # Via brower or refresh of .httr-oauth-salesforcer
 #' sf_auth()
 #' 
+#' # log in to a Sandbox environment
+#' # Via brower or refresh of .httr-oauth-salesforcer
+#' sf_auth(login_url = "https://test.salesforce.com")
+#' 
 #' # Save token and log in using it
-#' saveRDS(.state$token, "token.rds")
+#' saveRDS(salesforcer_state()$token, "token.rds")
 #' sf_auth(token = "token.rds")
 #' }
 #' @export
@@ -132,9 +138,17 @@ sf_auth <- function(username = NULL,
                                            base_url = sprintf("%s/services/oauth2", login_url),
                                            authorize = "authorize", access = "token", revoke = "revoke")
       
-      sf_token <- oauth2.0_token(endpoint = sf_oauth_endpoints,
-                                 app = sf_oauth_app, 
-                                 cache = cache)
+      proxy <- build_proxy()
+      if(!is.null(proxy)){
+        sf_token <- oauth2.0_token(endpoint = sf_oauth_endpoints,
+                                   app = sf_oauth_app, 
+                                   cache = cache, 
+                                   config_init = proxy)
+      } else {
+        sf_token <- oauth2.0_token(endpoint = sf_oauth_endpoints,
+                                   app = sf_oauth_app, 
+                                   cache = cache)
+      }
   
       stopifnot(is_legit_token(sf_token, verbose = TRUE))
       
@@ -161,9 +175,9 @@ sf_auth <- function(username = NULL,
       sf_token <- try(suppressWarnings(readRDS(token)), silent = TRUE)
       
       if (inherits(sf_token, "try-error")) {
-        spf("Cannot read token from alleged .rds file:\n%s", token)
+        stop(sprintf("Cannot read token from alleged .rds file:\n%s", token), call. = FALSE)
       } else if (!is_legit_token(sf_token, verbose = TRUE)) {
-        spf("File does not contain a proper token:\n%s", token)
+        stop(sprintf("File does not contain a proper token:\n%s", token), call. = FALSE)
       }
       
       # set the global .state variable
@@ -173,8 +187,8 @@ sf_auth <- function(username = NULL,
       .state$instance_url <- sf_token$credentials$instance_url
       
     } else {
-      spf("Input provided via 'token' is neither a",
-          "token,\nnor a path to an .rds file containing a token.")
+      stop("Input provided via 'token' is neither a token",
+           "\nnor a path to an .rds file containing a token.", call. = FALSE)
     }
   }
   

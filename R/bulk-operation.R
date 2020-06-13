@@ -282,50 +282,76 @@ sf_get_job_bulk <- function(job_id,
   }
   catch_errors(httr_response)
   if(api_type == "Bulk 1.0"){
-    response_parsed <- content(httr_response, encoding="UTF-8")
-    job_info <- response_parsed %>%
-      xml_ns_strip() %>%
-      xml_find_all('//jobInfo') %>%
-      map_df(xml_nodeset_to_df) %>%
-      type_convert(col_types = cols())
+    content_type <- httr_response$headers$`content-type`
+    if (grepl('xml', content_type)){
+      response_parsed <- content(httr_response, as='parsed', type="text/xml", encoding="UTF-8")
+      job_info <- response_parsed %>%
+        xml_ns_strip() %>%
+        xml_find_all('//jobInfo') %>%
+        map_df(xml_nodeset_to_df) %>%
+        type_convert(col_types = cols())
+    } else if(grepl('json', content_type)){
+      response_parsed <- content(httr_response, as='parsed', type="application/json", encoding="UTF-8")
+      response_parsed[sapply(response_parsed, is.null)] <- NA
+      job_info <- as_tibble(response_parsed)
+    } else {
+      message(sprintf("Unhandled content-type: %s", content_type))
+      job_info <- content(httr_response, as='parsed', encoding="UTF-8")
+    }
   } else if(api_type == "Bulk 2.0"){
     response_parsed <- content(httr_response, encoding="UTF-8")
     job_info <- as_tibble(response_parsed)
   } else {
-    stop("Unknown API type")
+    stop("Unknown API type.")
   }
   return(job_info)
 }
 
 #' Get All Bulk API Jobs 
 #' 
-#' This function retrieves details about all Bulk 2.0 jobs in the org.
+#' This function retrieves details about all Bulk jobs in the org.
 #'
 #' @importFrom httr content
-#' @importFrom readr type_convert cols
+#' @importFrom readr type_convert cols col_guess
 #' @importFrom purrr map_df
-#' @importFrom dplyr as_tibble bind_rows
+#' @importFrom dplyr as_tibble bind_rows mutate_all
+#' @param parameterized_search_list list; a list of parameters to be added as part 
+#' of the URL query string (i.e. after a question mark ("?") so that the result 
+#' only returns information about jobs that meet that specific criteria. For 
+#' more information, read the note below and/or the Salesforce documentation 
+#' \href{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/get_all_jobs.htm}{here}.
 #' @param next_records_url character (leave as NULL); a string used internally 
 #' by the function to paginate through to more records until complete
 #' @template api_type
 #' @template verbose
 #' @return A \code{tbl_df} of parameters defining the details of all bulk jobs
 #' @references \url{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/get_all_jobs.htm}
+#' @note parameterized_search_list elements that can be set to filter the results:
+#' \itemize{
+#'   \item{isPkChunkingEnabled}{A logical either TRUE or FALSE. TRUE only returns 
+#'   information about jobs where PK Chunking has been enabled.}
+#'   \item{jobType}{A character string to return jobs matching the specified type. 
+#'   Must be one of: "BigObjectIngest", "Classic", "V2QIngest". Classic corresponds 
+#'   to Bulk 1.0 API jobs and V2Ingest corresponds to the Bulk 2.0 API jobs.}
+#' }
 #' @examples
 #' \dontrun{
 #' job_info <- sf_create_job_bulk('insert', 'Account')
 #' all_jobs_info <- sf_get_all_jobs_bulk()
+#' # just the Bulk API 1.0 jobs
+#' all_jobs_info <- sf_get_all_jobs_bulk(parameterized_search_list=list(jobType='Classic'))
 #' }
 #' @export
-sf_get_all_jobs_bulk <- function(next_records_url = NULL, 
+sf_get_all_jobs_bulk <- function(parameterized_search_list = 
+                                   list(isPkChunkingEnabled=NULL, 
+                                        jobType=NULL), 
+                                 next_records_url = NULL, 
                                  api_type = c("Bulk 2.0"), 
                                  verbose = FALSE){
   api_type <- match.arg(api_type)
-  if(!is.null(next_records_url)){
-    this_url <- next_records_url
-  } else {
-    this_url <- make_bulk_get_all_jobs_url(api_type=api_type)
-  }
+  this_url <- make_bulk_get_all_jobs_url(parameterized_search_list, 
+                                         next_records_url, 
+                                         api_type)
   httr_response <- rGET(url = this_url)
   if(verbose){
     make_verbose_httr_message(httr_response$request$method, 
@@ -333,27 +359,119 @@ sf_get_all_jobs_bulk <- function(next_records_url = NULL,
                               httr_response$request$headers)
   }
   catch_errors(httr_response)
-  response_parsed <- content(httr_response, encoding="UTF-8")
+  response_parsed <- content(httr_response, as="parsed", encoding="UTF-8")
   
   if(length(response_parsed$records) > 0){
     resultset <- response_parsed$records %>% 
-      map_df(as_tibble)
-  }
-  
-  if(!response_parsed$done){
-    next_records_url <- response_parsed$nextRecordsUrl
+      map_df(as_tibble) %>% 
+      mutate_all(as.character)
+  } else {
+    resultset <- tibble()
   }
   
   # check whether it has next record
-  if(!is.null(next_records_url)){
-    next_records <- sf_get_all_jobs_bulk(next_records_url = next_records_url, 
+  if(!response_parsed$done){
+    next_records <- sf_get_all_jobs_bulk(parameterized_search_list = parameterized_search_list, 
+                                         next_records_url = response_parsed$nextRecordsUrl,
                                          api_type = api_type, 
                                          verbose = verbose)
     resultset <- bind_rows(resultset, next_records)
   }
   
-  resultset <- resultset %>%
-    type_convert(col_types = cols())
+  if(is.null(next_records_url) & (nrow(resultset) > 0)){
+    resultset <- resultset %>%
+      type_convert(col_types = cols(.default = col_guess()))
+  }
+  return(resultset)
+}
+
+#' Get All Bulk API Query Jobs 
+#' 
+#' This function retrieves details about all Bulk query jobs in the org.
+#'
+#' @importFrom httr content
+#' @importFrom readr type_convert cols col_guess
+#' @importFrom purrr map_df
+#' @importFrom dplyr as_tibble bind_rows filter mutate_all
+#' @param parameterized_search_list list; a list of parameters to be added as part 
+#' of the URL query string (i.e. after a question mark ("?") so that the result 
+#' only returns information about jobs that meet that specific criteria. For 
+#' more information, read the note below and/or the Salesforce documentation 
+#' \href{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/query_get_all_jobs.htm}{here}.
+#' @param next_records_url character (leave as NULL); a string used internally 
+#' by the function to paginate through to more records until complete
+#' @template api_type
+#' @template verbose
+#' @return A \code{tbl_df} of parameters defining the details of all bulk jobs
+#' @references \url{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/get_all_jobs.htm}
+#' @note parameterized_search_list elements that can be set to filter the results:
+#' \itemize{
+#'   \item{isPkChunkingEnabled}{A logical either TRUE or FALSE. TRUE only returns 
+#'   information about jobs where PK Chunking has been enabled.}
+#'   \item{jobType}{A character string to return jobs matching the specified type. 
+#'   Must be one of: "BigObjectIngest", "Classic", "V2Query". Classic corresponds 
+#'   to Bulk 1.0 API jobs and V2Query corresponds to the Bulk 2.0 API jobs.}
+#'   \item{concurrencyMode}{A character string to return jobs matching the specified 
+#'   concurrency mode. Must be one of: "serial" or "parallel", but only "serial" 
+#'   is currently supported.}
+#' }
+#' @examples
+#' \dontrun{
+#' job_info <- sf_create_job_bulk('insert', 'Account')
+#' all_query_jobs_info <- sf_get_all_query_jobs_bulk()
+#' # just the Bulk API 2.0 query jobs
+#' all_query_jobs_info <- sf_get_all_query_jobs_bulk(parameterized_search_list=list(jobType='V2Query'))
+#' # just the Bulk API 1.0 query jobs
+#' all_query_jobs_info <- sf_get_all_query_jobs_bulk(parameterized_search_list=list(jobType='Classic'))
+#' }
+#' @export
+sf_get_all_query_jobs_bulk <- function(parameterized_search_list = 
+                                         list(isPkChunkingEnabled=NULL,
+                                              jobType=NULL, 
+                                              concurrencyMode=NULL), 
+                                       next_records_url = NULL, 
+                                       api_type = c("Bulk 2.0"), 
+                                       verbose = FALSE){
+  api_type <- match.arg(api_type)
+  this_url <- make_bulk_get_all_query_jobs_url(parameterized_search_list, 
+                                               next_records_url, 
+                                               api_type)
+  httr_response <- rGET(url = this_url)
+  if(verbose){
+    make_verbose_httr_message(httr_response$request$method, 
+                              httr_response$request$url, 
+                              httr_response$request$headers)
+  }
+  catch_errors(httr_response)
+  response_parsed <- content(httr_response, as="parsed", encoding="UTF-8")
+  
+  if(length(response_parsed$records) > 0){
+    resultset <- response_parsed$records %>% 
+      map_df(as_tibble) %>% 
+      mutate_all(as.character)
+  } else {
+    resultset <- tibble()
+  }
+
+  # check whether the query has more results to pull via pagination 
+  if(!response_parsed$done){
+    next_records <- sf_get_all_query_jobs_bulk(parameterized_search_list = parameterized_search_list, 
+                                         next_records_url = response_parsed$nextRecordsUrl,
+                                         api_type = api_type, 
+                                         verbose = verbose)
+    resultset <- bind_rows(resultset, next_records)
+  }
+  
+  # cast the data in the final iteration and remove Bulk 1.0 ingest operations
+  # because as of 6/10/2020 the API will return both Bulk 1.0 query jobs and ingest 
+  # jobs, for some reason, but to make it more straightforward for the user we 
+  # will filter to only include the query jobs
+  if(is.null(next_records_url) & (nrow(resultset) > 0)){
+    # cast the data
+    resultset <- resultset %>%
+      type_convert(col_types = cols(.default = col_guess())) %>% 
+      filter(operation == 'query')
+  }
   
   return(resultset)
 }
@@ -512,6 +630,7 @@ sf_delete_job_bulk <- function(job_id,
 #' @template job_id
 #' @param input_data \code{named vector}, \code{matrix}, \code{data.frame}, or 
 #' \code{tbl_df}; data can be coerced into .csv file for submitting as batch request
+#' @template batch_size
 #' @template api_type
 #' @template verbose
 #' @return a \code{tbl_df} containing details of each batch
@@ -540,75 +659,199 @@ sf_delete_job_bulk <- function(job_id,
 #' @export
 sf_create_batches_bulk <- function(job_id, 
                                    input_data, 
-                                   api_type = c("Bulk 1.0", "Bulk 2.0"), 
+                                   batch_size = NULL,
+                                   api_type = c("Bulk 1.0", "Bulk 2.0"),
                                    verbose = FALSE){
   api_type <- match.arg(api_type)
   if(api_type == "Bulk 1.0"){
-    created_batches <- sf_create_batches_bulk_v1(job_id, input_data, verbose = verbose)
+    created_batches <- sf_create_batches_bulk_v1(job_id, input_data, 
+                                                 batch_size = batch_size,
+                                                 verbose = verbose)
   } else if(api_type == "Bulk 2.0"){
-    created_batches <- sf_create_batches_bulk_v2(job_id, input_data, verbose = verbose)
+    created_batches <- sf_create_batches_bulk_v2(job_id, input_data, 
+                                                 batch_size = batch_size,
+                                                 verbose = verbose)
   } else { 
-    stop("Unknown API type")
+    stop("Unknown API type.")
   }
   return(created_batches)
 }
   
 #' @importFrom utils head
 #' @importFrom stats quantile
+#' @importFrom purrr transpose
+#' @importFrom XML saveXML xmlDoc
+#' @importFrom zip zipr
 sf_create_batches_bulk_v1 <- function(job_id, 
-                                      input_data, 
+                                      input_data,
+                                      batch_size = NULL,
                                       verbose = FALSE){
-  
   job_status <- sf_get_job_bulk(job_id, 
                                 api_type = "Bulk 1.0", 
                                 verbose = verbose)
   stopifnot(job_status$state == "Open")
-  input_data <- sf_input_data_validation(operation = job_status$operation, 
-                                         input_data)
+  if(job_status$contentType %in% c("ZIP_CSV", "ZIP_XML", "ZIP_JSON")){
+    binary_attachments <- TRUE
+    input_data <- sf_input_data_validation(operation = sprintf("%s_%s", 
+                                                               job_status$operation,
+                                                               tolower(job_status$object)), 
+                                           input_data)
+    input_data <- check_and_encode_files(input_data, encode=FALSE)
+  } else {
+    binary_attachments <- FALSE
+    input_data <- sf_input_data_validation(operation = job_status$operation, input_data)
+  }
   
-  # Batch sizes should be adjusted based on processing times. Start with 5000 
-  # records and adjust the batch size based on processing time. If it takes more 
-  # than five minutes to process a batch, it may be beneficial to reduce the batch size. 
-  # If it takes a few seconds, the batch size should be increased. If you get a 
-  # timeout error when processing a batch, split your batch into smaller batches, 
-  # and try again.
-  # https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_batches_intro.htm
-  batch_size <- 5000
-  row_num <- nrow(input_data)
-  batch_id <- (seq.int(row_num)-1) %/% batch_size
-  if(verbose) message("Submitting data in ", max(batch_id) + 1, " Batches")
-  message_flag <- unique(as.integer(quantile(0:max(batch_id), c(0.25,0.5,0.75,1))))
-  
-  bulk_batches_url <- make_bulk_batches_url(job_id, api_type="Bulk 1.0")
-  batches_response <- list()
-  for(batch in seq(0, max(batch_id))){
-    if(verbose){
-      batch_msg_flg <- batch %in% message_flag
-      if(batch_msg_flg){
-        message(paste0("Processing Batch # ", head(batch, 1) + 1))
-      } 
+  if(binary_attachments){
+    # Binary content Bulk API Limits: 
+    #  - The length of any file name can’t exceed 512 bytes.
+    #  - A zip file can’t exceed 10 MB.
+    #  - The total size of the unzipped content can’t exceed 20 MB.
+    #  - A maximum of 1,000 files can be contained in a zip file. Directories don’t 
+    #    count toward this total.
+    # https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_concepts_limits.htm#binary_content_title
+    # TODO: Determine if we want to check the following for the user or allow Salesforce 
+    # to return errors back to the user for them to correct 
+    #  - Check that each Name and Body is unique?
+    #  - Check file name < 512 bytes?
+    #  - Check if the number of files in a batch is greater than 1000, if so, then repartition
+    if(is.null(batch_size)){
+      # use conservative approach and batch in 10MB unzipped, which will be < 10MB zipped
+      file_sizes_mb <- sapply(input_data$Body, file.size, USE.NAMES = FALSE) / 1000000
+      if(any(file_sizes_mb > 10)){
+        stop("The max file size limit is 10MB. The following files exceed that limit: '%s'", 
+             paste0(input_data$Name[file_sizes_mb > 10], collapse="','"))
+      }
+      batch_id <- floor(cumsum(file_sizes_mb) / 10)
+    } else {
+      if (batch_size > 10){
+        message(sprintf("It appears that you have set `batch_size=%s` while uploading binary blob data.", batch_size))
+        message("It is highly recommended to leave `batch_size=NULL` so that the batch sizes can be optimized for you.")
+      }
+      batch_id <- (seq.int(1:length(input_data$Body))-1) %/% batch_size
     }
-    batched_data <- input_data[batch_id == batch, , drop=FALSE]   
-    f <- tempfile()
-    sf_write_csv(batched_data, f)
-    httr_response <- rPOST(url = bulk_batches_url,
-                          headers = c("Content-Type"="text/csv", 
-                                      "Accept"="application/xml"),
-                          body = upload_file(path=f, type="text/csv"))
-    if(verbose){
-      make_verbose_httr_message(httr_response$request$method, 
-                                httr_response$request$url, 
-                                httr_response$request$headers, 
-                                sprintf("Uploaded CSV file: %s", f))
+    if(verbose) message("Submitting data in ", max(batch_id) + 1, " Batches")
+    message_flag <- unique(as.integer(quantile(0:max(batch_id), c(0.25,0.5,0.75,1))))
+    
+    bulk_batches_url <- make_bulk_batches_url(job_id, api_type="Bulk 1.0")
+    batches_response <- list()
+    tmpdir <- tempdir(TRUE)
+    for(batch in seq(0, max(batch_id))){
+      if(verbose){
+        batch_msg_flg <- batch %in% message_flag
+        if(batch_msg_flg){
+          message(paste0("Processing Batch # ", head(batch, 1) + 1))
+        } 
+      }
+      # zip the lists of files from each batch
+      batched_data <- input_data[batch_id == batch, , drop=FALSE]
+      # create manifest of files in batched zip file
+      # convert Body file references to relative within the zip file (i.e. add leading #)
+      orig_paths <- batched_data$Body
+      batched_data$Body <- paste0("#", basename(batched_data$Body))
+      f1a <- tempfile(fileext = "_request.txt")
+      if(job_status$contentType == "ZIP_CSV"){
+        # make a unique file name and save the request txt file
+        write_csv(batched_data, f1a)
+      } else if(job_status$contentType == "ZIP_XML"){
+        xml_manifest <- build_manifest_xml_from_list(transpose(batched_data, .names=rep("sObject", nrow(batched_data))))
+        invisible(saveXML(xmlDoc(xml_manifest), file=f1a, indent=FALSE, 
+                          prefix='<?xml version="1.0" encoding="UTF-8"?>\n'))
+      } else if(job_status$contentType == "ZIP_JSON"){
+        # stop if all Name column values are not equal to Body without "#"
+        if(!all(batched_data$Name == gsub("^#", "", batched_data$Body))){
+          stop("When using content_type='ZIP_JSON' the values in Name must match the base file name exactly. Fix or use content_type='ZIP_CSV'.")
+        }
+        write(toJSON(batched_data), f1a)
+      } else {
+        stop("Unsupported content type for binary attachments.")
+      }
+      # copy the file and rename the file because it is required to be called 
+      # request.txt by Salesforce
+      f1b <- file.path(tmpdir, "request.txt")
+      invisible(file.copy(from = f1a, to = f1b, overwrite = TRUE))
+      # create the batched zip file with the manifest inside
+      f2 <- tempfile(fileext = ".zip")
+      zipr(f2, c(f1b, orig_paths))
+      
+      # set content type to match the format of the zip file and its manifest
+      zip_content_type <- gsub("_", "/", tolower(job_status$contentType))
+      httr_response <- rPOST(url = bulk_batches_url,
+                             headers = c("Content-Type"=zip_content_type, 
+                                         "Accept"="application/xml"),
+                             body = upload_file(path=f2, type=zip_content_type))
+      if(verbose){
+        make_verbose_httr_message(httr_response$request$method, 
+                                  httr_response$request$url, 
+                                  httr_response$request$headers, 
+                                  sprintf("Uploaded ZIP file: %s\nWith manifest: %s", f2, f1a))
+      }
+      catch_errors(httr_response)
+      content_type <- httr_response$headers$`content-type`
+      if (grepl('xml', content_type)){
+        response_parsed <- content(httr_response, as='parsed', type="text/xml", encoding="UTF-8")
+        this_batch_info <- response_parsed %>%
+          xml_ns_strip() %>%
+          xml_find_all('//batchInfo') %>%
+          map_df(xml_nodeset_to_df) %>%
+          type_convert(col_types = cols())
+      } else if(grepl('json', content_type)){
+        response_parsed <- content(httr_response, as='parsed', type="application/json", encoding="UTF-8")
+        response_parsed[sapply(response_parsed, is.null)] <- NA
+        this_batch_info <- response_parsed
+      } else {
+        message(sprintf("Unhandled content-type: %s", content_type))
+        this_batch_info <- content(httr_response, as='parsed', encoding="UTF-8")
+      }
+      batches_response[[batch+1]] <- this_batch_info
     }
-    catch_errors(httr_response)
-    response_parsed <- content(httr_response, encoding="UTF-8")
-    this_batch_info <- response_parsed %>%
-      xml_ns_strip() %>%
-      xml_find_all('//batchInfo') %>%
-      map_df(xml_nodeset_to_df) %>%
-      type_convert(col_types = cols())
-    batches_response[[batch+1]] <- this_batch_info
+  } else {
+    # Batch sizes should be adjusted based on processing times. Start with 5000 
+    # records and adjust the batch size based on processing time. If it takes more 
+    # than five minutes to process a batch, it may be beneficial to reduce the batch size. 
+    # If it takes a few seconds, the batch size should be increased. If you get a 
+    # timeout error when processing a batch, split your batch into smaller batches, 
+    # and try again.
+    # https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_planning_guidelines.htm
+    if(is.null(batch_size)){
+      batch_size <- 5000
+    }
+    row_num <- nrow(input_data)
+    batch_id <- (seq.int(row_num)-1) %/% batch_size
+    if(verbose) message("Submitting data in ", max(batch_id) + 1, " Batches")
+    message_flag <- unique(as.integer(quantile(0:max(batch_id), c(0.25,0.5,0.75,1))))
+    
+    bulk_batches_url <- make_bulk_batches_url(job_id, api_type="Bulk 1.0")
+    batches_response <- list()
+    for(batch in seq(0, max(batch_id))){
+      if(verbose){
+        batch_msg_flg <- batch %in% message_flag
+        if(batch_msg_flg){
+          message(paste0("Processing Batch # ", head(batch, 1) + 1))
+        } 
+      }
+      batched_data <- input_data[batch_id == batch, , drop=FALSE]   
+      f <- tempfile()
+      sf_write_csv(batched_data, f)
+      httr_response <- rPOST(url = bulk_batches_url,
+                             headers = c("Content-Type"="text/csv", 
+                                         "Accept"="application/xml"),
+                             body = upload_file(path=f, type="text/csv"))
+      if(verbose){
+        make_verbose_httr_message(httr_response$request$method, 
+                                  httr_response$request$url, 
+                                  httr_response$request$headers, 
+                                  sprintf("Uploaded CSV file: %s", f))
+      }
+      catch_errors(httr_response)
+      response_parsed <- content(httr_response, encoding="UTF-8")
+      this_batch_info <- response_parsed %>%
+        xml_ns_strip() %>%
+        xml_find_all('//batchInfo') %>%
+        map_df(xml_nodeset_to_df) %>%
+        type_convert(col_types = cols())
+      batches_response[[batch+1]] <- this_batch_info
+    }
   }
   batches_response <- bind_rows(batches_response)
   return(batches_response)
@@ -617,22 +860,24 @@ sf_create_batches_bulk_v1 <- function(job_id,
 #' @importFrom utils object.size head
 #' @importFrom stats quantile
 sf_create_batches_bulk_v2 <- function(job_id, 
-                                      input_data, 
+                                      input_data,
+                                      batch_size = NULL,
                                       verbose = FALSE){
   job_status <- sf_get_job_bulk(job_id, 
                                 api_type = "Bulk 2.0", 
                                 verbose = verbose)
   input_data <- sf_input_data_validation(operation = job_status$operation, 
                                          input_data)
-  
   # A request can provide CSV data that does not in total exceed 150 MB of base64 
   # encoded content. When job data is uploaded, it is converted to base64. This 
   # conversion can increase the data size by approximately 50%. To account for 
   # the base64 conversion increase, upload data that does not exceed 100 MB. 
   # https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/upload_job_data.htm
-  data_size <- object.size(input_data)
-  numb_batches <- ceiling((as.numeric(data_size)/(1024^2))/100) # 100MB / (size converted to MB)
-  batch_size <- ceiling(nrow(input_data) / numb_batches)
+  if(is.null(batch_size)){
+    data_size <- object.size(input_data)
+    numb_batches <- ceiling((as.numeric(data_size)/(1024^2))/100) # 100MB / (size converted to MB)
+    batch_size <- ceiling(nrow(input_data) / numb_batches)
+  }
   row_num <- nrow(input_data)
   batch_id <- (seq.int(row_num)-1) %/% batch_size
   if(verbose) message("Submitting data in ", max(batch_id) + 1, " Batches")
@@ -704,12 +949,24 @@ sf_job_batches_bulk <- function(job_id,
                               httr_response$request$headers)
   }
   catch_errors(httr_response)
-  response_parsed <- content(httr_response, encoding="UTF-8")
-  resultset <- response_parsed %>%
-    xml_ns_strip() %>%
-    xml_find_all('.//batchInfo') %>%
-    map_df(xml_nodeset_to_df) %>%
-    type_convert(col_types = cols())
+  content_type <- httr_response$headers$`content-type`
+  if (grepl('xml', content_type)){
+    response_parsed <- content(httr_response, as='parsed', type="text/xml", encoding="UTF-8")
+    resultset <- response_parsed %>%
+      xml_ns_strip() %>%
+      xml_find_all('.//batchInfo') %>%
+      map_df(xml_nodeset_to_df) %>%
+      type_convert(col_types = cols())
+  } else if(grepl('json', content_type)){
+    response_parsed <- content(httr_response, as='parsed', type="application/json", encoding="UTF-8")
+    response_parsed <- response_parsed$batchInfo %>% 
+      map(function(x) map(x, function(y) ifelse(is.null(y), NA, y)))
+    resultset <- bind_rows(response_parsed) %>%
+      type_convert(col_types = cols())
+  } else {
+    message(sprintf("Unhandled content-type: %s", content_type))
+    resultset <- content(httr_response, as='parsed', encoding="UTF-8")
+  }
   return(resultset)
 }
 
@@ -734,8 +991,8 @@ sf_job_batches_bulk <- function(job_id,
 #' job_info <- sf_create_job_bulk(operation = "query", object = "Account")
 #' soql <- "SELECT Id, Name FROM Account LIMIT 10"
 #' batch_query_info <- sf_submit_query_bulk(job_id = job_info$id, soql = soql)
-#' batch_status <- sf_batch_status_bulk(job_id=batch_query_info$jobId,
-#'                                      batch_id=batch_query_info$id)
+#' batch_status <- sf_batch_status_bulk(job_id = batch_query_info$jobId,
+#'                                      batch_id = batch_query_info$id)
 #' job_close_ind <- sf_close_job_bulk(job_info$id)
 #' sf_get_job_bulk(job_info$id)                               
 #' }
@@ -752,12 +1009,24 @@ sf_batch_status_bulk <- function(job_id, batch_id,
                               httr_response$request$headers)
   }
   catch_errors(httr_response)
-  response_parsed <- content(httr_response, encoding="UTF-8")
-  resultset <- response_parsed %>%
-    xml_ns_strip() %>%
-    xml_find_all('//batchInfo') %>%
-    map_df(xml_nodeset_to_df) %>%
-    type_convert(col_types = cols())
+  content_type <- httr_response$headers$`content-type`
+  if (grepl('xml', content_type)){
+    response_parsed <- content(httr_response, as='parsed', type="text/xml", encoding="UTF-8")
+    resultset <- response_parsed %>%
+      xml_ns_strip() %>%
+      xml_find_all('//batchInfo') %>%
+      map_df(xml_nodeset_to_df) %>%
+      type_convert(col_types = cols())
+  } else if(grepl('json', content_type)){
+    response_parsed <- content(httr_response, as='parsed', type="application/json", encoding="UTF-8")
+    response_parsed <- response_parsed$batchInfo %>% 
+      map(function(x) map(x, function(y) ifelse(is.null(y), NA, y)))
+    resultset <- bind_rows(response_parsed) %>%
+      type_convert(col_types = cols())
+  } else {
+    message(sprintf("Unhandled content-type: %s", content_type))
+    resultset <- content(httr_response, as='parsed', encoding="UTF-8")
+  }
   return(resultset)
 }
 
@@ -802,17 +1071,29 @@ sf_batch_details_bulk <- function(job_id, batch_id,
                               httr_response$request$headers)
   }
   catch_errors(httr_response)
-  response_text <- content(httr_response, as="text", encoding="UTF-8")
-  
   content_type <- httr_response$headers$`content-type`
-  if (grepl('xml', content_type)) {
-    res <- as_tibble(xmlToList(response_text))
-  } else if(grepl('text/csv', content_type)) {
+  if(content_type == 'text/csv' | content_type == 'zip/csv'){
+    response_text <- content(httr_response, as="text", encoding="UTF-8")
     res <- read_csv(response_text)
+  } else if(content_type == 'zip/xml'){
+    response_parsed <- content(httr_response, as="parsed", type="text/xml", encoding="UTF-8")
+    res <- response_parsed %>%
+      xml_ns_strip() %>%
+      xml_find_all('.//result') %>% 
+      map_df(xml_nodeset_to_df)
+  } else if(content_type == 'zip/json'){
+    response_text <- content(httr_response, as="text", encoding="UTF-8")
+    res <- fromJSON(response_text)
+  } else if(grepl('xml', content_type)){
+    response_text <- content(httr_response, as="text", encoding="UTF-8")
+    res <- xmlToList(response_text)
   } else {
     message(sprintf("Unhandled content-type: %s", content_type))
     res <- content(httr_response, as="parsed", encoding="UTF-8")
   }
+  res <- res %>%
+    as_tibble() %>%
+    type_convert(col_types = cols())
   return(res)
 }
 
@@ -861,7 +1142,7 @@ sf_get_job_records_bulk <- function(job_id,
                                                 combine_record_types = combine_record_types, 
                                                 verbose = verbose)
   } else { 
-    stop("Unknown API type")
+    stop("Unknown API type.")
   }
   return(batch_records)
 }
@@ -913,6 +1194,23 @@ sf_get_job_records_bulk_v2 <- function(job_id,
     records[[r]] <- res
   }
   if(combine_record_types){
+    # Before combining, try to match the data types of each column in the dataset 
+    # with recordsets having 0 records taking on the datatype of the one with 
+    # the most records. Otherwise, we will receive an error such as: 
+    #   Can't combine `test_number__c` <double> and `test_number__c` <character>.
+    
+    # First, determine the column datatypes from the data.frame with most rows
+    base_class_df <- records[[head(which.max(sapply(records, nrow)), 1)]]
+    # Second, convert the datatypes for any data.frames with zero rows
+    for (i in 1:length(records)){
+      if(nrow(records[[i]]) == 0){
+        common <- names(records[[i]])[names(records[[i]]) %in% names(base_class_df)]
+        records[[i]][common] <- lapply(common, function(x) {
+          match.fun(paste0("as.", class(base_class_df[[x]])))(records[[i]][[x]])
+        })
+      }
+    }
+    # Third, now bind them together
     res <- bind_rows(records)
   } else {
     res <- records
@@ -930,12 +1228,13 @@ sf_get_job_records_bulk_v2 <- function(job_id,
 #' @param operation character; string defining the type of operation being performed
 #' @template external_id_fieldname
 #' @template api_type
-#' @param wait_for_results logical; indicating whether to wait for the operation to complete 
-#' so that the batch results of individual records can be obtained
+#' @template batch_size
 #' @param interval_seconds integer; defines the seconds between attempts to check 
 #' for job completion
 #' @param max_attempts integer; defines then max number attempts to check for job 
 #' completion before stopping
+#' @param wait_for_results logical; indicating whether to wait for the operation to complete 
+#' so that the batch results of individual records can be obtained
 #' @template control
 #' @param ... other arguments passed on to \code{\link{sf_control}} or \code{\link{sf_create_job_bulk}} 
 #' such as \code{content_type}, \code{concurrency_mode}, or \code{column_delimiter}
@@ -961,9 +1260,10 @@ sf_bulk_operation <- function(input_data,
                                             "update", "hardDelete"),
                               external_id_fieldname = NULL,
                               api_type = c("Bulk 1.0", "Bulk 2.0"),
-                              wait_for_results = TRUE,
+                              batch_size = NULL,
                               interval_seconds = 3,
                               max_attempts = 200,
+                              wait_for_results = TRUE,
                               control = list(...), ...,
                               verbose = FALSE){
 
@@ -983,14 +1283,14 @@ sf_bulk_operation <- function(input_data,
   job_info <- sf_create_job_bulk(operation, 
                                  object_name = object_name, 
                                  external_id_fieldname = external_id_fieldname, 
-                                 api_type = api_type, 
+                                 api_type = api_type,
                                  control = control_args, ...,
                                  verbose = verbose)
   batches_info <- sf_create_batches_bulk(job_id = job_info$id, 
-                                         input_data, 
-                                         api_type = api_type, 
+                                         input_data,
+                                         batch_size = batch_size,
+                                         api_type = api_type,
                                          verbose = verbose)
-  
   if(wait_for_results){
     status_complete <- FALSE
     z <- 1
