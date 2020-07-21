@@ -13,27 +13,27 @@ make_soap_xml_skeleton(soap_headers = list(), metadata_ns = FALSE)
 a XML document
 }
 \description{
-Create XML in preparate for sending to the SOAP API
+Create XML in preparation for sending to the SOAP API
 }
 \note{
 This function is meant to be used internally. Only use when debugging.
 Any of the following SOAP headers are allowed:
 \itemize{
-   \item AllorNoneHeader
-   \item AllowFieldTruncationHeader
-   \item AssignmentRuleHeader
-   \item CallOptions
-   \item DisableFeedTrackingHeader
-   \item EmailHeader
-   \item LimitInfoHeader
-   \item LocaleOptions
-   \item LoginScopeHeader
-   \item MruHeader
-   \item OwnerChangeOptions
-   \item PackageVersionHeader
-   \item QueryOptions
-   \item UserTerritoryDeleteHeader
-   }
+\item AllOrNoneHeader
+\item AllowFieldTruncationHeader
+\item AssignmentRuleHeader
+\item CallOptions
+\item DisableFeedTrackingHeader
+\item EmailHeader
+\item LimitInfoHeader
+\item LocaleOptions
+\item LoginScopeHeader
+\item MruHeader
+\item OwnerChangeOptions
+\item PackageVersionHeader
+\item QueryOptions
+\item UserTerritoryDeleteHeader
+}
 Additionally, Bulk API can't access or query compound address or compound geolocation fields.
 }
 \references{

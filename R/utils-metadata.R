@@ -3880,7 +3880,7 @@
 #'      \item{SORT_ORDER_MISSING - Errors with this extended error code have the following properties:
 #' fieldName}
 #'      \item{SPECIFIC_FIELD_VALUE_MAKES_OTHER_FIELD_REQUIRED - Errors with this extended error code have the following properties:
-#' fieldName, fieldType, requiedField}
+#' fieldName, fieldType, requiredField}
 #'      \item{START_ELEMENT_MISSING - Errors with this extended error code have the following properties:}
 #'      \item{SUBFLOW_DESKTOP_DESIGNER_FLOWS_NOT_SUPPORTED - Errors with this extended error code have the following properties: flowName}
 #'      \item{SUBFLOW_INPUT_ELEMENT_INCOMPATIBLE_DATATYPES - Errors with this extended error code have the following properties:
@@ -11771,23 +11771,26 @@ metadata_type_validator <- function(obj_type, obj_data){
  new_obj_data <- list()
  counter <- 1
  for (e in 1:length(obj_data)){
-   # pull out only the acceptable inputs, just ignore the rest
-   obj_data[[e]] <- obj_data[[e]][names(obj_data[[e]]) %in% acceptable_inputs]
-   # reorder according to WSDL since order matters
-   matched_order <- order(match(names(obj_data[[e]]), acceptable_inputs))
-   
-   # if(all(is.na(matched_order)))
-   #     warning(paste0("Some of the records were dropped because their inputs did not match the acceptable inputs for the specified data type:", obj_type))
+    # pull out only the acceptable inputs, just ignore the rest
+    obj_data[[e]] <- obj_data[[e]][names(obj_data[[e]]) %in% acceptable_inputs]
+    # reorder according to WSDL since order matters
+    matched_order <- order(match(names(obj_data[[e]]), acceptable_inputs))
 
-   obj_data[[e]] <- obj_data[[e]][matched_order[!is.na(matched_order)]]
+    if(all(is.na(matched_order))){
+      message(sprintf(paste0("Some of the records were dropped because their ", 
+                             "inputs did not match the acceptable inputs for ", 
+                             "the specified data type: %s", obj_type)))
+    }
 
-   # add to the final formatted object if it is a record with some valid input elements
-   if(length(obj_data[[e]]) > 0){
-     new_obj_data[[counter]] <- obj_data[[e]]
-     counter <- counter + 1
-   }
+    obj_data[[e]] <- obj_data[[e]][matched_order[!is.na(matched_order)]]
+
+    # add to the final formatted object if it is a record with some valid input elements
+    if(length(obj_data[[e]]) > 0){
+      new_obj_data[[counter]] <- obj_data[[e]]
+      counter <- counter + 1
+    }
  }
-
+ 
  return(new_obj_data)
 }
 

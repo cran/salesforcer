@@ -1,5 +1,8 @@
 #' Return Current User Info
 #' 
+#' @description
+#' \lifecycle{maturing}
+#' 
 #' Retrieves personal information for the user associated with the current session.
 #' 
 #' @importFrom httr content
@@ -57,12 +60,15 @@ sf_user_info <- function(api_type=c("SOAP", "Chatter"), verbose=FALSE){
     this_res <- content(httr_response, encoding='UTF-8')
     
   } else {
-    stop("Unknown API type")
+    catch_unknown_api(api_type)
   }
   return(this_res)
 }
 
 #' Set User Password
+#' 
+#' @description
+#' \lifecycle{experimental}
 #' 
 #' Sets the specified user’s password to the specified value.
 #' 
@@ -99,6 +105,9 @@ sf_set_password <- function(user_id, password, verbose=FALSE){
 }
 
 #' Reset User Password
+#' 
+#' @description
+#' \lifecycle{experimental}
 #' 
 #' Changes a user’s password to a temporary, system-generated value.
 #' 
@@ -154,6 +163,9 @@ sf_reset_password <- function(user_id,
 
 #' Salesforce Server Timestamp
 #' 
+#' @description
+#' \lifecycle{stable}
+#' 
 #' Retrieves the current system timestamp from the API.
 #' 
 #' @importFrom httr headers 
@@ -177,6 +189,9 @@ sf_server_timestamp <- function(){
 
 #' List REST API Versions
 #' 
+#' @description
+#' \lifecycle{stable}
+#' 
 #' Lists summary information about each Salesforce version currently available, 
 #' including the version, label, and a link to each version\'s root
 #' 
@@ -197,6 +212,9 @@ sf_list_rest_api_versions <- function(){
 
 #' List the Resources for an API
 #' 
+#' @description
+#' \lifecycle{stable}
+#' 
 #' Lists available resources for the specified API version, including resource 
 #' name and URI.
 #' 
@@ -216,6 +234,9 @@ sf_list_resources <- function(){
 }
 
 #' List the Limits for an API
+#' 
+#' @description
+#' \lifecycle{stable}
 #' 
 #' Lists information about limits in your org.
 #' 
@@ -265,6 +286,9 @@ sf_list_api_limits <- function(){
 
 #' List Organization Objects and their Metadata
 #' 
+#' @description
+#' \lifecycle{stable}
+#' 
 #' Lists the available objects and their metadata for your organization’s data.
 #' 
 #' @importFrom httr content
@@ -284,6 +308,9 @@ sf_list_objects <- function(){
 
 #' Find Duplicate Records
 #' 
+#' @description
+#' \lifecycle{experimental}
+#' 
 #' Performs rule-based searches for duplicate records.
 #' 
 #' @importFrom utils head
@@ -299,14 +326,14 @@ sf_list_objects <- function(){
 #' @template guess_types
 #' @template verbose
 #' @return \code{tbl_df} of records found to be duplicates by the match rules
-#' @note You must have actived duplicate rules for the supplied object before running 
+#' @note You must have active duplicate rules for the supplied object before running 
 #' this function. The \code{object_name} argument refers to using that object's duplicate 
 #' rules on the search criteria to determine which records in other objects are duplicates.
 #' @examples
 #' \dontrun{
 #' # use the duplicate rules associated with the Lead object on the search 
 #' # criteria (email) in order to find duplicates
-#' found_dupes <- sf_find_duplicates(search_criteria = 
+#' found_dupes <- sf_find_duplicates(search_criteria =
 #'                                     list(Email="bond_john@@grandhotels.com"),
 #'                                   object_name = "Lead")
 #'                                   
@@ -327,15 +354,17 @@ sf_find_duplicates <- function(search_criteria,
     message(base_soap_url)
   }
   
-  # build the body
-  r <- make_soap_xml_skeleton(soap_headers=list(DuplicateRuleHeader = list(includeRecordDetails = tolower(include_record_details))))
+  r <- make_soap_xml_skeleton(soap_headers =
+                                list(DuplicateRuleHeader = 
+                                       list(includeRecordDetails = 
+                                              tolower(include_record_details))))
   xml_dat <- build_soap_xml_from_list(input_data = search_criteria,
                                       operation = "findDuplicates",
                                       object_name = object_name,
                                       root = r)
 
   httr_response <- rPOST(url = base_soap_url,
-                         headers = c("SOAPAction"="create",
+                         headers = c("SOAPAction"="findDuplicates",
                                      "Content-Type"="text/xml"),
                          body = as(xml_dat, "character"))
   catch_errors(httr_response)
@@ -353,10 +382,10 @@ sf_find_duplicates <- function(search_criteria,
     xml_find_all('.//result') %>%
     xml_find_all('.//duplicateResults//duplicateRule') %>%
     map(xml_text) %>% 
-    unlist() %>% 
-    paste(collapse = ", ")
+    unlist()
   
-  message(sprintf("Using %s rules: %s", duplicate_entitytype, which_rules))
+  message_w_errors_listed(main_text = sprintf("Using %s rules:", duplicate_entitytype), 
+                          errors = which_rules)
   
   this_res <- response_parsed %>%
     xml_ns_strip() %>%
@@ -364,31 +393,22 @@ sf_find_duplicates <- function(search_criteria,
     xml_find_all('.//duplicateResults//matchResults//matchRecords//record') 
   
   if(length(this_res) > 0){
-    this_res <- this_res %>%
-      map_df(xml_nodeset_to_df) %>% 
-      rename(sObject = `sf:type`) %>% 
-      remove_empty_linked_object_cols() %>% 
-      # remove redundant linked entity object types.type
-      select(-matches("\\.sf:type")) %>% 
-      rename_at(.vars = vars(starts_with("sf:")), 
-                .funs = list(~sub("^sf:", "", .))) %>%
-      rename_at(.vars = vars(matches("\\.sf:")), 
-                .funs = list(~sub("sf:", "", .))) %>%
-      # move columns without dot up since those are related entities
-      select(-matches("\\."), everything())
+    resultset <- this_res %>%
+      map_df(extract_records_from_xml_node, 
+             object_name_as_col = TRUE) %>%
+      sf_reorder_cols() %>% 
+      sf_guess_cols(guess_types)
   } else {
-    this_res <- tibble()
+    resultset <- tibble()
   }
   
-  if(guess_types){
-    this_res <- this_res %>% 
-      type_convert(col_types = cols(.default = col_guess()))
-  }
-  
-  return(this_res)
+  return(resultset)
 }
 
 #' Find Duplicate Records By Id
+#' 
+#' @description
+#' \lifecycle{experimental}
 #' 
 #' Performs rule-based searches for duplicate records.
 #' 
@@ -403,7 +423,7 @@ sf_find_duplicates <- function(search_criteria,
 #' @template guess_types
 #' @template verbose
 #' @return \code{tbl_df} of records found to be duplicates by the match rules
-#' @note You must have actived duplicate rules for the supplied object before running 
+#' @note You must have active duplicate rules for the supplied object before running 
 #' this function. This function uses the duplicate rules for the object that has 
 #' the same type as the input record IDs. For example, if the record Id represents 
 #' an Account, this function uses the duplicate rules associated with the 
@@ -428,12 +448,15 @@ sf_find_duplicates_by_id <- function(sf_id,
   }
   
   # build the body
-  r <- make_soap_xml_skeleton(soap_headers=list(DuplicateRuleHeader = list(includeRecordDetails = tolower(include_record_details))))
+  r <- make_soap_xml_skeleton(soap_headers = 
+                                list(DuplicateRuleHeader = 
+                                       list(includeRecordDetails = 
+                                              tolower(include_record_details))))
   xml_dat <- build_soap_xml_from_list(input_data = sf_id,
                                       operation = "findDuplicatesByIds",
                                       root = r)
   httr_response <- rPOST(url = base_soap_url,
-                         headers = c("SOAPAction"="create",
+                         headers = c("SOAPAction"="findDuplicatesByIds",
                                      "Content-Type"="text/xml"),
                          body = as(xml_dat, "character"))
   catch_errors(httr_response)
@@ -451,10 +474,10 @@ sf_find_duplicates_by_id <- function(sf_id,
     xml_find_all('.//result') %>%
     xml_find_all('.//duplicateResults//duplicateRule') %>%
     map(xml_text) %>% 
-    unlist() %>% 
-    paste(collapse = ", ")
+    unlist()
   
-  message(sprintf("Using %s rules: %s", duplicate_entitytype, which_rules))
+  message_w_errors_listed(main_text = sprintf("Using %s rules:", duplicate_entitytype), 
+                          errors = which_rules)
   
   this_res <- response_parsed %>%
     xml_ns_strip() %>%
@@ -462,31 +485,22 @@ sf_find_duplicates_by_id <- function(sf_id,
     xml_find_all('.//duplicateResults//matchResults//matchRecords//record')
   
   if(length(this_res) > 0){
-    this_res <- this_res %>%
-      map_df(xml_nodeset_to_df) %>%
-      rename(sObject = `sf:type`) %>% 
-      remove_empty_linked_object_cols() %>% 
-      # remove redundant linked entity object types.type
-      select(-matches("\\.sf:type")) %>% 
-      rename_at(.vars = vars(starts_with("sf:")), 
-                .funs = list(~sub("^sf:", "", .))) %>%
-      rename_at(.vars = vars(matches("\\.sf:")), 
-                .funs = list(~sub("sf:", "", .))) %>%
-      # move columns without dot up since those are related entities
-      select(-matches("\\."), everything())
+    resultset <- this_res %>%
+      map_df(extract_records_from_xml_node, 
+             object_name_as_col = TRUE) %>%
+        sf_reorder_cols() %>% 
+        sf_guess_cols(guess_types)
   } else {
-    this_res <- tibble()
+    resultset <- tibble()
   }
   
-  if(guess_types){
-    this_res <- this_res %>% 
-      type_convert(col_types = cols(.default = col_guess()))
-  }
-  
-  return(this_res)
+  return(resultset)
 }
 
 #' Convert Leads
+#' 
+#' @description
+#' \lifecycle{experimental}
 #' 
 #' Converts Leads each into an Account, Contact, as well as (optionally) an Opportunity.
 #' 
@@ -501,6 +515,7 @@ sf_find_duplicates_by_id <- function(sf_id,
 #' \code{tbl_df}; data can be coerced into a \code{data.frame}. See the details 
 #' below on how format your input data to control things like whether an opportunity 
 #' will be created, an email will be sent to the new owner, and other control options.
+#' @template guess_types
 #' @template api_type
 #' @template control
 #' @param ... arguments passed to \code{\link{sf_control}}
@@ -518,18 +533,18 @@ sf_find_duplicates_by_id <- function(sf_id,
 #' \describe{
 #'  \item{leadId}{ID of the Lead to convert. Required.}
 #'  \item{convertedStatus}{Valid LeadStatus value for a converted lead. Required.}
-#'  \item{accountId}{ID of the Account into which the lead will be merged. Required 
+#'  \item{accountId}{Id of the Account into which the lead will be merged. Required 
 #'  only when updating an existing account, including person accounts. If no 
-#'  accountID is specified, then the API creates a new account.}
-#'  \item{contactId}{D of the Contact into which the lead will be merged (this 
+#'  accountId is specified, then the API creates a new account.}
+#'  \item{contactId}{Id of the Contact into which the lead will be merged (this 
 #'  contact must be associated with the specified accountId, and an accountId 
 #'  must be specified). Required only when updating an existing contact. If no 
-#'  contactID is specified, then the API creates a new contact that is implicitly 
+#'  contactId is specified, then the API creates a new contact that is implicitly 
 #'  associated with the Account.}
-#'  \item{ownerId}{Specifies the ID of the person to own any newly created account, 
+#'  \item{ownerId}{Specifies the Id of the person to own any newly created account, 
 #'  contact, and opportunity. If the client application does not specify this 
 #'  value, then the owner of the new object will be the owner of the lead.}
-#'  \item{opportunityId}{The ID of an existing opportunity to relate to the lead. 
+#'  \item{opportunityId}{The Id of an existing opportunity to relate to the lead. 
 #'  The opportunityId and opportunityName arguments are mutually exclusive. Specifying 
 #'  a value for both results in an error. If doNotCreateOpportunity argument is 
 #'  \code{TRUE}, then no Opportunity is created and this field must be left blank; 
@@ -553,8 +568,8 @@ sf_find_duplicates_by_id <- function(sf_id,
 #'  to the owner specified in the ownerId (\code{TRUE}) or not (\code{FALSE}, 
 #'  the default).}
 #' }
-#' \href{https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_convertlead.htm}{Salesforce Documentation for convertLead}
-#' @examples 
+#' \href{https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_convertlead.htm}{Salesforce Documentation}
+#' @examples
 #' \dontrun{
 #' # create a new lead at Grand Hotels & Resorts Ltd
 #' new_lead <- tibble(FirstName = "Test", LastName = "Prospect",
@@ -572,7 +587,8 @@ sf_find_duplicates_by_id <- function(sf_id,
 #' }
 #' @export
 sf_convert_lead <- function(input_data, 
-                            api_type = c("SOAP"), 
+                            guess_types = TRUE,
+                            api_type = c("SOAP"),
                             control = list(...), ...,
                             verbose = FALSE){
   
@@ -580,7 +596,8 @@ sf_convert_lead <- function(input_data,
   input_data <- sf_input_data_validation(operation='convertLead', input_data)
   
   # specify the following defaults (all FALSE by default), if not included
-  expected_options <- c("doNotCreateOpportunity", "overwriteLeadSource", 
+  expected_options <- c("doNotCreateOpportunity", 
+                        "overwriteLeadSource", 
                         "sendNotificationEmail")
   for(e in expected_options){
     if(!(e %in% names(input_data))){
@@ -630,15 +647,21 @@ sf_convert_lead <- function(input_data,
     this_set <- response_parsed %>%
       xml_ns_strip() %>%
       xml_find_all('.//result') %>% 
-      map_df(xml_nodeset_to_df)
+      map_df(extract_records_from_xml_node)
     resultset <- bind_rows(resultset, this_set)
   }
+  
   resultset <- resultset %>%
-    type_convert(col_types = cols())
+    sf_reorder_cols() %>% 
+    sf_guess_cols(guess_types)  
+  
   return(resultset)
 }
 
 #' Merge Records
+#' 
+#' @description
+#' \lifecycle{experimental}
 #' 
 #' This function combines records of the same object type into one of the records, 
 #' known as the master record. The other records, known as the victim records, will
@@ -698,7 +721,8 @@ sf_merge <- function(master_id,
   
   master_fields <- unlist(master_fields)
   master_fields["Id"] <- master_id
-  master_fields <- c(master_fields["Id"], master_fields[names(master_fields) != 'Id'])
+  master_fields <- c(master_fields["Id"], 
+                     master_fields[names(master_fields) != 'Id'])
 
   control_args <- return_matching_controls(control)
   control_args$api_type <- api_type
@@ -724,27 +748,34 @@ sf_merge <- function(master_id,
                               request_body)
   }
   catch_errors(httr_response)
-  response_parsed <- content(httr_response, encoding="UTF-8")
+  response_parsed <- content(httr_response, as="parsed", encoding="UTF-8")
+  
   this_set <- response_parsed %>%
     xml_ns_strip() %>%
-    xml_find_all('.//result') %>%
+    xml_find_all('.//result') %>% 
     # we must use XML because character elements are not automatically unboxed
     # see https://github.com/r-lib/xml2/issues/215
     map(.f=function(x){
       xmlToList(xmlParse(as(object=x, Class="character")))
-    }) %>% .[[1]]
+    }) %>% 
+    .[[1]]
   
-  res <- tibble(id = merge_null_to_na(this_set$id), 
-                success = merge_null_to_na(this_set$success),
-                mergedRecordIds = merge_null_to_na(list(unname(unlist(this_set[names(this_set) == "mergedRecordIds"])))),
-                updatedRelatedIds = merge_null_to_na(list(unname(unlist(this_set[names(this_set) == "updatedRelatedIds"])))),
-                errors = merge_null_to_na(list(this_set$errors))) %>%
-    type_convert(col_types = cols())
+  resultset <- tibble(
+      id = merge_null_to_na(this_set$id), 
+      success = merge_null_to_na(this_set$success),
+      mergedRecordIds = merge_null_to_na(list(unname(unlist(this_set[names(this_set) == "mergedRecordIds"])))),
+      updatedRelatedIds = merge_null_to_na(list(unname(unlist(this_set[names(this_set) == "updatedRelatedIds"])))),
+      errors = merge_null_to_na(list(this_set$errors))
+    ) %>%
+    type_convert(col_types = cols(.default = col_guess()))
   
-  return(res)
+  return(resultset)
 }
 
 #' Get Deleted Records from a Timeframe
+#' 
+#' @description
+#' \lifecycle{maturing}
 #' 
 #' Retrieves the list of individual records that have been deleted within the given 
 #' timespan for the specified object.
@@ -814,6 +845,9 @@ sf_get_deleted <- function(object_name,
 }
 
 #' Get Updated Records from a Timeframe
+#' 
+#' @description
+#' \lifecycle{maturing}
 #' 
 #' Retrieves the list of individual records that have been inserted or updated 
 #' within the given timespan in the specified object.
@@ -885,6 +919,9 @@ sf_get_updated <- function(object_name,
 }
 
 #' Undelete Records
+#' 
+#' @description
+#' \lifecycle{experimental}
 #' 
 #' Undeletes records from the Recycle Bin.
 #' 
@@ -977,7 +1014,10 @@ sf_undelete <- function(ids,
 }
 
 #' Empty Recycle Bin
-#'
+#' 
+#' @description
+#' \lifecycle{experimental}
+#' 
 #' Delete records from the recycle bin immediately and permanently.
 #'
 #' @importFrom httr content
@@ -1013,9 +1053,14 @@ sf_undelete <- function(ids,
 #' # confirm that the record really is gone (can't be deleted)
 #' undelete <- sf_undelete(new_records$id[1])
 #' # if you use queryall you still will find the record for ~24hrs
-#' #is_deleted <- sf_query(sprintf("SELECT Id, IsDeleted FROM Contact WHERE Id='%s'",
-#' #                               new_records$id[1]),
-#' #                       queryall = TRUE)
+#' is_deleted <- sf_query(sprintf("SELECT Id, IsDeleted FROM Contact WHERE Id='%s'", 
+#'                                new_records$id[1]), queryall = TRUE)
+#'                                
+#' # As of v48.0 (Spring 2020) you can query the Ids of all records in the Recycle 
+#' # Bin, which makes it easier to clear the entire bin because you can grab the 
+#' # Ids of the records first
+#' records_in_bin <- sf_query("SELECT Record FROM DeleteEvent")
+#' records_emptied_from_bin <- sf_delete(records_in_bin$Record)
 #' }
 #' @export
 sf_empty_recycle_bin <- function(ids,  

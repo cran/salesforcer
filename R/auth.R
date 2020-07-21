@@ -31,6 +31,9 @@
 
 #' Log in to Salesforce
 #' 
+#' @description
+#' \lifecycle{stable}
+#' 
 #' Log in using Basic (Username-Password) or OAuth 2.0 authenticaion. OAuth does
 #' not require sharing passwords, but will require authorizing \code{salesforcer} 
 #' as a connected app to view and manage your organization. You will be directed to 
@@ -103,9 +106,22 @@ sf_auth <- function(username = NULL,
       xml_set_namespace("soapenv") %>%
       xml_add_child("login") %>% 
       xml_set_namespace("urn") %>%
-      xml_add_child("username", username) %>%
-      xml_add_sibling("password", paste0(password, security_token))
-
+      {
+        xml_add_child(., "username", username) %>% 
+        xml_add_sibling("password", paste0(password, security_token))
+        if(getOption("salesforcer.proxy_url") != "" & 
+           !is.null(getOption("salesforcer.proxy_port"))){ 
+          xml_add_child(., "proxy") %>%
+            xml_add_child("proxyhost", getOption("salesforcer.proxy_url")) %>% 
+            xml_add_sibling("proxyport", getOption("salesforcer.proxy_port"))
+        }
+        if(!is.null(getOption("salesforcer.proxy_username")) & 
+           !is.null(getOption("salesforcer.proxy_password"))){ 
+          xml_add_child(., "proxyusername", getOption("salesforcer.proxy_username")) %>% 
+            xml_add_child("proxypassword", getOption("salesforcer.proxy_password"))
+        }
+      }
+    
     # POST the data using httr package and handle response
     httr_response <- rPOST(url = make_login_url(login_url),
                            headers = c("SOAPAction"="login", "Content-Type"="text/xml"), 
@@ -325,14 +341,16 @@ token_available <- function(verbose = TRUE) {
   if (is.null(.state$token)) {
     if (verbose) {
       if (file.exists(".httr-oauth-salesforcer")) {
-        message("A '.httr-oauth-salesforcer' file exists in current working ",
-                "directory.\nWhen/if needed, the credentials cached in ",
-                "'.httr-oauth-salesforcer' will be used for this session.\nOr run sf_auth() ",
-                "for explicit authentication and authorization.")
+        message(paste0("A '.httr-oauth-salesforcer' file exists in current ", 
+                       "working directory.\n\nWhen needed, the credentials ", 
+                       "cached in '.httr-oauth-salesforcer' can be used for ", 
+                       "this session.\n\nAlternatively, you can run sf_auth() ", 
+                       "for explicit authentication and authorization."))
       } else {
-        message("No '.httr-oauth-salesforcer' file exists in current working directory.\n",
-                "When/if needed, salesforcer will initiate authentication ",
-                "and authorization.\nOr run sf_auth() to trigger this explicitly.")
+        message(paste0("No '.httr-oauth-salesforcer' file exists in current ", 
+                       "working directory.\n\nWhen needed, salesforcer will ", 
+                       "initiate authentication and authorization.\n\nAlternatively, ",
+                       "you can run sf_auth() to trigger this explicitly."))
       }
     }
     return(FALSE)

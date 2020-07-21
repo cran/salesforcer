@@ -13,17 +13,17 @@ collapse_list_with_dupe_names(x)
 A \code{list} containing one row per field for the requested object.
 }
 \description{
-This function looks for instances of elements in a list that have the same name 
-and then combine them all into a single comma separated character string (referenceTo) 
-or \code{tbl_df} (picklistValues).
+This function looks for instances of elements in a list that have the same name
+and then combine them all into a single comma separated character string
+(referenceTo) or \code{tbl_df} (picklistValues).
 }
 \note{
-The tibble only contains the fields that the user can view, as defined by 
+The tibble only contains the fields that the user can view, as defined by
 the user's field-level security settings.
 }
 \examples{
 \dontrun{
-obj_dat <- sf_describe_objects(object_names = object_name, api_type = "SOAP")[[1]]
+obj_dat <- sf_describe_objects(object_names = "Contact", api_type = "SOAP")[[1]]
 obj_fields_list <- obj_dat[names(obj_dat) == "fields"] \%>\% 
   map(collapse_list_with_dupe_names)
 }

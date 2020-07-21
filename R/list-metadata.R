@@ -1,5 +1,8 @@
 #' List All Objects of a Certain Metadata Type in Salesforce
 #' 
+#' @description
+#' \lifecycle{experimental}
+#' 
 #' This function takes a query of metadata types and returns a 
 #' summary of all objects in salesforce of the requested types
 #'
@@ -14,7 +17,7 @@
 #' that use folders, such as Dashboard, Document, EmailTemplate, or Report.
 #' @template verbose
 #' @return A \code{tbl_dfs} containing the queried metadata types
-#' @note Only 3 queries can be specifed at one time, so the list length must not exceed 3.
+#' @note Only 3 queries can be specified at one time, so the list length must not exceed 3.
 #' @examples
 #' \dontrun{
 #' # pull back a list of all Custom Objects and Email Templates

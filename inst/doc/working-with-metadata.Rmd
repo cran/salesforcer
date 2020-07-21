@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
   purl = NOT_CRAN,
   eval = NOT_CRAN
 )
+options(tibble.print_min = 5L, tibble.print_max = 5L)
 ```
 
 Salesforce is a very flexible platform in that it provides the 
@@ -29,18 +30,24 @@ for users to create, read, update and delete their entire Salesforce environment
 objects to page layouts and more. This makes it very easy to programmatically setup 
 and teardown the Salesforce environment.
 
-### Retrieving Object Metadata
+## Retrieving Object Metadata
 
 One common use case for the Metadata API is retrieving information about an object 
-(fields, permissions, etc.). First, load the **salesforcer**, **dplyr**, and **purrr** 
+(fields, permissions, etc.). First, load the {salesforcer}, {dplyr}, and {purrr} 
 packages and login, if needed.
 
 ```{r auth, include = FALSE}
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressWarnings(suppressMessages(library(purrr)))
 library(salesforcer)
-token_path <- here::here("tests", "testthat", "salesforcer_token.rds")
-suppressMessages(sf_auth(token = token_path, verbose = FALSE))
+
+username <- Sys.getenv("SALESFORCER_USERNAME")
+password <- Sys.getenv("SALESFORCER_PASSWORD")
+security_token <- Sys.getenv("SALESFORCER_SECURITY_TOKEN")
+
+sf_auth(username = username,
+        password = password,
+        security_token = security_token)
 ```
 
 ```{r load-package, eval=FALSE}
@@ -108,7 +115,7 @@ It is recommended that you try out the various metadata functions `sf_read_metad
 `sf_list_metadata()`, `sf_describe_metadata()`, and `sf_describe_objects()` in order 
 to see which information best suits your use case.
 
-### Modifying Metadata
+## Modifying Metadata
 
 Where the Metadata API really shines is when it comes to CRUD operations on metadata. 
 In this example we will create an object, add fields to it, then delete that object.

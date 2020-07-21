@@ -2,8 +2,8 @@
 #' 
 #' Typically only used internally by functions when control parameters are passed 
 #' through via dots (...), but it can be called directly to control the behavior 
-#' of API calls. This function behaves exactly like \code{\link[stats:glm.control]{glm.control}} 
-#' for the \code{\link[stats:glm]{glm}} function.
+#' of API calls. This function behaves exactly like \code{\link[stats]{glm.control}} 
+#' for the \code{\link[stats]{glm}} function.
 #' 
 #' @importFrom purrr modify modify_if map
 #' @param AllOrNoneHeader \code{list}; containing the \code{allOrNone} element with 
@@ -85,9 +85,11 @@
 #' When you’re creating a bulk upload job, the Line Ending control lets you 
 #' specify whether line endings are read as line feeds (LFs) or as carriage returns 
 #' and line feeds (CRLFs) for fields of type Text Area and Text Area (Long). This 
-#' works for most operations run through the Bulk APIs or creating a Bulk 1.0 
-#' job with \code{\link{sf_create_job_bulk}}. For more information, read the 
-#' Salesforce documentation 
+#' works for most operations run through the Bulk APIs and/or creating a Bulk
+#' job from scratch with \code{\link{sf_create_job_bulk}}. However, note that 
+#' as of \code{readr v1.3.1} all CSV files end with the line feed character 
+#' ("\\n") regardless of the operating system. So it is usually best to not specify 
+#' this argument. For more information, read the Salesforce documentation 
 #' \href{https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/async_api_headers_line_ending.htm}{here}.
 #' @param PKChunkingHeader \code{list}; containing the \code{Sforce-Enable-PKChunking} element. 
 #' Use the PK Chunking control to enable automatic primary key (PK) chunking 
@@ -164,9 +166,6 @@ sf_control <- function(AllOrNoneHeader=list(allOrNone=FALSE),
   
   # determine which elements were supplied, dropping the function call itself
   supplied_arguments <-  as.list(match.call()[-1])
-  # drop api_type and operation existing
-  supplied_arguments[["api_type"]] <- NULL
-  supplied_arguments[["operation"]] <- NULL
   
   # now eval them to no longer be objects of class "call"
   supplied_arguments <- supplied_arguments %>% 
@@ -175,13 +174,29 @@ sf_control <- function(AllOrNoneHeader=list(allOrNone=FALSE),
     modify(~modify_if(., is.logical, tolower))
   
   # check that they are all lists
-  if(!all(sapply(supplied_arguments, is.list))){
-    stop("All control arguments must be lists. Review the argument defaults in 'sf_control()' for help formatting.")
+  list_argument <- sapply(supplied_arguments, is.list)
+  if(!all(list_argument)){
+    if(!all(names(which(!list_argument)) %in% c("api_type", "operation"))){
+      mismatched_warn_str <- c()
+      for(n in names(which(!list_argument))){
+        if(!(n %in% c("api_type", "operation"))){
+          mismatched_warn_str <- c(mismatched_warn_str, n)
+        }
+      }
+      mismatched_warn_str <- paste0(mismatched_warn_str, collapse=", ")  
+      stop(
+        sprintf(paste0("The following control arguments were not provided as lists: \n%s\n\n",
+                       "Review the argument defaults in 'sf_control()' for help formatting."), 
+                mismatched_warn_str)
+        , call. = FALSE
+      )
+    }
   }
   
   # check that the controls valid for the API and operation
-  supplied_arguments <- filter_valid_controls(supplied_arguments, api_type = api_type)
-  supplied_arguments <- filter_valid_controls(supplied_arguments, operation = operation)
+  supplied_arguments <- filter_valid_controls(supplied_arguments, 
+                                              api_type = api_type, 
+                                              operation = operation)
   
   return(supplied_arguments)
 }
@@ -246,14 +261,27 @@ accepted_controls_by_operation <- function(operation = c("delete", "undelete", "
 #' @keywords internal
 #' @export
 filter_valid_controls <- function(supplied, api_type = NULL, operation = NULL){
-  if(!is.null(api_type)){
+  
+  if(is.null(api_type) & !is.null(supplied$api_type)){
+    api_type <- supplied$api_type
+  }
+  # remove the api_type from the supplied args, if it exists
+  supplied$api_type <- NULL
+  
+  if(is.null(operation) & !is.null(supplied$operation)){
+    operation <- supplied$operation
+  }
+  # remove the api_type from the supplied args, if it exists
+  supplied$operation <- NULL  
+  
+  if(!is.null(api_type) ){
     valid <- accepted_controls_by_api(api_type)
     # provide a warning before dropping 
     if(length(setdiff(names(supplied), valid)) >  0){
-      warning(sprintf("Ignoring the following controls which are not used in the %s API: %s",
-                      api_type,
-                      paste0(setdiff(names(supplied), valid), collapse=", ")),
-              call. = TRUE)
+      warn_w_errors_listed(sprintf(paste0("Ignoring the following controls which ", 
+                                          "are not used in the %s API: %s"),
+                                   api_type, 
+                                   paste0(setdiff(names(supplied), valid), collapse=", ")))
     }
     supplied <- supplied[intersect(names(supplied), valid)]
   }
@@ -262,10 +290,10 @@ filter_valid_controls <- function(supplied, api_type = NULL, operation = NULL){
     valid <- accepted_controls_by_operation(operation)
     # provide a warning before dropping 
     if(length(setdiff(names(supplied), valid)) >  0){
-      warning(sprintf("Ignoring the following controls which are not used in the '%s' operation: %s",
-                      operation,
-                      paste0(setdiff(names(supplied), valid), collapse=", ")),
-              call. = TRUE)
+      warn_w_errors_listed(sprintf(paste0("Ignoring the following controls which ", 
+                                          "are not used in the %s operation: %s"),
+                                   operation, 
+                                   paste0(setdiff(names(supplied), valid), collapse=", ")))
     }
     supplied <- supplied[intersect(names(supplied), valid)]
   }
@@ -320,14 +348,14 @@ return_matching_controls <- function(args){
 
 
 # REST Translations
-#  AllorNoneHeader =  (allOrNone, currently in our batched data process)
+#  AllOrNoneHeader =  (allOrNone, currently in our batched data process)
 #  AssignmentRuleHeader = Sforce-Auto-Assign
 #  DuplicateRuleHeader = NONE!
 #  QueryOptions = Sforce-Query-Options
 
 # Bulk 1.0 Translations
 #  AssignmentRuleHeader = assignmentRuleId (in the job info) (only if id?)
-#  AllorNoneHeader? = Unknown if SOAP works for Bulk 1.0 as well
+#  AllOrNoneHeader? = Unknown if SOAP works for Bulk 1.0 as well
 #  DuplicateRuleHeader? = Unknown if SOAP works for Bulk 1.0 as well
 
 # Bulk 2.0 Translations (does not use any headers)

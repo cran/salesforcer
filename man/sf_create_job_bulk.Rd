@@ -8,6 +8,7 @@ sf_create_job_bulk(
   operation = c("insert", "delete", "upsert", "update", "hardDelete", "query",
     "queryall"),
   object_name,
+  soql = NULL,
   external_id_fieldname = NULL,
   api_type = c("Bulk 1.0", "Bulk 2.0"),
   content_type = c("CSV", "ZIP_CSV", "ZIP_XML", "ZIP_JSON"),
@@ -15,45 +16,61 @@ sf_create_job_bulk(
   column_delimiter = c("COMMA", "TAB", "PIPE", "SEMICOLON", "CARET", "BACKQUOTE"),
   control = list(...),
   ...,
+  line_ending = deprecated(),
   verbose = FALSE
 )
 }
 \arguments{
-\item{operation}{character; a string defining the type of operation being 
-performed (e.g. "insert", "update", "upsert", "delete")}
+\item{operation}{\code{character}; a string defining the type of operation being
+performed (e.g. "insert", "update", "upsert", "delete", "hardDelete",
+"query", "queryall").}
 
-\item{object_name}{character; the name of one Salesforce objects that the 
-function is operating against (e.g. "Account", "Contact", "CustomObject__c")}
+\item{object_name}{\code{character}; the name of the Salesforce object that the
+function is operating against (e.g. "Account", "Contact", "CustomObject__c").}
 
-\item{external_id_fieldname}{character; string identifying a custom field on the 
-object that has been set as an "External ID" field. This field is used to reference 
+\item{soql}{\code{character}; a string defining a SOQL query
+(e.g. "SELECT Id, Name FROM Account").}
+
+\item{external_id_fieldname}{\code{character}; string identifying a custom field on the
+object that has been set as an "External ID" field. This field is used to reference
 objects during upserts to determine if the record already exists in Salesforce or not.}
 
-\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
-"Chatter" indicating which API to use when making the request}
+\item{api_type}{\code{character}; one of \code{"REST"}, \code{"SOAP"},
+\code{"Bulk 1.0"}, or \code{"Bulk 2.0"} indicating which API to use when
+making the request.}
 
-\item{content_type}{character; being one of 'CSV', 'ZIP_CSV', 'ZIP_XML', or 'ZIP_JSON' to 
-indicate the type of data being passed to the Bulk APIs. For the Bulk 2.0 API the only 
+\item{content_type}{character; being one of 'CSV', 'ZIP_CSV', 'ZIP_XML', or 'ZIP_JSON' to
+indicate the type of data being passed to the Bulk APIs. For the Bulk 2.0 API the only
 valid value (and the default) is 'CSV'.}
 
-\item{concurrency_mode}{character; either "Parallel" or "Serial" that specifies 
-whether batches should be completed sequentially or in parallel. Use "Serial" 
-only if lock contentions persist with in "Parallel" mode. Note: this argument is 
+\item{concurrency_mode}{character; either "Parallel" or "Serial" that specifies
+whether batches should be completed sequentially or in parallel. Use "Serial"
+only if lock contentions persist with in "Parallel" mode. Note: this argument is
 only used in the Bulk 1.0 API and will be ignored in calls using the Bulk 2.0 API.}
 
-\item{column_delimiter}{character; indicating the column delimiter used for CSV job data. 
-The default value is COMMA. Valid values are: "BACKQUOTE", "CARET", "COMMA", "PIPE", 
-"SEMICOLON", and "TAB", but this package only accepts and uses "COMMA". Also, 
-note that this argument is only used in the Bulk 2.0 API and will be ignored 
+\item{column_delimiter}{character; indicating the column delimiter used for CSV job data.
+The default value is COMMA. Valid values are: "BACKQUOTE", "CARET", "COMMA", "PIPE",
+"SEMICOLON", and "TAB", but this package only accepts and uses "COMMA". Also,
+note that this argument is only used in the Bulk 2.0 API and will be ignored
 in calls using the Bulk 1.0 API.}
 
-\item{control}{\code{list}; a list of parameters for controlling the behavior of 
-the API call being used. For more information of what parameters are available 
-look at the documentation for \code{\link{sf_control}}}
+\item{control}{\code{list}; a list of parameters for controlling the behavior of
+the API call being used. For more information of what parameters are available
+look at the documentation for \code{\link{sf_control}}.}
 
 \item{...}{arguments passed to \code{\link{sf_control}}}
 
-\item{verbose}{logical; do you want informative messages?}
+\item{line_ending}{\code{character}; indicating the The line ending used for
+CSV job data, marking the end of a data row. The default is NULL and determined
+by the operating system using "CRLF" for Windows machines and "LF" for Unix
+machines. NOTE: As of \code{readr v1.3.1} all CSV files end with the line
+feed character ("\\n") regardless of the operating system. So it is usually
+best to not specify this argument.}
+
+\item{verbose}{\code{logical}; an indicator of whether to print additional
+detail for each API call, which is useful for debugging. More specifically, when
+set to \code{TRUE} the URL, header, and body will be printed for each request,
+along with additional diagnostic information where available.}
 }
 \value{
 A \code{tbl_df} parameters defining the created job, including id

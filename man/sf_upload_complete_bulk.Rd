@@ -7,13 +7,17 @@
 sf_upload_complete_bulk(job_id, api_type = c("Bulk 2.0"), verbose = FALSE)
 }
 \arguments{
-\item{job_id}{character; the Salesforce Id assigned to a submitted job as 
-returned by \link{sf_create_job_bulk}}
+\item{job_id}{\code{character}; the Salesforce Id assigned to a submitted job as
+returned by \link{sf_create_job_bulk}. It will start with \code{"750"}.}
 
-\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
-"Chatter" indicating which API to use when making the request}
+\item{api_type}{\code{character}; one of \code{"REST"}, \code{"SOAP"},
+\code{"Bulk 1.0"}, or \code{"Bulk 2.0"} indicating which API to use when
+making the request.}
 
-\item{verbose}{logical; do you want informative messages?}
+\item{verbose}{\code{logical}; an indicator of whether to print additional
+detail for each API call, which is useful for debugging. More specifically, when
+set to \code{TRUE} the URL, header, and body will be printed for each request,
+along with additional diagnostic information where available.}
 }
 \value{
 A \code{list} of parameters defining the job after signaling a completed upload
@@ -22,8 +26,8 @@ A \code{list} of parameters defining the job after signaling a completed upload
 This function signals that uploads are complete to a Job in the Salesforce Bulk API
 }
 \note{
-This function is typically not used directly. It is used in \code{sf_create_batches_bulk()} 
-right after submitting the batches to signal to Salesforce that the batches should 
+This function is typically not used directly. It is used in \code{sf_create_batches_bulk()}
+right after submitting the batches to signal to Salesforce that the batches should
 no longer be queued.
 }
 \examples{

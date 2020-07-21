@@ -1,8 +1,5 @@
 context("Describe")
 
-salesforcer_token <- readRDS("salesforcer_token.rds")
-sf_auth(token = salesforcer_token)
-
 test_that("testing sf_describe_objects", {
   account_metadata <- sf_describe_objects("Account")
   expect_is(account_metadata, "list")
@@ -18,5 +15,6 @@ test_that("testing sf_describe_objects", {
   expect_is(multiple_objs_metadata, "list")
   expect_equal(length(multiple_objs_metadata), 2)
   expect_equal(sort(c(unlist(multiple_objs_metadata[[1]]$name), 
-                      unlist(multiple_objs_metadata[[2]]$name))), c("Contact", "Lead"))
+                      unlist(multiple_objs_metadata[[2]]$name))), 
+               c("Contact", "Lead"))
 })

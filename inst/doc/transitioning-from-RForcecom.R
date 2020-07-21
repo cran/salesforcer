@@ -6,16 +6,20 @@ knitr::opts_chunk$set(
   purl = NOT_CRAN,
   eval = NOT_CRAN
 )
+options(tibble.print_min = 5L, tibble.print_max = 5L)
 
 ## ----auth, include = FALSE----------------------------------------------------
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressWarnings(suppressMessages(library(here)))
 library(salesforcer)
-options_path <- here::here("tests", "testthat", "salesforcer_test_settings.rds")
-salesforcer_test_settings <- readRDS(options_path)
-username <- salesforcer_test_settings$username
-password <- salesforcer_test_settings$password
-security_token <- salesforcer_test_settings$security_token
+
+username <- Sys.getenv("SALESFORCER_USERNAME")
+password <- Sys.getenv("SALESFORCER_PASSWORD")
+security_token <- Sys.getenv("SALESFORCER_SECURITY_TOKEN")
+
+sf_auth(username = username,
+        password = password,
+        security_token = security_token)
 
 ## ---- warning=FALSE-----------------------------------------------------------
 # the RForcecom way
@@ -25,15 +29,17 @@ session1['sessionID'] <- "{MASKED}"
 session1
 
 # replicated in salesforcer package
-session2 <- salesforcer::rforcecom.login(username, paste0(password, security_token), 
-                                         apiVersion=getOption("salesforcer.api_version"))
+session2 <- salesforcer::rforcecom.login(username, 
+                                         paste0(password, security_token), 
+                                         apiVersion = getOption("salesforcer.api_version"))
 session2['sessionID'] <- "{MASKED}"
 session2
 
 ## ---- include=FALSE-----------------------------------------------------------
 # keep using the session, just rename it to "session"
-session <- salesforcer::rforcecom.login(username, paste0(password, security_token), 
-                                         apiVersion=getOption("salesforcer.api_version"))
+session <- salesforcer::rforcecom.login(username, 
+                                        paste0(password, security_token), 
+                                        apiVersion = getOption("salesforcer.api_version"))
 
 ## ---- warning=FALSE-----------------------------------------------------------
 object <- "Contact"

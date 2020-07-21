@@ -16,6 +16,22 @@
 
 <title>Transitioning from RForcecom</title>
 
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -315,10 +331,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </ul>
 </div>
 
-<p>While writing the <strong>salesforcer</strong> package we were keenly aware that many folks are already using the <strong>RForcecom</strong> package to connect to Salesforce. In order to foster adoption and switching between the packages <strong>salesforcer</strong> replicates the functionality of many <strong>RForcecom</strong> functions so that you will only need to swap out <code>library(RForcecom)</code> for <code>library(salesforcer)</code> and still have your production tested scripts perform as usual.</p>
-<div id="authentication" class="section level3">
-<h3>Authentication</h3>
-<p><strong>salesforcer</strong> supports OAuth 2.0 authentication which is preferred, but for backward compatibility provides the username-password authentication routine implemented by <strong>RForcecom</strong>. Here is an example running the function from each of the packages side-by-side and producing the same result.</p>
+<p>While writing the {salesforcer} package we were keenly aware that many folks are already using the <strong>RForcecom</strong> package to connect to Salesforce. In order to foster adoption and switching between the packages {salesforcer} replicates the functionality of many <strong>RForcecom</strong> functions so that you will only need to swap out <code>library(RForcecom)</code> for <code>library(salesforcer)</code> and still have your production tested scripts perform as usual.</p>
+<div id="authentication" class="section level2">
+<h2>Authentication</h2>
+<p>{salesforcer} supports OAuth 2.0 authentication which is preferred, but for backward compatibility provides the username-password authentication routine implemented by <strong>RForcecom</strong>. Here is an example running the function from each of the packages side-by-side and producing the same result.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># the RForcecom way</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>session1 &lt;-<span class="st"> </span>RForcecom<span class="op">::</span><span class="kw">rforcecom.login</span>(username, <span class="kw">paste0</span>(password, security_token), </span>
 <span id="cb1-3"><a href="#cb1-3"></a>                                       <span class="dt">apiVersion=</span><span class="kw">getOption</span>(<span class="st">&quot;salesforcer.api_version&quot;</span>))</span>
@@ -330,19 +346,20 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb1-9"><a href="#cb1-9"></a><span class="co">#&gt;                          &quot;48.0&quot;</span></span>
 <span id="cb1-10"><a href="#cb1-10"></a></span>
 <span id="cb1-11"><a href="#cb1-11"></a><span class="co"># replicated in salesforcer package</span></span>
-<span id="cb1-12"><a href="#cb1-12"></a>session2 &lt;-<span class="st"> </span>salesforcer<span class="op">::</span><span class="kw">rforcecom.login</span>(username, <span class="kw">paste0</span>(password, security_token), </span>
-<span id="cb1-13"><a href="#cb1-13"></a>                                         <span class="dt">apiVersion=</span><span class="kw">getOption</span>(<span class="st">&quot;salesforcer.api_version&quot;</span>))</span>
-<span id="cb1-14"><a href="#cb1-14"></a>session2[<span class="st">&#39;sessionID&#39;</span>] &lt;-<span class="st"> &quot;{MASKED}&quot;</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a>session2</span>
-<span id="cb1-16"><a href="#cb1-16"></a><span class="co">#&gt;                       sessionID                     instanceURL </span></span>
-<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt;                      &quot;{MASKED}&quot; &quot;https://na122.salesforce.com/&quot; </span></span>
-<span id="cb1-18"><a href="#cb1-18"></a><span class="co">#&gt;                      apiVersion </span></span>
-<span id="cb1-19"><a href="#cb1-19"></a><span class="co">#&gt;                          &quot;48.0&quot;</span></span></code></pre></div>
-<p>Note that we must set the API version here because calls to session will not create a new sessionId and then we are stuck with version 35.0 (the default from RForcecom::rforcecom.login). Some functions in <strong>salesforcer</strong> implement API calls that are only available after version 35.0.</p>
+<span id="cb1-12"><a href="#cb1-12"></a>session2 &lt;-<span class="st"> </span>salesforcer<span class="op">::</span><span class="kw">rforcecom.login</span>(username, </span>
+<span id="cb1-13"><a href="#cb1-13"></a>                                         <span class="kw">paste0</span>(password, security_token), </span>
+<span id="cb1-14"><a href="#cb1-14"></a>                                         <span class="dt">apiVersion =</span> <span class="kw">getOption</span>(<span class="st">&quot;salesforcer.api_version&quot;</span>))</span>
+<span id="cb1-15"><a href="#cb1-15"></a>session2[<span class="st">&#39;sessionID&#39;</span>] &lt;-<span class="st"> &quot;{MASKED}&quot;</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a>session2</span>
+<span id="cb1-17"><a href="#cb1-17"></a><span class="co">#&gt;                       sessionID                     instanceURL </span></span>
+<span id="cb1-18"><a href="#cb1-18"></a><span class="co">#&gt;                      &quot;{MASKED}&quot; &quot;https://na122.salesforce.com/&quot; </span></span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="co">#&gt;                      apiVersion </span></span>
+<span id="cb1-20"><a href="#cb1-20"></a><span class="co">#&gt;                          &quot;48.0&quot;</span></span></code></pre></div>
+<p>Note that we must set the API version here because calls to session will not create a new sessionId and then we are stuck with version 35.0 (the default from RForcecom::rforcecom.login). Some functions in {salesforcer} implement API calls that are only available after version 35.0.</p>
 </div>
-<div id="crud-operations" class="section level3">
-<h3>CRUD Operations</h3>
-<p>“CRUD” operations (Create, Retrieve, Update, Delete) in the <strong>RForcecom</strong> package only operate on one record at a time. One benefit to using the <strong>salesforcer</strong> package is that these operations will accept a named vector (one record) or an entire <code>data.frame</code> or <code>tbl_df</code> of records to churn through. However, rest assured that the replicated functions behave exactly the same way if you are hesitant to making the switch.</p>
+<div id="crud-operations" class="section level2">
+<h2>CRUD Operations</h2>
+<p>“CRUD” operations (Create, Retrieve, Update, Delete) in the <strong>RForcecom</strong> package only operate on one record at a time. One benefit to using the {salesforcer} package is that these operations will accept a named vector (one record) or an entire <code>data.frame</code> or <code>tbl_df</code> of records to churn through. However, rest assured that the replicated functions behave exactly the same way if you are hesitant to making the switch.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>object &lt;-<span class="st"> &quot;Contact&quot;</span></span>
 <span id="cb2-2"><a href="#cb2-2"></a>fields &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">FirstName=</span><span class="st">&quot;Test&quot;</span>, <span class="dt">LastName=</span><span class="st">&quot;Contact-Create-Compatibility&quot;</span>)</span>
 <span id="cb2-3"><a href="#cb2-3"></a></span>
@@ -350,14 +367,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb2-5"><a href="#cb2-5"></a>result1 &lt;-<span class="st"> </span>RForcecom<span class="op">::</span><span class="kw">rforcecom.create</span>(session, <span class="dt">objectName=</span>object, fields)</span>
 <span id="cb2-6"><a href="#cb2-6"></a>result1</span>
 <span id="cb2-7"><a href="#cb2-7"></a><span class="co">#&gt;                   id success</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; 1 0033s000012MKV9AAO    true</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="co">#&gt; 1 0033s000013YBr0AAG    true</span></span>
 <span id="cb2-9"><a href="#cb2-9"></a></span>
 <span id="cb2-10"><a href="#cb2-10"></a><span class="co"># replicated in salesforcer package</span></span>
 <span id="cb2-11"><a href="#cb2-11"></a>result2 &lt;-<span class="st"> </span>salesforcer<span class="op">::</span><span class="kw">rforcecom.create</span>(session, <span class="dt">objectName=</span>object, fields)</span>
 <span id="cb2-12"><a href="#cb2-12"></a>result2</span>
 <span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt;                   id success</span></span>
-<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 1 0033s000012MKVEAA4    TRUE</span></span></code></pre></div>
-<p>Here is an example showing the reduction in code of using <strong>salesforcer</strong> if you would like to create multiple records.</p>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 1 0033s000013YBrEAAW    TRUE</span></span></code></pre></div>
+<p>Here is an example showing the reduction in code of using {salesforcer} if you would like to create multiple records.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>n &lt;-<span class="st"> </span><span class="dv">2</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>new_contacts &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">FirstName =</span> <span class="kw">rep</span>(<span class="st">&quot;Test&quot;</span>, n),</span>
 <span id="cb3-3"><a href="#cb3-3"></a>                       <span class="dt">LastName =</span> <span class="kw">paste0</span>(<span class="st">&quot;Contact-Create-&quot;</span>, <span class="dv">1</span><span class="op">:</span>n))</span>
@@ -372,8 +389,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb3-12"><a href="#cb3-12"></a>}</span>
 <span id="cb3-13"><a href="#cb3-13"></a>rforcecom_results</span>
 <span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt;                   id success</span></span>
-<span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt; 1 0033s000012MKVJAA4    true</span></span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt; 2 0033s000012MKVOAA4    true</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt; 1 0033s000013YBrJAAW    true</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt; 2 0033s000013YBrOAAW    true</span></span>
 <span id="cb3-17"><a href="#cb3-17"></a></span>
 <span id="cb3-18"><a href="#cb3-18"></a><span class="co"># the better way in salesforcer to do multiple records</span></span>
 <span id="cb3-19"><a href="#cb3-19"></a>salesforcer_results &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contacts, <span class="dt">object_name=</span><span class="st">&quot;Contact&quot;</span>)</span>
@@ -381,51 +398,51 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; # A tibble: 2 x 2</span></span>
 <span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt; 1 0033s000012MKVTAA4 TRUE   </span></span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt; 2 0033s000012MKVUAA4 TRUE</span></span></code></pre></div>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt; 1 0033s000013YBZwAAO TRUE   </span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt; 2 0033s000013YBZxAAO TRUE</span></span></code></pre></div>
 </div>
-<div id="query" class="section level3">
-<h3>Query</h3>
-<p><strong>salesforcer</strong> also has better printing and type-casting when returning query result thanks to features of the readr package.</p>
+<div id="query" class="section level2">
+<h2>Query</h2>
+<p>{salesforcer} also has better printing and type-casting when returning query result thanks to features of the readr package.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>this_soql &lt;-<span class="st"> &quot;SELECT Id, Email FROM Contact LIMIT 5&quot;</span></span>
 <span id="cb4-2"><a href="#cb4-2"></a></span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="co"># the RForcecom way</span></span>
 <span id="cb4-4"><a href="#cb4-4"></a>result1 &lt;-<span class="st"> </span>RForcecom<span class="op">::</span><span class="kw">rforcecom.query</span>(session, <span class="dt">soqlQuery =</span> this_soql)</span>
 <span id="cb4-5"><a href="#cb4-5"></a>result1</span>
 <span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt;                   Id</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; 1 0033s000012MKTNAA4</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; 2 0033s000012MGJZAA4</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; 3 0033s000012MGcXAAW</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; 4 0033s000012MG7oAAG</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; 5 0033s000012MIlnAAG</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; 1 0033s000013YAdhAAG</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; 2 0033s000013YB7iAAG</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#&gt; 3 0033s000013YAnLAAW</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#&gt; 4 0033s000013YAnMAAW</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#&gt; 5 0033s000013YBFbAAO</span></span>
 <span id="cb4-12"><a href="#cb4-12"></a></span>
 <span id="cb4-13"><a href="#cb4-13"></a><span class="co"># replicated in salesforcer package</span></span>
 <span id="cb4-14"><a href="#cb4-14"></a>result2 &lt;-<span class="st"> </span>salesforcer<span class="op">::</span><span class="kw">rforcecom.query</span>(session, <span class="dt">soqlQuery =</span> this_soql)</span>
 <span id="cb4-15"><a href="#cb4-15"></a>result2</span>
-<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; # A tibble: 5 x 2</span></span>
-<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt;   Id                 Email</span></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;</span></span>
-<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; 1 0033s000012MKTNAA4 NA   </span></span>
-<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; 2 0033s000012MGJZAA4 NA   </span></span>
-<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; 3 0033s000012MGcXAAW NA   </span></span>
-<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; 4 0033s000012MG7oAAG NA   </span></span>
-<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; 5 0033s000012MIlnAAG NA</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co">#&gt; # A tibble: 5 x 1</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt;   Id                </span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt;   &lt;chr&gt;             </span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt; 1 0033s000013YAdhAAG</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; 2 0033s000013YB7iAAG</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt; 3 0033s000013YAnLAAW</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt; 4 0033s000013YAnMAAW</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; 5 0033s000013YBFbAAO</span></span>
 <span id="cb4-24"><a href="#cb4-24"></a></span>
 <span id="cb4-25"><a href="#cb4-25"></a><span class="co"># the better way in salesforcer to query</span></span>
 <span id="cb4-26"><a href="#cb4-26"></a>salesforcer_results &lt;-<span class="st"> </span><span class="kw">sf_query</span>(this_soql)</span>
 <span id="cb4-27"><a href="#cb4-27"></a>salesforcer_results</span>
-<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; # A tibble: 5 x 2</span></span>
-<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;   Id                 Email</span></span>
-<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;</span></span>
-<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; 1 0033s000012MKTNAA4 NA   </span></span>
-<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt; 2 0033s000012MGJZAA4 NA   </span></span>
-<span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt; 3 0033s000012MGcXAAW NA   </span></span>
-<span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt; 4 0033s000012MG7oAAG NA   </span></span>
-<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt; 5 0033s000012MIlnAAG NA</span></span></code></pre></div>
+<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; # A tibble: 5 x 1</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt;   Id                </span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt;   &lt;chr&gt;             </span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt; 1 0033s000013YAdhAAG</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt; 2 0033s000013YB7iAAG</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt; 3 0033s000013YAnLAAW</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a><span class="co">#&gt; 4 0033s000013YAnMAAW</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a><span class="co">#&gt; 5 0033s000013YBFbAAO</span></span></code></pre></div>
 </div>
-<div id="describe" class="section level3">
-<h3>Describe</h3>
-<p>The <strong>RForcecom</strong> package has the function <code>rforcecom.getObjectDescription()</code> which returns a <code>data.frame</code> with one row per field on an object. The same function in <strong>salesforcer</strong> is named <code>sf_describe_object_fields()</code> and also has better printing and datatype casting by using tibbles.</p>
+<div id="describe" class="section level2">
+<h2>Describe</h2>
+<p>The <strong>RForcecom</strong> package has the function <code>rforcecom.getObjectDescription()</code> which returns a <code>data.frame</code> with one row per field on an object. The same function in {salesforcer} is named <code>sf_describe_object_fields()</code> and also has better printing and datatype casting by using tibbles.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># the RForcecom way</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>result1 &lt;-<span class="st"> </span>RForcecom<span class="op">::</span><span class="kw">rforcecom.getObjectDescription</span>(session, <span class="dt">objectName=</span><span class="st">&#39;Account&#39;</span>)</span>
 <span id="cb5-3"><a href="#cb5-3"></a></span>
@@ -435,29 +452,24 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-7"><a href="#cb5-7"></a><span class="co"># the better way in salesforcer to get object fields</span></span>
 <span id="cb5-8"><a href="#cb5-8"></a>result3 &lt;-<span class="st"> </span>salesforcer<span class="op">::</span><span class="kw">sf_describe_object_fields</span>(<span class="st">&#39;Account&#39;</span>)</span>
 <span id="cb5-9"><a href="#cb5-9"></a>result3</span>
-<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; # A tibble: 68 x 39</span></span>
-<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt;    aggregatable aiPredictionFie… autoNumber byteLength calculated caseSensitive</span></span>
-<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;    &lt;chr&gt;        &lt;chr&gt;            &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;        </span></span>
-<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;  1 true         false            false      18         false      false        </span></span>
-<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt;  2 false        false            false      0          false      false        </span></span>
-<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt;  3 true         false            false      18         false      false        </span></span>
-<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt;  4 true         false            false      765        false      false        </span></span>
-<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt;  5 true         false            false      120        false      false        </span></span>
-<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt;  6 true         false            false      18         false      false        </span></span>
-<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt;  7 true         false            false      765        false      false        </span></span>
-<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt;  8 true         false            false      120        false      false        </span></span>
-<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt;  9 true         false            false      240        false      false        </span></span>
-<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; 10 true         false            false      60         false      false        </span></span>
-<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; # … with 58 more rows, and 33 more variables: compoundFieldName &lt;chr&gt;,</span></span>
-<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; #   createable &lt;chr&gt;, custom &lt;chr&gt;, defaultedOnCreate &lt;chr&gt;,</span></span>
-<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; #   defaultValue &lt;list&gt;, deprecatedAndHidden &lt;chr&gt;, digits &lt;chr&gt;,</span></span>
-<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; #   externalId &lt;chr&gt;, extraTypeInfo &lt;chr&gt;, filterable &lt;chr&gt;, groupable &lt;chr&gt;,</span></span>
-<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt; #   idLookup &lt;chr&gt;, label &lt;chr&gt;, length &lt;chr&gt;, name &lt;chr&gt;, nameField &lt;chr&gt;,</span></span>
-<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt; #   namePointing &lt;chr&gt;, nillable &lt;chr&gt;, permissionable &lt;chr&gt;,</span></span>
-<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt; #   picklistValues &lt;list&gt;, polymorphicForeignKey &lt;chr&gt;, precision &lt;chr&gt;,</span></span>
-<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt; #   queryByDistance &lt;chr&gt;, referenceTo &lt;chr&gt;, relationshipName &lt;chr&gt;,</span></span>
-<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt; #   restrictedPicklist &lt;chr&gt;, scale &lt;chr&gt;, searchPrefilterable &lt;chr&gt;,</span></span>
-<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt; #   soapType &lt;chr&gt;, sortable &lt;chr&gt;, type &lt;chr&gt;, unique &lt;chr&gt;, updateable &lt;chr&gt;</span></span></code></pre></div>
+<span id="cb5-10"><a href="#cb5-10"></a><span class="co">#&gt; # A tibble: 69 x 39</span></span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt;   aggregatable aiPredictionFie… autoNumber byteLength calculated caseSensitive</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;            &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;        </span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; 1 true         false            false      18         false      false        </span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt; 2 false        false            false      0          false      false        </span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt; 3 true         false            false      18         false      false        </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt; 4 true         false            false      765        false      false        </span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; 5 true         false            false      120        false      false        </span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; # … with 64 more rows, and 33 more variables: compoundFieldName &lt;chr&gt;,</span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; #   createable &lt;chr&gt;, custom &lt;chr&gt;, defaultValue &lt;list&gt;,</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; #   defaultedOnCreate &lt;chr&gt;, deprecatedAndHidden &lt;chr&gt;, digits &lt;chr&gt;,</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="co">#&gt; #   externalId &lt;chr&gt;, extraTypeInfo &lt;chr&gt;, filterable &lt;chr&gt;, groupable &lt;chr&gt;,</span></span>
+<span id="cb5-22"><a href="#cb5-22"></a><span class="co">#&gt; #   idLookup &lt;chr&gt;, label &lt;chr&gt;, length &lt;chr&gt;, name &lt;chr&gt;, nameField &lt;chr&gt;,</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a><span class="co">#&gt; #   namePointing &lt;chr&gt;, nillable &lt;chr&gt;, permissionable &lt;chr&gt;,</span></span>
+<span id="cb5-24"><a href="#cb5-24"></a><span class="co">#&gt; #   picklistValues &lt;list&gt;, polymorphicForeignKey &lt;chr&gt;, precision &lt;chr&gt;,</span></span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; #   queryByDistance &lt;chr&gt;, referenceTo &lt;chr&gt;, relationshipName &lt;chr&gt;,</span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; #   restrictedPicklist &lt;chr&gt;, scale &lt;chr&gt;, searchPrefilterable &lt;chr&gt;,</span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt; #   soapType &lt;chr&gt;, sortable &lt;chr&gt;, type &lt;chr&gt;, unique &lt;chr&gt;, updateable &lt;chr&gt;</span></span></code></pre></div>
 <p>In the future more features will be migrated from <strong>RForcecom</strong> to make the transition as seamless as possible.</p>
 </div>
 

@@ -1,21 +1,26 @@
 #' Create Records
 #' 
+#' @description
+#' \lifecycle{maturing}
+#' 
 #' Adds one or more new records to your organization’s data.
 #' 
+#' @importFrom lifecycle deprecate_warn is_present deprecated
 #' @param input_data \code{named vector}, \code{matrix}, \code{data.frame}, or 
 #' \code{tbl_df}; data can be coerced into a \code{data.frame}
 #' @template object_name
 #' @template api_type
+#' @template guess_types
 #' @template control
 #' @param ... arguments passed to \code{\link{sf_control}} or further downstream 
 #' to \code{\link{sf_bulk_operation}}
+#' @template all_or_none
 #' @template verbose
 #' @return \code{tbl_df} of records with success indicator
 #' @note Because the SOAP and REST calls chunk data into batches of 200 records 
 #' the AllOrNoneHeader will only apply to the success or failure of every batch 
 #' of records and not all records submitted to the function.
-#' @examples
-#' \dontrun{
+#' @examples \dontrun{
 #' n <- 2
 #' new_contacts <- tibble(FirstName = rep("Test", n),
 #'                        LastName = paste0("Contact", 1:n))
@@ -35,26 +40,29 @@
 sf_create <- function(input_data,
                       object_name,
                       api_type = c("SOAP", "REST", "Bulk 1.0", "Bulk 2.0"),
+                      guess_types = TRUE,
                       control = list(...), ...,
+                      all_or_none = deprecated(),
                       verbose = FALSE){
   
   api_type <- match.arg(api_type)
   
   # determine how to pass along the control args 
-  all_args <- list(...)
   control_args <- return_matching_controls(control)
   control_args$api_type <- api_type
   control_args$operation <- "insert"
-  if("all_or_none" %in% names(all_args)){
-    # warn then set it in the control list
-    warning(paste0("The `all_or_none` argument has been deprecated.\n", 
-                   "Please pass AllOrNoneHeader argument or use the `sf_control` function."), 
-            call. = FALSE)
-    control_args$AllOrNoneHeader = list(allOrNone = tolower(all_args$all_or_none))
-  }
+  
+  if(is_present(all_or_none)) {
+    deprecate_warn("0.1.3", "sf_create(all_or_none = )", "sf_create(AllOrNoneHeader = )", 
+                   details = paste0("You can pass the all or none header directly ", 
+                                    "as shown above or via the `control` argument."))
+    control_args$AllOrNoneHeader <- list(allOrNone = tolower(all_or_none))
+  }  
+  
   if("AssignmentRuleHeader" %in% names(control_args)){
     if(!object_name %in% c("Account", "Case", "Lead")){
-      stop("The AssignmentRuleHeader can only be used when creating, updating, or upserting an Account, Case, or Lead")
+      stop(paste0("The AssignmentRuleHeader can only be used when creating, ", 
+                  "updating, or upserting an Account, Case, or Lead"))
     }
   }
   
@@ -62,24 +70,28 @@ sf_create <- function(input_data,
     resultset <- sf_create_soap(input_data = input_data,
                                 object_name = object_name,
                                 control = control_args, 
+                                guess_types = guess_types,
                                 verbose = verbose)
   } else if(api_type == "REST"){
     resultset <- sf_create_rest(input_data = input_data,
                                 object_name = object_name,
+                                guess_types = guess_types,
                                 control = control_args, 
                                 verbose = verbose)
   } else if(api_type == "Bulk 1.0"){
     resultset <- sf_create_bulk_v1(input_data, 
                                    object_name = object_name, 
-                                   control = control_args, 
+                                   control = control_args,
+                                   guess_types = guess_types,
                                    verbose = verbose, ...)
   } else if(api_type == "Bulk 2.0"){
     resultset <- sf_create_bulk_v2(input_data, 
                                    object_name = object_name, 
                                    control = control_args, 
+                                   guess_types = guess_types,
                                    verbose = verbose, ...)
   } else {
-    stop("Unknown API type.")
+    catch_unknown_api(api_type)
   }
   return(resultset)
 }
@@ -97,6 +109,7 @@ sf_create <- function(input_data,
 #' @keywords internal
 sf_create_soap <- function(input_data, 
                            object_name,
+                           guess_types = TRUE,
                            control, ...,
                            verbose = FALSE){
   
@@ -138,29 +151,32 @@ sf_create_soap <- function(input_data,
                                 request_body)
     }
     catch_errors(httr_response)
-    response_parsed <- content(httr_response, encoding="UTF-8")
+    response_parsed <- content(httr_response, as="parsed", encoding="UTF-8")
     this_set <- response_parsed %>%
       xml_ns_strip() %>%
       xml_find_all('.//result') %>% 
-      map_df(xml_nodeset_to_df)
+      map_df(extract_records_from_xml_node)
     resultset <- bind_rows(resultset, this_set)
   }
-  resultset <- resultset %>%
-    type_convert(col_types = cols())
+  
+  resultset <- resultset %>% 
+    sf_reorder_cols() %>% 
+    sf_guess_cols(guess_types)
+  
   return(resultset)
 }
 
 #' Create Records using REST API
 #' 
-#' @importFrom readr cols type_convert
-#' @importFrom dplyr everything as_tibble bind_rows select
-#' @importFrom jsonlite toJSON fromJSON prettify
+#' @importFrom purrr map_df
+#' @importFrom readr cols type_convert col_guess
 #' @importFrom stats quantile
 #' @importFrom utils head
 #' @note This function is meant to be used internally. Only use when debugging.
 #' @keywords internal
 sf_create_rest <- function(input_data, 
                            object_name,
+                           guess_types = TRUE,
                            control, ..., 
                            verbose = FALSE){
   # This resource is available in API version 42.0 and later.
@@ -182,9 +198,13 @@ sf_create_rest <- function(input_data,
   
   # add attributes to insert multiple records at a time
   # https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm?search_text=update%20multiple
-  input_data$attributes <- lapply(1:nrow(input_data), FUN=function(x, obj){list(type=obj, referenceId=paste0("ref" ,x))}, obj=object_name)
+  input_data$attributes <- lapply(1:nrow(input_data), 
+                                  FUN=function(x, obj){
+                                    list(type=obj,
+                                         referenceId=paste0("ref" ,x))
+                                    }, obj=object_name)
   #input_data$attributes <- list(rep(list(type=object_name), nrow(input_data)))[[1]]
-  input_data <- input_data %>% select(attributes, everything())
+  input_data <- input_data %>% select(any_of("attributes"), everything())
   
   composite_url <- make_composite_url()
   # this type of request can only handle 200 records at a time
@@ -204,26 +224,27 @@ sf_create_rest <- function(input_data,
       } 
     }
     batched_data <- input_data[batch_id == batch, , drop=FALSE]
-    request_body <- toJSON(list(allOrNone = tolower(all_or_none), 
-                                records = batched_data), 
-                           auto_unbox = TRUE, 
-                           na = "null")
+    request_body <- list(allOrNone = all_or_none, records = batched_data)
     httr_response <- rPOST(url = composite_url,
                            headers = request_headers,
-                           body = request_body)
+                           body = request_body, 
+                           encode = "json")
     if(verbose){
       make_verbose_httr_message(httr_response$request$method,
                                 httr_response$request$url, 
                                 httr_response$request$headers, 
-                                prettify(request_body))
+                                request_body)
     }
     catch_errors(httr_response)
-    response_parsed <- content(httr_response, "text", encoding="UTF-8")
-    resultset <- bind_rows(resultset, fromJSON(response_parsed))
+    response_parsed <- content(httr_response, as="parsed", encoding="UTF-8")
+    resultset <- c(resultset, response_parsed)
   }
+  
   resultset <- resultset %>%
-    as_tibble() %>%
-    type_convert(col_types = cols())
+    map_df(flatten_tbl_df) %>%
+    sf_reorder_cols() %>% 
+    sf_guess_cols(guess_types)
+
   return(resultset)
 }
 
@@ -233,12 +254,14 @@ sf_create_rest <- function(input_data,
 #' @keywords internal
 sf_create_bulk_v1 <- function(input_data, 
                               object_name,
+                              guess_types = TRUE,
                               control, ...,
                               verbose = FALSE){
   input_data <- sf_input_data_validation(operation = "create", input_data)
   control <- do.call("sf_control", control)
   resultset <- sf_bulk_operation(input_data = input_data, 
                                  object_name = object_name, 
+                                 guess_types = guess_types,
                                  operation = "insert", 
                                  api_type = "Bulk 1.0",
                                  control = control, ...,
@@ -246,13 +269,13 @@ sf_create_bulk_v1 <- function(input_data,
   return(resultset)
 }
 
-
 #' Create Records using Bulk 2.0 API
 #' 
 #' @note This function is meant to be used internally. Only use when debugging.
 #' @keywords internal
 sf_create_bulk_v2 <- function(input_data, 
                               object_name,
+                              guess_types = TRUE,
                               control, ...,
                               verbose = FALSE){
   # The order of records in the response is not guaranteed to match the ordering of
@@ -261,6 +284,7 @@ sf_create_bulk_v2 <- function(input_data,
   control <- do.call("sf_control", control)
   resultset <- sf_bulk_operation(input_data = input_data, 
                                  object_name = object_name, 
+                                 guess_types = guess_types,
                                  operation = "insert", 
                                  api_type = "Bulk 2.0",
                                  control = control, ...,

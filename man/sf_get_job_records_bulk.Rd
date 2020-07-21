@@ -13,23 +13,27 @@ sf_get_job_records_bulk(
 )
 }
 \arguments{
-\item{job_id}{character; the Salesforce Id assigned to a submitted job as 
-returned by \link{sf_create_job_bulk}}
+\item{job_id}{\code{character}; the Salesforce Id assigned to a submitted job as
+returned by \link{sf_create_job_bulk}. It will start with \code{"750"}.}
 
-\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
-"Chatter" indicating which API to use when making the request}
+\item{api_type}{\code{character}; one of \code{"REST"}, \code{"SOAP"},
+\code{"Bulk 1.0"}, or \code{"Bulk 2.0"} indicating which API to use when
+making the request.}
 
-\item{record_types}{character; one or more types of records to retrieve from 
+\item{record_types}{character; one or more types of records to retrieve from
 the results of running the specified job}
 
-\item{combine_record_types}{logical; indicating for Bulk 2.0 jobs whether the 
-successfulResults, failedResults, and unprocessedRecords should be stacked together 
+\item{combine_record_types}{logical; indicating for Bulk 2.0 jobs whether the
+successfulResults, failedResults, and unprocessedRecords should be stacked together
 using \code{bind_rows}}
 
-\item{verbose}{logical; do you want informative messages?}
+\item{verbose}{\code{logical}; an indicator of whether to print additional
+detail for each API call, which is useful for debugging. More specifically, when
+set to \code{TRUE} the URL, header, and body will be printed for each request,
+along with additional diagnostic information where available.}
 }
 \value{
-A \code{tbl_df} or \code{list} of \code{tbl_df}, formatted by Salesforce, 
+A \code{tbl_df} or \code{list} of \code{tbl_df}, formatted by Salesforce,
 with information containing the success or failure or certain rows in a submitted job
 }
 \description{
@@ -37,7 +41,7 @@ This function returns detailed (row-level) information on a job
 which has already been submitted completed (successfully or not).
 }
 \note{
-With Bulk 2.0 the order of records in the response is not guaranteed to 
+With Bulk 2.0 the order of records in the response is not guaranteed to
 match the ordering of records in the original job data.
 }
 \examples{

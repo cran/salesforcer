@@ -11,11 +11,11 @@ test_that("testing sf_user_info()", {
 })
 
 test_that("testing sf_set_password()", {
-  # nothing right now
+  skip("Not testing password set right now.")
 })
 
 test_that("testing sf_reset_password()", {
-  # nothing right now
+  skip("Not testing password reset right now.")
 })
 
 test_that("testing sf_server_timestamp()", {
@@ -49,8 +49,8 @@ test_that("testing sf_list_objects()", {
   res <- sf_list_objects()
   valid_object_names <- sapply(res$sobjects, FUN=function(x){x$name})
   expect_is(res, "list")
-  expect_true(all(c("Account", "Contact", "Lead", 
-                    "Opportunity", "Task") %in% valid_object_names))
+  expect_true(all(c("Account", "Contact", "Lead", "Opportunity", "Task") %in% 
+                    valid_object_names))
 })
 
 test_that("testing sf_find_duplicates()", {
@@ -58,12 +58,25 @@ test_that("testing sf_find_duplicates()", {
                                           object_name = "Contact")
   expect_is(duplicates_search, "tbl_df")
   expect_named(duplicates_search, c("sObject", "Id"))
+
+  duplicates_search_w_details <- sf_find_duplicates(search_criteria = list(Email="bond_john@grandhotels.com"),
+                                                    object_name = "Contact", 
+                                                    include_record_details = TRUE)
+  expect_is(duplicates_search_w_details, "tbl_df")
+  expect_true(all(c("sObject", "Id", "Name", "Phone", "Account.Id", "Owner.Id") %in% 
+                    names(duplicates_search_w_details)))  
 })
 
 test_that("testing sf_find_duplicates_by_id()", {
   duplicates_search <- sf_find_duplicates_by_id(sf_id = "0036A000002C6McQAK") 
   expect_is(duplicates_search, "tbl_df")
   expect_named(duplicates_search, c("sObject", "Id"))
+  
+  duplicates_search_w_details <- sf_find_duplicates_by_id(sf_id = "0036A000002C6McQAK", 
+                                                          include_record_details = TRUE)
+  expect_is(duplicates_search_w_details, "tbl_df")
+  expect_true(all(c("sObject", "Id", "Name", "Phone", "Owner.Id") %in% 
+                    names(duplicates_search_w_details)))    
 })
 
 test_that("testing sf_convert_lead()", {
@@ -79,10 +92,13 @@ test_that("testing sf_convert_lead()", {
                        doNotCreateOpportunity = TRUE)
   converted_lead <- sf_convert_lead(to_convert)
   expect_is(converted_lead, "tbl_df")
-  expect_named(converted_lead, c("accountId", "contactId", "leadId", 
-                                 "opportunityId", "success"))
-  # delete the lead
-  sf_delete(rec$id)
+  expect_named(converted_lead, c("success", 
+                                 "accountId", 
+                                 "contactId", 
+                                 "leadId"))
+  # delete the lead and contact
+  invisible(sf_delete(converted_lead$leadId))
+  invisible(sf_delete(converted_lead$contactId))
 })
 
 test_that("testing sf_merge()", {
@@ -100,7 +116,12 @@ test_that("testing sf_merge()", {
   expect_equal(nrow(merge_res), 1)
   
   # check the second and third records now have the same Master Record Id as the first
-  merge_check <- sf_query(sprintf("SELECT Id, MasterRecordId, Description FROM Contact WHERE Id IN ('%s')", 
+  merge_check <- sf_query(sprintf("SELECT 
+                                     Id, 
+                                     MasterRecordId, 
+                                     Description 
+                                  FROM Contact 
+                                  WHERE Id IN ('%s')", 
                                   paste0(new_recs1$id, collapse="','")), queryall = TRUE)
   expect_equal(merge_check$MasterRecordId, c(NA, new_recs1$id[1], new_recs1$id[1]))
   expect_equal(merge_check$Description, c("Description2", "Description2", "Description3"))

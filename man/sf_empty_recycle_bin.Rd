@@ -7,28 +7,34 @@
 sf_empty_recycle_bin(ids, api_type = c("SOAP"), verbose = FALSE)
 }
 \arguments{
-\item{ids}{\code{vector}, \code{matrix}, \code{data.frame}, or 
-\code{tbl_df}; if not a vector, there must be a column called Id (case-insensitive) 
+\item{ids}{\code{vector}, \code{matrix}, \code{data.frame}, or
+\code{tbl_df}; if not a vector, there must be a column called Id (case-insensitive)
 that can be passed in the request}
 
-\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
-"Chatter" indicating which API to use when making the request}
+\item{api_type}{\code{character}; one of \code{"REST"}, \code{"SOAP"},
+\code{"Bulk 1.0"}, or \code{"Bulk 2.0"} indicating which API to use when
+making the request.}
 
-\item{verbose}{logical; do you want informative messages?}
+\item{verbose}{\code{logical}; an indicator of whether to print additional
+detail for each API call, which is useful for debugging. More specifically, when
+set to \code{TRUE} the URL, header, and body will be printed for each request,
+along with additional diagnostic information where available.}
 }
 \value{
 \code{tbl_df} of records with success indicator
 }
 \description{
+\lifecycle{experimental}
+
 Delete records from the recycle bin immediately and permanently.
 }
 \details{
 When emptying recycle bins, consider the following rules and guidelines:
 \itemize{
-  \item The logged in user can delete any record that he or she can query in their Recycle Bin, or the recycle bins of any subordinates. If the logged in user has Modify All Data permission, he or she can query and delete records from any Recycle Bin in the organization.
-  \item Do not include the IDs of any records that will be cascade deleted, or an error will occur.
-  \item Once records are deleted using this call, they cannot be undeleted using \code{link{sf_undelete}}
-  \item After records are deleted from the Recycle Bin using this call, they can be queried using the \code{queryall} argument for some time. Typically this time is 24 hours, but may be shorter or longer.
+\item The logged in user can delete any record that he or she can query in their Recycle Bin, or the recycle bins of any subordinates. If the logged in user has Modify All Data permission, he or she can query and delete records from any Recycle Bin in the organization.
+\item Do not include the IDs of any records that will be cascade deleted, or an error will occur.
+\item Once records are deleted using this call, they cannot be undeleted using \code{link{sf_undelete}}
+\item After records are deleted from the Recycle Bin using this call, they can be queried using the \code{queryall} argument for some time. Typically this time is 24 hours, but may be shorter or longer.
 }
 }
 \examples{
@@ -45,9 +51,14 @@ hard_deleted <- sf_empty_recycle_bin(new_records$id[1])
 # confirm that the record really is gone (can't be deleted)
 undelete <- sf_undelete(new_records$id[1])
 # if you use queryall you still will find the record for ~24hrs
-#is_deleted <- sf_query(sprintf("SELECT Id, IsDeleted FROM Contact WHERE Id='\%s'",
-#                               new_records$id[1]),
-#                       queryall = TRUE)
+is_deleted <- sf_query(sprintf("SELECT Id, IsDeleted FROM Contact WHERE Id='\%s'", 
+                               new_records$id[1]), queryall = TRUE)
+                               
+# As of v48.0 (Spring 2020) you can query the Ids of all records in the Recycle 
+# Bin, which makes it easier to clear the entire bin because you can grab the 
+# Ids of the records first
+records_in_bin <- sf_query("SELECT Record FROM DeleteEvent")
+records_emptied_from_bin <- sf_delete(records_in_bin$Record)
 }
 }
 \references{

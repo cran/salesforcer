@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Steven M. Mortimer" />
+
+<meta name="date" content="2020-07-12" />
+
+<title>Working with Bulk APIs</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Working with Bulk APIs</h1>
+<h4 class="author">Steven M. Mortimer</h4>
+<h4 class="date">2020-07-12</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#using-the-bulk-api">Using the Bulk API</a></li>
+<li><a href="#a-complete-bulk-api-workflow">A Complete Bulk API Workflow</a></li>
+<li><a href="#query-limitations">Query Limitations</a></li>
+<li><a href="#using-the-bulk-2.0-api">Using the Bulk 2.0 API</a></li>
+<li><a href="#performance-benchmarks-for-bulk-queries">Performance Benchmarks for Bulk Queries</a></li>
+</ul>
+</div>
+
+<div id="using-the-bulk-api" class="section level2">
+<h2>Using the Bulk API</h2>
+<p>First, load the {salesforcer} and {dplyr} packages and login, if needed.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>(<span class="kw">library</span>(dplyr)))</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(salesforcer)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">sf_auth</span>()</span></code></pre></div>
+<p>For really large inserts, updates, deletes, upserts, and queries you can just add <code>api_type = &quot;Bulk 1.0&quot;</code> to most functions to get the benefits of using the Bulk API instead of the SOAP or REST APIs. The change you have to make from using the REST API to the Bulk 1.0 API as simple as adding <code>api_type=&quot;Bulk 1.0&quot;</code> to your function arguments. First, let’s build a <code>tbl_df</code> with two new records to be created.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>n &lt;-<span class="st"> </span><span class="dv">4</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>prefix &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Bulk-&quot;</span>, <span class="kw">as.integer</span>(<span class="kw">runif</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">100000</span>)), <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>new_contacts &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">FirstName =</span> <span class="kw">rep</span>(<span class="st">&quot;Test&quot;</span>, n),</span>
+<span id="cb2-4"><a href="#cb2-4"></a>                       <span class="dt">LastName =</span> <span class="kw">paste0</span>(<span class="st">&quot;Contact-Create-&quot;</span>, <span class="dv">1</span><span class="op">:</span>n),</span>
+<span id="cb2-5"><a href="#cb2-5"></a>                       <span class="dt">My_External_Id__c=</span><span class="kw">paste0</span>(prefix, letters[<span class="dv">1</span><span class="op">:</span>n]))</span></code></pre></div>
+<p>There are some differences in the way the REST API returns response information vs.  the Bulk 1.0 API. However, the changes in Salesforce are exactly the same for these two calls.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># REST</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>rest_created_records &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contacts[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,], </span>
+<span id="cb3-3"><a href="#cb3-3"></a>                                  <span class="dt">object_name=</span><span class="st">&quot;Contact&quot;</span>, </span>
+<span id="cb3-4"><a href="#cb3-4"></a>                                  <span class="dt">api_type=</span><span class="st">&quot;REST&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5"></a>rest_created_records</span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; # A tibble: 2 x 2</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt;   id                 success</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt; 1 0033s000013YBrYAAW TRUE   </span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt; 2 0033s000013YBrZAAW TRUE</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a></span>
+<span id="cb3-12"><a href="#cb3-12"></a><span class="co"># Bulk</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>bulk_created_records &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contacts[<span class="dv">3</span><span class="op">:</span><span class="dv">4</span>,], </span>
+<span id="cb3-14"><a href="#cb3-14"></a>                                  <span class="dt">object_name=</span><span class="st">&quot;Contact&quot;</span>, </span>
+<span id="cb3-15"><a href="#cb3-15"></a>                                  <span class="dt">api_type=</span><span class="st">&quot;Bulk 1.0&quot;</span>)</span>
+<span id="cb3-16"><a href="#cb3-16"></a>bulk_created_records</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; # A tibble: 2 x 4</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt;   Id                 Success Created Error</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;   &lt;lgl&gt;   &lt;lgl&gt;</span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt; 1 0033s000013YBrdAAG TRUE    TRUE    NA   </span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; 2 0033s000013YBreAAG TRUE    TRUE    NA</span></span></code></pre></div>
+</div>
+<div id="a-complete-bulk-api-workflow" class="section level2">
+<h2>A Complete Bulk API Workflow</h2>
+<p>To show a more lengthy example of using the Bulk 1.0 API, below is a workflow of that creates 2 records, queries them, and deletes them. This is just an example. Typically, you’d want to use the Bulk APIs over the REST or SOAP APIs when dealing with over 10,000 records.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>object &lt;-<span class="st"> &quot;Contact&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>created_records &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contacts, <span class="dt">object_name=</span>object, <span class="dt">api_type=</span><span class="st">&quot;Bulk 1.0&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a>created_records</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; # A tibble: 2 x 4</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt;   Id                 Success Created Error</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;   &lt;lgl&gt;   &lt;lgl&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; 1 0033s000013YBriAAG TRUE    TRUE    NA   </span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; 2 0033s000013YBrjAAG TRUE    TRUE    NA</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># query bulk</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>my_soql &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;SELECT Id,</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="st">                           FirstName, </span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="st">                           LastName</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="st">                    FROM Contact </span></span>
+<span id="cb4-15"><a href="#cb4-15"></a><span class="st">                    WHERE Id in (&#39;%s&#39;)&quot;</span>, </span>
+<span id="cb4-16"><a href="#cb4-16"></a>                   <span class="kw">paste0</span>(created_records<span class="op">$</span>Id , <span class="dt">collapse=</span><span class="st">&quot;&#39;,&#39;&quot;</span>))</span>
+<span id="cb4-17"><a href="#cb4-17"></a></span>
+<span id="cb4-18"><a href="#cb4-18"></a>queried_records &lt;-<span class="st"> </span><span class="kw">sf_query</span>(my_soql, <span class="dt">object_name=</span>object, <span class="dt">api_type=</span><span class="st">&quot;Bulk 1.0&quot;</span>)</span>
+<span id="cb4-19"><a href="#cb4-19"></a>queried_records</span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt; # A tibble: 2 x 3</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a><span class="co">#&gt;   Id                 FirstName LastName        </span></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;     &lt;chr&gt;           </span></span>
+<span id="cb4-23"><a href="#cb4-23"></a><span class="co">#&gt; 1 0033s000013YBriAAG Test      Contact-Create-1</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; 2 0033s000013YBrjAAG Test      Contact-Create-2</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a></span>
+<span id="cb4-26"><a href="#cb4-26"></a><span class="co"># delete bulk</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a>deleted_records &lt;-<span class="st"> </span><span class="kw">sf_delete</span>(queried_records<span class="op">$</span>Id, <span class="dt">object_name=</span>object, <span class="dt">api_type=</span><span class="st">&quot;Bulk 1.0&quot;</span>)</span>
+<span id="cb4-28"><a href="#cb4-28"></a>deleted_records</span>
+<span id="cb4-29"><a href="#cb4-29"></a><span class="co">#&gt; # A tibble: 2 x 4</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a><span class="co">#&gt;   Id                 Success Created Error</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;   &lt;lgl&gt;   &lt;lgl&gt;</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a><span class="co">#&gt; 1 0033s000013YBriAAG TRUE    FALSE   NA   </span></span>
+<span id="cb4-33"><a href="#cb4-33"></a><span class="co">#&gt; 2 0033s000013YBrjAAG TRUE    FALSE   NA</span></span></code></pre></div>
+</div>
+<div id="query-limitations" class="section level2">
+<h2>Query Limitations</h2>
+<p>There is one limitation to Bulk queries is that it does not support the following operations or structures of SOQL:</p>
+<ul>
+<li>COUNT</li>
+<li>ROLLUP</li>
+<li>SUM</li>
+<li>GROUP BY CUBE</li>
+<li>OFFSET</li>
+<li>Nested SOQL queries</li>
+<li>Relationship fields</li>
+<li>Compound address fields</li>
+<li>Compound geolocation fields</li>
+</ul>
+</div>
+<div id="using-the-bulk-2.0-api" class="section level2">
+<h2>Using the Bulk 2.0 API</h2>
+<p>Salesforce has more recently introduced the Bulk 2.0 API which is supposed to be faster and have a more consistent JSON/REST based API than the Bulk 1.0 API. In some cases I have noticed that the ordering of the result records will differ from the order of the input data because the data is batched and processed asynchronously. by Salesforce instead of R. However, The Bulk 2.0 API returns every single field that was included in the call so if you have an identifying key your dataset, then it should not be a problem to join on that key with your original data to bring in the newly assigned Salesforce Id that is generated when the record was created in Salesforce. However, I have find it just seems wasteful to transfer all of the field information back after the query and have not found a significant performance improvement between the Bulk 1.0 and Bulk 2.0. Finally, note that the status field names (“Success”, “Created”, “Error”) are different from the Bulk 2.0 API.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>n &lt;-<span class="st"> </span><span class="dv">20</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>prefix &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Bulk-&quot;</span>, <span class="kw">as.integer</span>(<span class="kw">runif</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">100000</span>)), <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3"></a>new_contacts &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">FirstName =</span> <span class="kw">rep</span>(<span class="st">&quot;Test&quot;</span>, n),</span>
+<span id="cb5-4"><a href="#cb5-4"></a>                       <span class="dt">LastName =</span> <span class="kw">paste0</span>(<span class="st">&quot;Contact-Create-&quot;</span>, <span class="dv">1</span><span class="op">:</span>n),</span>
+<span id="cb5-5"><a href="#cb5-5"></a>                       <span class="dt">test_number__c =</span> <span class="dv">1</span><span class="op">:</span>n,</span>
+<span id="cb5-6"><a href="#cb5-6"></a>                       <span class="dt">My_External_Id__c=</span><span class="kw">paste0</span>(prefix, letters[<span class="dv">1</span><span class="op">:</span>n]))</span>
+<span id="cb5-7"><a href="#cb5-7"></a></span>
+<span id="cb5-8"><a href="#cb5-8"></a>created_records_v1 &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contacts[<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>,], </span>
+<span id="cb5-9"><a href="#cb5-9"></a>                                <span class="dt">object_name =</span> <span class="st">&quot;Contact&quot;</span>, </span>
+<span id="cb5-10"><a href="#cb5-10"></a>                                <span class="dt">api_type =</span> <span class="st">&quot;Bulk 1.0&quot;</span>)</span>
+<span id="cb5-11"><a href="#cb5-11"></a>created_records_v1</span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; # A tibble: 10 x 4</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt;   Id                 Success Created Error</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;   &lt;lgl&gt;   &lt;lgl&gt;</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co">#&gt; 1 0033s000013YBs2AAG TRUE    TRUE    NA   </span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co">#&gt; 2 0033s000013YBs3AAG TRUE    TRUE    NA   </span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="co">#&gt; 3 0033s000013YBs4AAG TRUE    TRUE    NA   </span></span>
+<span id="cb5-18"><a href="#cb5-18"></a><span class="co">#&gt; 4 0033s000013YBs5AAG TRUE    TRUE    NA   </span></span>
+<span id="cb5-19"><a href="#cb5-19"></a><span class="co">#&gt; 5 0033s000013YBs6AAG TRUE    TRUE    NA   </span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co">#&gt; # … with 5 more rows</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a></span>
+<span id="cb5-22"><a href="#cb5-22"></a>created_records_v2 &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contacts[<span class="dv">11</span><span class="op">:</span><span class="dv">20</span>,],</span>
+<span id="cb5-23"><a href="#cb5-23"></a>                                <span class="dt">object_name =</span> <span class="st">&quot;Contact&quot;</span>, </span>
+<span id="cb5-24"><a href="#cb5-24"></a>                                <span class="dt">api_type =</span> <span class="st">&quot;Bulk 2.0&quot;</span>)</span>
+<span id="cb5-25"><a href="#cb5-25"></a>created_records_v2</span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; # A tibble: 10 x 7</span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt;   sf__Id sf__Created sf__Error FirstName LastName My_External_Id_…</span></span>
+<span id="cb5-28"><a href="#cb5-28"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;lgl&gt;       &lt;lgl&gt;     &lt;chr&gt;     &lt;chr&gt;    &lt;chr&gt;           </span></span>
+<span id="cb5-29"><a href="#cb5-29"></a><span class="co">#&gt; 1 0033s… TRUE        NA        Test      Contact… Bulk-3491-k     </span></span>
+<span id="cb5-30"><a href="#cb5-30"></a><span class="co">#&gt; 2 0033s… TRUE        NA        Test      Contact… Bulk-3491-l     </span></span>
+<span id="cb5-31"><a href="#cb5-31"></a><span class="co">#&gt; 3 0033s… TRUE        NA        Test      Contact… Bulk-3491-m     </span></span>
+<span id="cb5-32"><a href="#cb5-32"></a><span class="co">#&gt; 4 0033s… TRUE        NA        Test      Contact… Bulk-3491-n     </span></span>
+<span id="cb5-33"><a href="#cb5-33"></a><span class="co">#&gt; 5 0033s… TRUE        NA        Test      Contact… Bulk-3491-o     </span></span>
+<span id="cb5-34"><a href="#cb5-34"></a><span class="co">#&gt; # … with 5 more rows, and 1 more variable: test_number__c &lt;dbl&gt;</span></span></code></pre></div>
+</div>
+<div id="performance-benchmarks-for-bulk-queries" class="section level2">
+<h2>Performance Benchmarks for Bulk Queries</h2>
+<p>Below is a simple performance benchmark between the Bulk 1.0 and Bulk 2.0 APIs for a small query. In general, the Bulk 2.0 should be faster. One potential reason for the implementation in R to be faster is that the entire recordset is parsed at once from a downloaded CSV of the results when using the Bulk 1.0 API. The Bulk 2.0 retrieves the same data in large batches (typically 50,000 records at a time). I would encourage users to experiment to see what works best in their Salesforce Org.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>soql &lt;-<span class="st"> &quot;SELECT Id, Name FROM Contact&quot;</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>bulk1_query &lt;-<span class="st"> </span><span class="cf">function</span>(){<span class="kw">sf_query</span>(soql, <span class="st">&quot;Contact&quot;</span>, <span class="dt">api_type=</span><span class="st">&quot;Bulk 1.0&quot;</span>)}</span>
+<span id="cb6-3"><a href="#cb6-3"></a>bulk2_query &lt;-<span class="st"> </span><span class="cf">function</span>(){<span class="kw">sf_query</span>(soql, <span class="dt">api_type=</span><span class="st">&quot;Bulk 2.0&quot;</span>)} <span class="co"># Bulk 2.0 doesn&#39;t need object name</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a></span>
+<span id="cb6-5"><a href="#cb6-5"></a>res &lt;-<span class="st"> </span>microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(</span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="kw">bulk1_query</span>(),</span>
+<span id="cb6-7"><a href="#cb6-7"></a>  <span class="kw">bulk2_query</span>(), </span>
+<span id="cb6-8"><a href="#cb6-8"></a>  <span class="dt">times=</span><span class="dv">8</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>)</span>
+<span id="cb6-10"><a href="#cb6-10"></a>res</span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; Unit: seconds</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt;           expr      min       lq     mean   median       uq      max neval</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt;  bulk1_query() 8.134483 8.290671 8.616309 8.577874 8.930128 9.198647     8</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;  bulk2_query() 6.806635 6.880987 7.470125 7.204538 8.197640 8.388032     8</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>(</span>
+<span id="cb6-17"><a href="#cb6-17"></a>  ggplot2<span class="op">::</span><span class="kw">autoplot</span>(res) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="st">    </span>ggplot2<span class="op">::</span><span class="kw">scale_y_continuous</span>(<span class="dt">name=</span><span class="st">&quot;Time [seconds]&quot;</span>, <span class="dt">n.breaks=</span><span class="dv">6</span>)</span>
+<span id="cb6-19"><a href="#cb6-19"></a>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

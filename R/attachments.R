@@ -1,5 +1,8 @@
 #' Download an Attachment
 #' 
+#' @description
+#' \lifecycle{maturing}
+#' 
 #' This function will allow you to download an attachment to disk based on the 
 #' attachment body, file name, and path.
 #' 
@@ -25,6 +28,9 @@ sf_download_attachment <- function(body, name, path = "."){
 }
 
 #' Create Attachments
+#' 
+#' @description
+#' \lifecycle{experimental}
 #' 
 #' This function will allow you to create attachments (and other blob data, such as 
 #' Documents) by supplying file paths (absolute or relative) to media that you 
@@ -72,7 +78,7 @@ sf_download_attachment <- function(body, name, path = "."){
 #'                            Keywords = "example,test,document")
 #' result <- sf_create_attachment(document_details, object_name = "Document")
 #' 
-#' # the Bulk API can be envoked using api_type="Bulk 1.0" which will automatically 
+#' # the Bulk API can be invoked using api_type="Bulk 1.0" which will automatically 
 #' # take a data.frame of Attachment info and create a ZIP file with CSV manifest 
 #' # that is required for that API
 #' result <- sf_create_attachment(attachment_details, api_type="Bulk 1.0")
@@ -113,9 +119,10 @@ sf_create_attachment <- function(input_data,
                                               control = control_args, 
                                               verbose = verbose, ...)
   } else if(api_type == "Bulk 2.0"){
-    stop("Binary Attachments are not supported in Bulk 2.0 API. Use 'REST, 'SOAP', or 'Bulk 1.0' APIs instead.")
+    stop(paste0("Binary Attachments are not supported in Bulk 2.0 API. Use ", 
+                "'REST, 'SOAP', or 'Bulk 1.0' APIs instead."), call. = FALSE)
   } else {
-    stop("Unknown API type.")
+    catch_unknown_api(api_type, c("SOAP", "REST", "Bulk 1.0"))
   }
   return(resultset)
 }

@@ -16,6 +16,22 @@
 
 <title>Working with Metadata</title>
 
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 
 <style type="text/css">code{white-space: pre;}</style>
@@ -314,9 +330,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 
 <p>Salesforce is a very flexible platform in that it provides the <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_intro.htm">Metadata API</a> for users to create, read, update and delete their entire Salesforce environment from objects to page layouts and more. This makes it very easy to programmatically setup and teardown the Salesforce environment.</p>
-<div id="retrieving-object-metadata" class="section level3">
-<h3>Retrieving Object Metadata</h3>
-<p>One common use case for the Metadata API is retrieving information about an object (fields, permissions, etc.). First, load the <strong>salesforcer</strong>, <strong>dplyr</strong>, and <strong>purrr</strong> packages and login, if needed.</p>
+<div id="retrieving-object-metadata" class="section level2">
+<h2>Retrieving Object Metadata</h2>
+<p>One common use case for the Metadata API is retrieving information about an object (fields, permissions, etc.). First, load the {salesforcer}, {dplyr}, and {purrr} packages and login, if needed.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>(<span class="kw">library</span>(dplyr)))</span>
 <span id="cb1-2"><a href="#cb1-2"></a><span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>(<span class="kw">library</span>(purrr)))</span>
 <span id="cb1-3"><a href="#cb1-3"></a><span class="kw">library</span>(salesforcer)</span>
@@ -363,36 +379,30 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <code>sf_describe_object_fields()</code>. Here is an example using <code>sf_describe_object_fields()</code> where we get a <code>tbl_df</code> with one row for each field on the Account object:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>acct_fields &lt;-<span class="st"> </span><span class="kw">sf_describe_object_fields</span>(<span class="st">&quot;Account&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2"></a>acct_fields <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(name, label, length, soapType, type)</span>
-<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; # A tibble: 68 x 5</span></span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt;    name              label                   length soapType    type     </span></span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt;    &lt;chr&gt;             &lt;chr&gt;                   &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;    </span></span>
-<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt;  1 Id                Account ID              18     tns:ID      id       </span></span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt;  2 IsDeleted         Deleted                 0      xsd:boolean boolean  </span></span>
-<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt;  3 MasterRecordId    Master Record ID        18     tns:ID      reference</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt;  4 Name              Account Name            255    xsd:string  string   </span></span>
-<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt;  5 Type              Account Type            40     xsd:string  picklist </span></span>
-<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt;  6 ParentId          Parent Account ID       18     tns:ID      reference</span></span>
-<span id="cb3-12"><a href="#cb3-12"></a><span class="co">#&gt;  7 BillingStreet     Billing Street          255    xsd:string  textarea </span></span>
-<span id="cb3-13"><a href="#cb3-13"></a><span class="co">#&gt;  8 BillingCity       Billing City            40     xsd:string  string   </span></span>
-<span id="cb3-14"><a href="#cb3-14"></a><span class="co">#&gt;  9 BillingState      Billing State/Province  80     xsd:string  string   </span></span>
-<span id="cb3-15"><a href="#cb3-15"></a><span class="co">#&gt; 10 BillingPostalCode Billing Zip/Postal Code 20     xsd:string  string   </span></span>
-<span id="cb3-16"><a href="#cb3-16"></a><span class="co">#&gt; # … with 58 more rows</span></span>
-<span id="cb3-17"><a href="#cb3-17"></a></span>
-<span id="cb3-18"><a href="#cb3-18"></a><span class="co"># show the picklist selection options for the Account Type field</span></span>
-<span id="cb3-19"><a href="#cb3-19"></a>acct_fields <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb3-20"><a href="#cb3-20"></a><span class="st">  </span><span class="kw">filter</span>(label <span class="op">==</span><span class="st"> &quot;Account Type&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
-<span id="cb3-21"><a href="#cb3-21"></a><span class="st">  </span>.<span class="op">$</span>picklistValues</span>
-<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt; [[1]]</span></span>
-<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; # A tibble: 7 x 4</span></span>
-<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt;   active defaultValue label                      value                     </span></span>
-<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt;   &lt;lgl&gt;  &lt;lgl&gt;        &lt;chr&gt;                      &lt;chr&gt;                     </span></span>
-<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt; 1 TRUE   FALSE        Prospect                   Prospect                  </span></span>
-<span id="cb3-27"><a href="#cb3-27"></a><span class="co">#&gt; 2 TRUE   FALSE        Customer - Direct          Customer - Direct         </span></span>
-<span id="cb3-28"><a href="#cb3-28"></a><span class="co">#&gt; 3 TRUE   FALSE        Customer - Channel         Customer - Channel        </span></span>
-<span id="cb3-29"><a href="#cb3-29"></a><span class="co">#&gt; 4 TRUE   FALSE        Channel Partner / Reseller Channel Partner / Reseller</span></span>
-<span id="cb3-30"><a href="#cb3-30"></a><span class="co">#&gt; 5 TRUE   FALSE        Installation Partner       Installation Partner      </span></span>
-<span id="cb3-31"><a href="#cb3-31"></a><span class="co">#&gt; 6 TRUE   FALSE        Technology Partner         Technology Partner        </span></span>
-<span id="cb3-32"><a href="#cb3-32"></a><span class="co">#&gt; 7 TRUE   FALSE        Other                      Other</span></span></code></pre></div>
+<span id="cb3-3"><a href="#cb3-3"></a><span class="co">#&gt; # A tibble: 69 x 5</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co">#&gt;   name           label            length soapType    type     </span></span>
+<span id="cb3-5"><a href="#cb3-5"></a><span class="co">#&gt;   &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;    </span></span>
+<span id="cb3-6"><a href="#cb3-6"></a><span class="co">#&gt; 1 Id             Account ID       18     tns:ID      id       </span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="co">#&gt; 2 IsDeleted      Deleted          0      xsd:boolean boolean  </span></span>
+<span id="cb3-8"><a href="#cb3-8"></a><span class="co">#&gt; 3 MasterRecordId Master Record ID 18     tns:ID      reference</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="co">#&gt; 4 Name           Account Name     255    xsd:string  string   </span></span>
+<span id="cb3-10"><a href="#cb3-10"></a><span class="co">#&gt; 5 Type           Account Type     40     xsd:string  picklist </span></span>
+<span id="cb3-11"><a href="#cb3-11"></a><span class="co">#&gt; # … with 64 more rows</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a></span>
+<span id="cb3-13"><a href="#cb3-13"></a><span class="co"># show the picklist selection options for the Account Type field</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a>acct_fields <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="st">  </span><span class="kw">filter</span>(label <span class="op">==</span><span class="st"> &quot;Account Type&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="st">  </span>.<span class="op">$</span>picklistValues</span>
+<span id="cb3-17"><a href="#cb3-17"></a><span class="co">#&gt; [[1]]</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="co">#&gt; # A tibble: 7 x 4</span></span>
+<span id="cb3-19"><a href="#cb3-19"></a><span class="co">#&gt;   active defaultValue label                      value                     </span></span>
+<span id="cb3-20"><a href="#cb3-20"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;                      &lt;chr&gt;                     </span></span>
+<span id="cb3-21"><a href="#cb3-21"></a><span class="co">#&gt; 1 true   false        Prospect                   Prospect                  </span></span>
+<span id="cb3-22"><a href="#cb3-22"></a><span class="co">#&gt; 2 true   false        Customer - Direct          Customer - Direct         </span></span>
+<span id="cb3-23"><a href="#cb3-23"></a><span class="co">#&gt; 3 true   false        Customer - Channel         Customer - Channel        </span></span>
+<span id="cb3-24"><a href="#cb3-24"></a><span class="co">#&gt; 4 true   false        Channel Partner / Reseller Channel Partner / Reseller</span></span>
+<span id="cb3-25"><a href="#cb3-25"></a><span class="co">#&gt; 5 true   false        Installation Partner       Installation Partner      </span></span>
+<span id="cb3-26"><a href="#cb3-26"></a><span class="co">#&gt; # … with 2 more rows</span></span></code></pre></div>
 <p>If you prefer to be more precise about collecting and formatting the field data you can work directly with the nested lists that the APIs return. In this example we look at the picklist values of fields on the Account object.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>describe_obj_result &lt;-<span class="st"> </span><span class="kw">sf_describe_objects</span>(<span class="dt">object_names=</span><span class="kw">c</span>(<span class="st">&#39;Account&#39;</span>, <span class="st">&#39;Contact&#39;</span>))</span>
 <span id="cb4-2"><a href="#cb4-2"></a></span>
@@ -420,12 +430,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb4-24"><a href="#cb4-24"></a><span class="co">#&gt; 3 true   false        Customer - Channel         Customer - Channel        </span></span>
 <span id="cb4-25"><a href="#cb4-25"></a><span class="co">#&gt; 4 true   false        Channel Partner / Reseller Channel Partner / Reseller</span></span>
 <span id="cb4-26"><a href="#cb4-26"></a><span class="co">#&gt; 5 true   false        Installation Partner       Installation Partner      </span></span>
-<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; 6 true   false        Technology Partner         Technology Partner        </span></span>
-<span id="cb4-28"><a href="#cb4-28"></a><span class="co">#&gt; 7 true   false        Other                      Other</span></span></code></pre></div>
+<span id="cb4-27"><a href="#cb4-27"></a><span class="co">#&gt; # … with 2 more rows</span></span></code></pre></div>
 <p>It is recommended that you try out the various metadata functions <code>sf_read_metadata()</code>, <code>sf_list_metadata()</code>, <code>sf_describe_metadata()</code>, and <code>sf_describe_objects()</code> in order to see which information best suits your use case.</p>
 </div>
-<div id="modifying-metadata" class="section level3">
-<h3>Modifying Metadata</h3>
+<div id="modifying-metadata" class="section level2">
+<h2>Modifying Metadata</h2>
 <p>Where the Metadata API really shines is when it comes to CRUD operations on metadata. In this example we will create an object, add fields to it, then delete that object.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># create an object</span></span>
 <span id="cb5-2"><a href="#cb5-2"></a>base_obj_name &lt;-<span class="st"> &quot;Custom_Account1&quot;</span></span>

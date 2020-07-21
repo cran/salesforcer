@@ -6,47 +6,59 @@ knitr::opts_chunk$set(
   purl = NOT_CRAN,
   eval = NOT_CRAN
 )
+options(tibble.print_min = 5L, tibble.print_max = 5L)
 
 ## ----auth, include = FALSE----------------------------------------------------
 library(salesforcer)
-token_path <- here::here("tests", "testthat", "salesforcer_token.rds")
-suppressMessages(sf_auth(token = token_path, verbose = FALSE))
+
+username <- Sys.getenv("SALESFORCER_USERNAME")
+password <- Sys.getenv("SALESFORCER_PASSWORD")
+security_token <- Sys.getenv("SALESFORCER_SECURITY_TOKEN")
+
+sf_auth(username = username,
+        password = password,
+        security_token = security_token)
 
 ## ----sample-create------------------------------------------------------------
-new_contact <- c(FirstName = "Test", LastName = "Contact-Create")
-record <- sf_create(new_contact,
-                    object_name = "Contact",
-                    DisableFeedTrackingHeader = list(disableFeedTracking = TRUE), 
-                    api_type = "SOAP")
-
-## ---- include = FALSE---------------------------------------------------------
-deleted_records <- sf_delete(record$id)
+new_contact <- c(FirstName = "Jenny", 
+                 LastName = "Williams", 
+                 Email = "jennyw@gmail.com")
+record1 <- sf_create(new_contact,
+                     object_name = "Contact",
+                     DisableFeedTrackingHeader = list(disableFeedTracking = TRUE))
+record1
 
 ## ----sample-create-w-duplicate------------------------------------------------
-new_contact <- c(FirstName = "Test", LastName = "Contact-Create")
-record <- sf_create(new_contact,
-                    object_name = "Contact",
-                    DuplicateRuleHeader = list(allowSave = TRUE, 
-                                               includeRecordDetails = FALSE, 
-                                               runAsCurrentUser = TRUE))
+# override the duplicate rules ...
+record2 <- sf_create(new_contact,
+                     object_name = "Contact",
+                     DuplicateRuleHeader = list(allowSave = TRUE, 
+                                                includeRecordDetails = FALSE, 
+                                                runAsCurrentUser = TRUE))
+record2
 
-## ---- include = FALSE---------------------------------------------------------
-deleted_records <- sf_delete(record$id)
+# ... or succumb to the duplicate rules
+record3 <- sf_create(new_contact,
+                     object_name = "Contact",
+                     DuplicateRuleHeader = list(allowSave = FALSE, 
+                                                includeRecordDetails = FALSE, 
+                                                runAsCurrentUser = TRUE))
+record3
 
 ## ----sample-create-w-warning--------------------------------------------------
-new_contact <- c(FirstName = "Test", LastName = "Contact-Create")
-record <- sf_create(new_contact,
-                    object_name = "Contact",
-                    BatchRetryHeader = list(`Sforce-Disable-Batch-Retry` = FALSE), 
-                    api_type = "SOAP")
+record4 <- sf_create(new_contact,
+                     object_name = "Contact",
+                     DuplicateRuleHeader = list(allowSave = FALSE, 
+                                                includeRecordDetails = FALSE, 
+                                                runAsCurrentUser = TRUE),
+                     api_type = "REST")
+record4
 
 ## ---- include = FALSE---------------------------------------------------------
-deleted_records <- sf_delete(record$id)
+deleted_records <- sf_delete(c(record1$id, record2$id))
 
 ## ----sample-query-------------------------------------------------------------
-new_contact <- c(FirstName = "Test", LastName = "Contact-Create")
-records <- sf_query("SELECT Id, Name FROM Account LIMIT 1000",
-                    object_name = "Account",
-                    control = sf_control(QueryOptions = list(batchSize = 100)), 
-                    api_type = "SOAP")
+sf_query("SELECT Id, Name FROM Account LIMIT 1000",
+         object_name = "Account",
+         control = sf_control(QueryOptions = list(batchSize = 200)))
 

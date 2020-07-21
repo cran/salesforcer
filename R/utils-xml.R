@@ -74,7 +74,7 @@ xml_nodeset_to_df <- function(this_node){
 
 #' Make SOAP XML Request Skeleton
 #' 
-#' Create XML in preparate for sending to the SOAP API
+#' Create XML in preparation for sending to the SOAP API
 #' 
 #' @importFrom XML newXMLNode xmlValue<-
 #' @param soap_headers \code{list}; any number of SOAP headers
@@ -83,7 +83,7 @@ xml_nodeset_to_df <- function(this_node){
 #' @note This function is meant to be used internally. Only use when debugging.
 #' Any of the following SOAP headers are allowed:
 #' \itemize{
-#'    \item AllorNoneHeader
+#'    \item AllOrNoneHeader
 #'    \item AllowFieldTruncationHeader
 #'    \item AssignmentRuleHeader
 #'    \item CallOptions
@@ -103,9 +103,7 @@ xml_nodeset_to_df <- function(this_node){
 #' @keywords internal
 #' @export
 make_soap_xml_skeleton <- function(soap_headers=list(), metadata_ns=FALSE){
-  
   sf_auth_check()
-  
   if(metadata_ns){
     these_ns = c("soapenv" = "http://schemas.xmlsoap.org/soap/envelope/",
                  "xsi" = "http://www.w3.org/2001/XMLSchema-instance",

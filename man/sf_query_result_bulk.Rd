@@ -2,41 +2,62 @@
 % Please edit documentation in R/bulk-query.R
 \name{sf_query_result_bulk}
 \alias{sf_query_result_bulk}
-\title{Retrieving the Results of a Bulk Query Batch in a Bulk API Job}
+\title{Retrieve the results of a completed bulk query}
 \usage{
 sf_query_result_bulk(
   job_id,
-  batch_id,
-  result_id,
+  batch_id = NULL,
+  result_id = NULL,
   guess_types = TRUE,
-  api_type = c("Bulk 1.0"),
+  bind_using_character_cols = FALSE,
+  batch_size = 50000,
+  api_type = c("Bulk 1.0", "Bulk 2.0"),
   verbose = FALSE
 )
 }
 \arguments{
-\item{job_id}{character; the Salesforce Id assigned to a submitted job as 
-returned by \link{sf_create_job_bulk}}
+\item{job_id}{\code{character}; the Salesforce Id assigned to a submitted job as
+returned by \link{sf_create_job_bulk}. It will start with \code{"750"}.}
 
-\item{batch_id}{character; the Salesforce Id assigned assigned to a submitted 
-batch as returned by \link{sf_create_batches_bulk}}
+\item{batch_id}{\code{character}; the Salesforce Id assigned to a submitted
+batch as returned by \link{sf_create_batches_bulk}. It will start with \code{"751"}.}
 
-\item{result_id}{a character string returned from \link{sf_batch_details_bulk} when a query has completed and specifies how to get the recordset}
+\item{result_id}{\code{character}; a string returned from
+\link{sf_batch_details_bulk} when a query has completed and specifies how to
+get the recordset}
 
-\item{guess_types}{logical; indicating whether or not to use \code{col_guess()} 
-to try and cast the data returned in the query recordset. TRUE uses \code{col_guess()} 
-and FALSE returns all values as character strings.}
+\item{guess_types}{\code{logical}; indicating whether or not to use \code{col_guess()}
+to try and cast the data returned in the recordset. If \code{TRUE} then
+\code{col_guess()} is used, if \code{FALSE} then all fields will be returned
+as character. This is helpful when \code{col_guess()} will mangle field values
+in Salesforce that you'd like to preserve during translation into a \code{tbl_df},
+like numeric looking values that must be preserved as strings ("48.0").}
 
-\item{api_type}{character; one of "REST", "SOAP", "Bulk 1.0", "Bulk 2.0", or 
-"Chatter" indicating which API to use when making the request}
+\item{bind_using_character_cols}{\code{logical}; an indicator of whether to
+cast the data to all character columns to ensure that \code{\link[dplyr:bind]{bind_rows}}
+does not fail because two paginated recordsets have differing datatypes for the
+same column. Set this to \code{TRUE} rarely, typically only when having this
+set to \code{FALSE} returns an error or you want all columns in the data to be
+character.}
 
-\item{verbose}{logical; do you want informative messages?}
+\item{batch_size}{\code{integer}; the number of individual records to be included in a
+single batch uploaded to the Bulk APIs (1.0 or 2.0).}
+
+\item{api_type}{\code{character}; one of \code{"REST"}, \code{"SOAP"},
+\code{"Bulk 1.0"}, or \code{"Bulk 2.0"} indicating which API to use when
+making the request.}
+
+\item{verbose}{\code{logical}; an indicator of whether to print additional
+detail for each API call, which is useful for debugging. More specifically, when
+set to \code{TRUE} the URL, header, and body will be printed for each request,
+along with additional diagnostic information where available.}
 }
 \value{
-A \code{tbl_df}, formatted by Salesforce, containing query results
+\code{tbl_df}, formatted by Salesforce, containing query results
 }
 \description{
-This function returns the row-level recordset of a bulk query
-which has already been submitted to Bulk API Job and has Completed state
+This function returns the recordset of a bulk query which has already been
+submitted to the Bulk 1.0 or Bulk 2.0 API and has completed.
 }
 \examples{
 \dontrun{
@@ -52,5 +73,5 @@ sf_close_job_bulk(job_info$id)
 }
 }
 \references{
-\url{https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/}
+\href{https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_bulk_query_intro.htm}{Bulk 1.0 documentation} and \href{https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/queries.htm}{Bulk 2.0 documentation}
 }

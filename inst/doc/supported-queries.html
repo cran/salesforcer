@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Steven M. Mortimer" />
+
+<meta name="date" content="2020-07-11" />
+
+<title>Supported Queries</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Supported Queries</h1>
+<h4 class="author">Steven M. Mortimer</h4>
+<h4 class="date">2020-07-11</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#authentication">Authentication</a></li>
+<li><a href="#default-query-behavior">Default query behavior</a></li>
+<li><a href="#rest-vs.-soap-api-query-performance-test">REST vs. SOAP API query performance test</a></li>
+<li><a href="#when-to-use-the-bulk-apis-for-queries">When to use the Bulk APIs for queries</a></li>
+<li><a href="#relationship-queries">Relationship queries</a><ul>
+<li><a href="#child-to-parent-lookup-queries">child-to-parent “lookup” queries</a></li>
+<li><a href="#parent-to-child-nested-queries">parent-to-child “nested” queries</a></li>
+</ul></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</div>
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>The following vignette outlines the different types of queries that have been documented and tested. These are the “supported” query types that the {salesforcer} package currently handles. If you run into an issue, please submit the issue <a href="https://github.com/StevenMMortimer/salesforcer/issues/new?assignees=StevenMMortimer&amp;labels=&amp;template=query-issue-template.md&amp;title=">HERE</a> in the GitHub repository so that we can fix or add your query type to this list. Thank you!</p>
+<p><strong>Note</strong>: Salesforce’s proprietary form of SQL called SOQL (Salesforce Object Query Language) is a powerful tool that allows you to return the fields of records in almost any object in Salesforce. This includes standard objects like Accounts, Contacts, and Tasks along with any custom objects and custom fields created in your Org. You are encouraged to use Bulk APIs when:</p>
+<ul>
+<li>You anticipate returning 10,000 records or more</li>
+<li>Your query does not involve a parent-to-child nested relationship query</li>
+<li>You would like to reduce the overall number of API calls to your Org</li>
+</ul>
+<p>If you are not familiar with SOQL, then please consider reading the following resources:</p>
+<ul>
+<li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_sosl_intro.htm">Introduction to SOQL and SOSL</a><br />
+</li>
+<li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select.htm">SOQL SELECT Syntax</a><br />
+</li>
+<li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_relationships.htm">Relationship Queries</a><br />
+</li>
+<li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/async_query_overview.htm">Async SOQL</a></li>
+<li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/asynch_api_bulk_query_intro.htm">Overview of queries in Bulk 1.0 API</a></li>
+<li><a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.api_bulk_v2.meta/api_bulk_v2/queries.htm">Overview of queries in Bulk 2.0 API</a></li>
+</ul>
+<hr />
+</div>
+<div id="authentication" class="section level2">
+<h2>Authentication</h2>
+<p>First, load the {salesforcer} package and login. There are two ways to authenticate: 1) OAuth 2.0 (SSO) and 2) Basic Username-Password. It is recommended to use OAuth 2.0 so that passwords do not have to be embedded in scripts or environment variables. By default, OAuth 2.0 stores the user’s credentials in a locally cached file entitled “.httr-oauth-salesforcer” in the current working directory and will be refreshed automatically when the session expires.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(dplyr, <span class="dt">warn.conflicts =</span> <span class="ot">FALSE</span>)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(salesforcer)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">sf_auth</span>()</span></code></pre></div>
+</div>
+<div id="default-query-behavior" class="section level2">
+<h2>Default query behavior</h2>
+<p>The default API for the <code>sf_query()</code> function is the REST API because it is both fast and flexible. Every effort has been made so that the format of the results from the REST and SOAP APIs is exactly the same. The only difference will be speed. The REST API uses JSON, which can generally be processed more quickly than XML used in the SOAP API.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>soql &lt;-<span class="st"> &quot;SELECT Id,</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="st">                FirstName, </span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="st">                LastName</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a><span class="st">         FROM Contact</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="st">         LIMIT 10&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a></span>
+<span id="cb2-7"><a href="#cb2-7"></a>queried_records &lt;-<span class="st"> </span><span class="kw">sf_query</span>(soql) <span class="co"># REST API is the default api_type</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>queried_records</span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="co">#&gt; # A tibble: 10 x 3</span></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co">#&gt;   Id                 FirstName LastName                    </span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;     &lt;chr&gt;                       </span></span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="co">#&gt; 1 0033s000013YAdhAAG Test      Contact-Create-Compatibility</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a><span class="co">#&gt; 2 0033s000013YB7iAAG Test      Contact-Create-2            </span></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co">#&gt; 3 0033s000013YAnLAAW Test      Contact-Create-3            </span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="co">#&gt; 4 0033s000013YAnMAAW Test      Contact-Create-4            </span></span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="co">#&gt; 5 0033s000013YBFbAAO Test      Contact-Create-1            </span></span>
+<span id="cb2-17"><a href="#cb2-17"></a><span class="co">#&gt; # … with 5 more rows</span></span>
+<span id="cb2-18"><a href="#cb2-18"></a></span>
+<span id="cb2-19"><a href="#cb2-19"></a>queried_records &lt;-<span class="st"> </span><span class="kw">sf_query</span>(soql, <span class="dt">api_type =</span> <span class="st">&quot;SOAP&quot;</span>)</span>
+<span id="cb2-20"><a href="#cb2-20"></a>queried_records</span>
+<span id="cb2-21"><a href="#cb2-21"></a><span class="co">#&gt; # A tibble: 10 x 3</span></span>
+<span id="cb2-22"><a href="#cb2-22"></a><span class="co">#&gt;   Id                 FirstName LastName                    </span></span>
+<span id="cb2-23"><a href="#cb2-23"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;     &lt;chr&gt;                       </span></span>
+<span id="cb2-24"><a href="#cb2-24"></a><span class="co">#&gt; 1 0033s000013YAdhAAG Test      Contact-Create-Compatibility</span></span>
+<span id="cb2-25"><a href="#cb2-25"></a><span class="co">#&gt; 2 0033s000013YB7iAAG Test      Contact-Create-2            </span></span>
+<span id="cb2-26"><a href="#cb2-26"></a><span class="co">#&gt; 3 0033s000013YAnLAAW Test      Contact-Create-3            </span></span>
+<span id="cb2-27"><a href="#cb2-27"></a><span class="co">#&gt; 4 0033s000013YAnMAAW Test      Contact-Create-4            </span></span>
+<span id="cb2-28"><a href="#cb2-28"></a><span class="co">#&gt; 5 0033s000013YBFbAAO Test      Contact-Create-1            </span></span>
+<span id="cb2-29"><a href="#cb2-29"></a><span class="co">#&gt; # … with 5 more rows</span></span></code></pre></div>
+</div>
+<div id="rest-vs.-soap-api-query-performance-test" class="section level2">
+<h2>REST vs. SOAP API query performance test</h2>
+<p>Below is a small example to roughly demonstrate the magnitude of the performance difference between the REST and SOAP APIs when querying 1,000 records.</p>
+<p><strong>Setup performance test</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># create a new account </span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="co"># (if replicating, you may or may not have an external id field in your Org)</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>prefix &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;APerfTest-&quot;</span>, <span class="kw">as.integer</span>(<span class="kw">runif</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">99999</span>)))</span>
+<span id="cb3-4"><a href="#cb3-4"></a>new_account &lt;-<span class="st"> </span><span class="kw">sf_create</span>(</span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="kw">tibble</span>(</span>
+<span id="cb3-6"><a href="#cb3-6"></a>    <span class="dt">Name =</span> <span class="st">&quot;Test Account For Performance Test&quot;</span>, </span>
+<span id="cb3-7"><a href="#cb3-7"></a>    <span class="dt">My_External_Id__c =</span> prefix,</span>
+<span id="cb3-8"><a href="#cb3-8"></a>    <span class="dt">Description =</span> <span class="kw">paste0</span>(<span class="st">&quot;This is a test account with 1,000 records for &quot;</span>, </span>
+<span id="cb3-9"><a href="#cb3-9"></a>                         <span class="st">&quot;testing the performance differences between the &quot;</span>, </span>
+<span id="cb3-10"><a href="#cb3-10"></a>                         <span class="st">&quot;SOAP and REST APIs.&quot;</span>)</span>
+<span id="cb3-11"><a href="#cb3-11"></a>  ), </span>
+<span id="cb3-12"><a href="#cb3-12"></a>  <span class="dt">object_name =</span> <span class="st">&quot;Account&quot;</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>)</span>
+<span id="cb3-14"><a href="#cb3-14"></a></span>
+<span id="cb3-15"><a href="#cb3-15"></a><span class="co"># create and associate a thousand new contacts with that account</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a><span class="co"># (again, you may or may not have an external id field in your Org)</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a>n &lt;-<span class="st"> </span><span class="dv">1000</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a>prefix &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;CPerfTest-&quot;</span>, <span class="kw">as.integer</span>(<span class="kw">runif</span>(<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">99999</span>)), <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb3-19"><a href="#cb3-19"></a>new_contacts &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">FirstName =</span> <span class="kw">rep</span>(<span class="st">&quot;Test&quot;</span>, n),</span>
+<span id="cb3-20"><a href="#cb3-20"></a>                       <span class="dt">LastName =</span> <span class="kw">paste0</span>(<span class="st">&quot;Query-Vignette&quot;</span>, <span class="dv">1</span><span class="op">:</span>n), </span>
+<span id="cb3-21"><a href="#cb3-21"></a>                       <span class="dt">test_number__c =</span> <span class="fl">999.9</span>,</span>
+<span id="cb3-22"><a href="#cb3-22"></a>                       <span class="dt">AccountId =</span> <span class="kw">rep</span>(new_account<span class="op">$</span>id, n),</span>
+<span id="cb3-23"><a href="#cb3-23"></a>                       <span class="dt">My_External_Id__c=</span><span class="kw">paste0</span>(prefix, <span class="dv">1</span><span class="op">:</span>n))</span>
+<span id="cb3-24"><a href="#cb3-24"></a>new_contacts_res &lt;-<span class="st"> </span><span class="kw">sf_create</span>(new_contacts, <span class="st">&quot;Contact&quot;</span>, <span class="dt">api_type =</span> <span class="st">&quot;Bulk 2.0&quot;</span>)</span></code></pre></div>
+<p><strong>Performance test</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>qry &lt;-<span class="st"> </span><span class="cf">function</span>(api_type){</span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="kw">sf_query</span>(</span>
+<span id="cb4-3"><a href="#cb4-3"></a>    <span class="kw">sprintf</span>(<span class="st">&quot;SELECT Id, Name, Owner.Id, </span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="st">               (SELECT Id, LastName, Owner.Id FROM Contacts) </span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="st">            FROM Account</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="st">            WHERE Id = &#39;%s&#39;&quot;</span>, </span>
+<span id="cb4-7"><a href="#cb4-7"></a>            new_account<span class="op">$</span>id), </span>
+<span id="cb4-8"><a href="#cb4-8"></a>    <span class="dt">api_type =</span> api_type</span>
+<span id="cb4-9"><a href="#cb4-9"></a>  )</span>
+<span id="cb4-10"><a href="#cb4-10"></a>}</span>
+<span id="cb4-11"><a href="#cb4-11"></a>res &lt;-<span class="st"> </span>microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(</span>
+<span id="cb4-12"><a href="#cb4-12"></a>  <span class="kw">qry</span>(<span class="st">&quot;REST&quot;</span>),</span>
+<span id="cb4-13"><a href="#cb4-13"></a>  <span class="kw">qry</span>(<span class="st">&quot;SOAP&quot;</span>),</span>
+<span id="cb4-14"><a href="#cb4-14"></a>  <span class="dt">times =</span> <span class="dv">5</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>)</span>
+<span id="cb4-16"><a href="#cb4-16"></a>res</span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co">#&gt; Unit: seconds</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co">#&gt;         expr       min        lq      mean    median        uq      max neval</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co">#&gt;  qry(&quot;REST&quot;)  3.125539  3.919618  4.120589  4.135651  4.382338  5.03980     5</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a><span class="co">#&gt;  qry(&quot;SOAP&quot;) 15.867897 16.380012 18.807489 16.417638 19.780766 25.59113     5</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="kw">suppressWarnings</span>(<span class="kw">suppressMessages</span>(</span>
+<span id="cb4-23"><a href="#cb4-23"></a>  ggplot2<span class="op">::</span><span class="kw">autoplot</span>(res) <span class="op">+</span><span class="st"> </span></span>
+<span id="cb4-24"><a href="#cb4-24"></a><span class="st">    </span>ggplot2<span class="op">::</span><span class="kw">scale_y_continuous</span>(<span class="dt">name=</span><span class="st">&quot;Time [seconds]&quot;</span>, <span class="dt">n.breaks=</span><span class="dv">6</span>)</span>
+<span id="cb4-25"><a href="#cb4-25"></a>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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qUOuDIWAEPAIiIA8EloKASGQOgIioNQhV4ZCQAh4BERAHgkthYAQSB0BEVDqkCtDISAEPAIiII+ElkJACKSOgAgodciVoRAQAh4BEZBHQkshIARSR0AElDrkylAICAGPgAjII6GlEBACqSMgAkodcmUoBISAR0AE5JHQUggIgdQREAGlDrkyFAJCwCMgAvJIaCkEhEDqCIiAUodcGQoBIeAREAF5JLQUAkIgdQREQKlDrgyFgBDwCIiAPBJaCgEhkDoCIqDUIVeGQkAIeAREQB4JLYWAEEgdARFQ6pArQyEgBDwCIiCPhJZCQAikjoAIKHXIlaEQEAIeARGQR0JLISAEUkdABJQ65MpQCAgBj4AIyCOhpRAQAqkjIAJKHXJlKASEgEdABOSR0FIICIHUEWibeo7KUAhkBIH333/f3nvvPRszZoz9+uuvNnPmTGvfvr1169bN5ptvPuvTp48ttthiNs8882SkROGpKQIKzybSKAAEZsyYYYcccoi1bt3a5p9/fuvRo4e1bdvWpk6dauPGjbMffvjBOAfp2bOnLb/88rb66qvboEGDbI455gigBNlQQQSUDTtJyyoggMdz/PHH26677lord459+eWX9uGHH9qbb75pr776qj355JPuvEUXXdRWW20191tyySWtTZs2ta7Xjv8iIALSnSAESiDQqlWrEnv/vwtS6d+/v/ttscUW7gBe0fPPP2///ve/7b777rNbb73VVdcGDhzoPKMVV1zRevfu/f9EtGYiIN0EQqBCCBAX2n777d1v+vTp9sYbb9hzzz1nL7zwgp133nkul7nnntuWXXZZwzNafPHFDW+JmFJeRQSUV8ur3HUiUCgU6jxe38F27drF1bCjjjrKfv75Z3vttdds+PDh9tZbb9k111xTI4aEN9WvXz/r27evLbzwwtapU6f6smgRxzNFQI888ohtvPHG9tJLLzljjRgxwlZYYQUXBJw4caK9+OKL9t1339mCCy7ojF/8Zvn666/dW2nSpEnuugEDBtSqn//yyy/urbX++utb165dYyOPGjXKtYj4HdwgSy21lHOpf/vtN3vqqadcEPL111+3zTbbzOXDGxFdJNlDYNasWRVVeq655rJNNtnE/Uh42rRp9sknn9hHH31kH3/8sVsnhvTTTz/F+XLNQgst5EgJYuIHSeFFpS0TJkwwfmPHjnWtglOm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zy+XIyBmSOzVq5c99thjrkRt27bNSMmkZp4REAEFbH08Hy9fffWVsU1LFwHnUjJgwAD7/vvv3XG+GSYRAqEjIAIK2EJJAvrmm2/cTIgzZsxwTe6l1B48eLDbvemmmzqyKnWO9gmBkBCQnx6SNYp0ad36v+8HPr8MAfmhFj179iw687+bO+64o/N+1lxzTXv22WdLnqOdQiAkBOQBhWSNMrosvPDC9u2337rqFaf478EXn96mTRvbaKONanVSLD5P20IgFAREQKFYog49FllkEaNP0FtvveXO8n1+6rhEh4RAJhAQAWXATIsttpjTkg6GeD8MxZAIgZaAgAgoA1akj88cc8xhdDJcfPHFM6CxVBQCDUNABNQwnKpylm8Fa9Wqla2xxhpOh1VWWaVBuvhrG3SyThICVUJArWBVAr4h2UI8Xg4//HDr3bu37bTTTn5XncvktXWeqINCoIoIiICqCH59WSdJZKGFFrKjjjqqvkvi48lr451aEQKBIaAqWGAGkTpCIE8IiIDyZG2VVQgEhoAIKDCDSB0hkCcEREB5srbKKgQCQyBzQegPPvjAOnTo4GAcO3asde3a1RigudRSS8VTUXCQICzzJC+xxBLxFKZffPFFycm66Fk8aNAglybTXgwfPtwmT55sdABcddVV3X5Go7/99ttuvfhvhRVWcMdWX311e/31122zzTazN954wxiR7ufpKb5G20JACJhlygNiitEbb7zR+vTpY6+++qrdc889xnSljz76qCOMc889177++mtjLmWWTMzOnMoQD/LOO+/YTTfdZJ988kmNH+cjL774oh1yyCE2cuRIN7/yZZddZieffLI7xjw8/ro777zTzbfst8eMGWPkTT4XXXSRO79v37523XXXuXX9CQEhUBqB1D0giAHPBDJh0iyGFfCpGT4vzIPcrVs395nhdu3aOY0ZA8VE6+yHaFZaaSXnATErIJOzs/QeERfss88+NbaPO+44e/zxx22//fZz6TGu6ogjjnDrxX/33nuv7bXXXrbVVlu5Q/S52WGHHdxI9OWWW874IWeccYbrkwO5IejHhGB4Un66VObs4csVeE14SBIhIARqI5AaATGVxMEHH+wIA6KBPLbbbjs3enuPPfYwiGHEiBHuYe3fv78jEtTlixB87eGggw6y2267zS644AJXCsiAj/NBQFOnTq1dsmjPzJkz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JzVrISACqgVJ+DuI9UyfPj0ekKphGOHbTBqWRkAEVBqXoPf66pb3gkRAQZtLytWBgAioDnBCPeRbu3zrF1UwjQML1VrSqy4EREB1oRPoMU82eD7MCzR58uQacwEFqrbUEgK1EBAB1YIk/B2egPhAof8Kqv9qavjaS0Mh8H8ERED/xyIza23btnWzHUJA/vtfIqDMmE+KJhAQASXAyNIqhAP5+K9h9OzZM0vqS1ch4BAQAWX0RuDzO5AP3wMjKN2pU6eMlkRq5xkBEVBGrT///PM78vnyyy+td+/eGS2F1M47AvosT0bvAL4V778FNnDgwIyWQmrnHQF5QBm9A/gEMwIJLbHEEhkthdTOOwIioIzeAYsuuqiL/bRu3dr4BphECGQRAVXBsmi1SGea4s8++2wbP3689erVK6OlkNp5R0AElOE7QFWvDBtPqjsEVAXTjSAEhEDVEBABVQ16ZSwEhIAISPeAEBACVUNABFQ16JWxEBACIiDdA0JACFQNARFQ1aBXxkJACIiAdA8IASFQNQREQFWDXhkLASEgAtI9IASEQNUQEAFVDXplLASEgAhI94AQEAJVQ0AEVDXolbEQEAIiIN0DQkAIVA0BEVDVoFfGQkAIWEHS4hD47LPPCgMGDCi89NJLQZVtq622Kpx44olB6TR06NBCNKFbUDp9/vnnzn4vvvhiUHptvfXWhb///e8V1UkeUAt8CUV3iM2aNYuXS1ClQyd+IQn6zJw5MySVnN1CwwmAmsN+IqCgbj0pIwTyhYBmRGyB9u7atattsskmNs888wRVujXXXNMWXnjhoHRibu0NN9wwKJ26dOni7Df33HMHpRf269evX0V1akWFrqIpKjEhIASEQAMRUBWsgUDpNCEgBCqPgKpglce0qil+9dVX8ffiUQQ33n9DrBqKTZw40d555x3DffcydepUGz58uLVq1cpWXnlla9eunT+U2vLJJ5+09dZbz31dhEyrjdunn37qvnS72mqr1fjM9tixY+2NN95wVZ+0P0Iwbtw4l/fSSy9tfInXy1tvvWXY0Mviiy9uc801l99s1LLNkEgadYVODhqB888/31544QX74osvbMSIETZjxgxbbrnlqqLzlClTLGp2t08++cQ22mgjp8PkyZPtT3/6k02aNMmiZmZ79tlnbeONN3ZklJaS//znP90njXbfffeYgKqJ22GHHWZvvvmma2W66KKLrG/fvu5z2zzof/vb39z336666irr2LGjLbnkkqnA9MADDxiYdO/e3e644w6DICFH7qc999zTfQ6K+4sfcb355ptv9vQiBiRpOQjstNNOheh78VUvEH2R/vCHPxT+/Oc/F4488shYnxtuuKFw4YUXxtscf/nll+Pt5lyZPn164dhjj3U6rbXWWoWIIOPsqoXbe++9V9htt91iPZ555pnCoYce6rb32GOPwttvv+3Woy/gFrbYYotC5HnE5zbXSkQyhe22265AfyQkelkUNt9888LPP/9cGDlyZCEiILe/En+KAc0ebwd51W+//WbRTWI//vij3XrrrfbNN99UTU90Of74423nnXeuoQNv0pVWWinex/qHH34YbzfnCv19eItffvnlNbKpJm5LLbWUXX311bE+fGgSzxFPA/t57xUPo3Pnzvbtt9/G5zbXSps2beymm26KWyzRh6o0+EUEZAsuuKA99thjhpcEdk0REVBT0Avs2sjrcHXz119/3d0suO+PPPJIVbRcZpllbNlll62VN9+yn2OOOeL9rP/000/xdnOudOjQwaLe2HG1y+dVTdz4tHanTp2cKmPGjLFbbrnFIs/HWKc5njiZF6pDvGDSEPJG6Hx48cUXx906qE5//PHHNmHCBLfccccdjTjV7IqC0LOLXIDXER+47777rEePHk47+rhcf/31FrnPwWjL2zXZ85g3vX8Aq6VkCLiNGjXKjj76aBcfw0v74YcfauAENmBFHCgtIdB8yimnuJ7ZeLPIvvvu6354Ywjn4A1F1Ui33dg/eUCNRSzg83/55Rej5cLLQgst5G7kkLr10zky+RZnfYEFFvAqV2VZbdw++ugji+I+dtBBB1kU53EY0HpJoD7Z2pQmVlStjjjiCOvWrZudeuqp1r59e6cXVcCkTtxjo0ePnm27iYBmG7rwLiR+wI1MS1MUILSHH37Y1l13XcPND0XWXntte/TRR12cA9c9GjBrK664YlXVqyZuYHDUUUfZSSed5GzlgWjbtq2tuuqq9uCDD7pdzz33nPNsvXfrz2uuJfrQ7H/MMccYXqsX9LjyyivdJiQVBc1ddwZ/vLFLVcEai1jA5y+yyCK27bbbWtSy5Nx14iu8vUIShj3Q/E5wGmKMWp/iYGe19KwmbnfffbfhgR1yyCFx8elTc//999uBBx7oyIlq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" /><!-- --></p>
+<p>As seen in the limited test above, the REST API can be anywhere from <strong>4-6x</strong> faster than the SOAP API for a query on 1,000 contact records associated with a single Account. Breaking up the number of records returned into smaller batches by setting <code>QueryOptions = list(batchSize = 200)</code> typically does not affect this result very much but it also depends on the number of fields in the query. For the REST API the default is 2,000 records per batch with a minimum of 200 and maximum of 2,000. For the SOAP API the default is 500 records per batch. For both APIs it is important to note that there is no guarantee that the requested batch size is the actual batch size. Changes are made as necessary to maximize performance. For example, the SOAP API states “batch size will be no more than 200 if the SOQL statement selects two or more custom fields of type long text”. The REST API mentions that the limit imposed by Salesforce’s app servers is around 20,000 characters which can cause batches to be smaller. In short, it’s generally okay to use the default batch sizes since Salesforce may optimize over your specified batch size anyways.</p>
+</div>
+<div id="when-to-use-the-bulk-apis-for-queries" class="section level2">
+<h2>When to use the Bulk APIs for queries</h2>
+<p>A general rule of thumb for using the Bulk APIs (Bulk 1.0 and Bulk 2.0) for queries is anytime you need to retrieve more than 10,000 records. The main reasons to not use the Bulk APIs are twofold. First, they do not support complex relationship queries or aggregate queries. If you need to write a nested relationship or aggregate query involving a large number of records you may be tempted to use the REST API. However, it is recommended to perform two or more separate bulk queries that retrieve the records you need and then join or aggregate the results in R.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># nested relationship query </span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="co"># (supposed to return the id and first name of all contacts on each account)</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a><span class="kw">try</span>(</span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="kw">sf_query</span>(</span>
+<span id="cb5-5"><a href="#cb5-5"></a>    <span class="st">&quot;SELECT Id, Name, </span></span>
+<span id="cb5-6"><a href="#cb5-6"></a><span class="st">      (SELECT Id, FirstName FROM Contacts)</span></span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="st">    FROM Account&quot;</span>,</span>
+<span id="cb5-8"><a href="#cb5-8"></a>    <span class="dt">api_type =</span> <span class="st">&quot;Bulk 2.0&quot;</span></span>
+<span id="cb5-9"><a href="#cb5-9"></a>  )</span>
+<span id="cb5-10"><a href="#cb5-10"></a>)</span>
+<span id="cb5-11"><a href="#cb5-11"></a><span class="co">#&gt; Request failed [400]. Retrying in 1 seconds...</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a><span class="co">#&gt; Request failed [400]. Retrying in 1.2 seconds...</span></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co">#&gt; Error : API_ERROR: Aggregate Relationships not supported in Bulk V2 Query with CSV content type</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a></span>
+<span id="cb5-15"><a href="#cb5-15"></a><span class="co"># aggregate query</span></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co"># (supposed to return the count of contacts per account)</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a><span class="kw">try</span>(</span>
+<span id="cb5-18"><a href="#cb5-18"></a>  <span class="kw">sf_query</span>(</span>
+<span id="cb5-19"><a href="#cb5-19"></a>    <span class="st">&quot;SELECT Account.Id, Count(Name) contacts_n</span></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="st">    FROM Contact</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a><span class="st">    GROUP BY Account.Id&quot;</span>,  </span>
+<span id="cb5-22"><a href="#cb5-22"></a>    <span class="dt">api_type =</span> <span class="st">&quot;Bulk 2.0&quot;</span></span>
+<span id="cb5-23"><a href="#cb5-23"></a>  )</span>
+<span id="cb5-24"><a href="#cb5-24"></a>)</span>
+<span id="cb5-25"><a href="#cb5-25"></a><span class="co">#&gt; Request failed [400]. Retrying in 1 seconds...</span></span>
+<span id="cb5-26"><a href="#cb5-26"></a><span class="co">#&gt; Request failed [400]. Retrying in 1.1 seconds...</span></span>
+<span id="cb5-27"><a href="#cb5-27"></a><span class="co">#&gt; Error : API_ERROR: Aggregate Relationships not supported in Bulk Query</span></span></code></pre></div>
+<p>The two queries above were trying to pull all the contacts for each account and then get a count of how many contacts there are per account. If you have a lot of records, using the REST API to return these results may not be feasible. Even though the Bulk APIs cannot handle the same query, they can pull down massive amounts of data quickly. In this case you can pull down all of the Contact records and all of the Account records and then perform the calculation using <strong>dplyr</strong>, like so:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>contacts &lt;-<span class="st"> </span><span class="kw">sf_query</span>(<span class="st">&quot;SELECT Id, FirstName, Account.Id</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="st">                     FROM Contact&quot;</span>, </span>
+<span id="cb6-3"><a href="#cb6-3"></a>                     <span class="dt">api_type =</span> <span class="st">&quot;Bulk 2.0&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4"></a></span>
+<span id="cb6-5"><a href="#cb6-5"></a>accounts &lt;-<span class="st"> </span><span class="kw">sf_query</span>(<span class="st">&quot;SELECT Id, Name </span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="st">                     FROM Account&quot;</span>, </span>
+<span id="cb6-7"><a href="#cb6-7"></a>                     <span class="dt">api_type =</span> <span class="st">&quot;Bulk 2.0&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8"></a></span>
+<span id="cb6-9"><a href="#cb6-9"></a>nested_query_recs &lt;-<span class="st"> </span>accounts <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="st">  </span><span class="kw">left_join</span>(contacts <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="st">              </span><span class="kw">rename</span>(<span class="st">`</span><span class="dt">Contact.Id</span><span class="st">`</span> =<span class="st"> </span>Id, </span>
+<span id="cb6-12"><a href="#cb6-12"></a>                     <span class="st">`</span><span class="dt">Contact.FirstName</span><span class="st">`</span> =<span class="st"> </span>FirstName), </span>
+<span id="cb6-13"><a href="#cb6-13"></a>            <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;Id&quot;</span> =<span class="st"> &quot;Account.Id&quot;</span>))</span>
+<span id="cb6-14"><a href="#cb6-14"></a>nested_query_recs</span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; # A tibble: 1,513 x 4</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt;   Id              Name                         Contact.Id       Contact.FirstNa…</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt;   &lt;chr&gt;           &lt;chr&gt;                        &lt;chr&gt;            &lt;chr&gt;           </span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; 1 0013s00000zFdu… KEEP Test Account With Chil… 0033s000012Nkzw… KEEP            </span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; 2 0013s00000zFdu… KEEP Test Account With Chil… 0033s000012Nkzx… KEEP            </span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; 3 0013s00000zFdu… KEEP Test Account With Chil… 0033s000012Nkzy… KEEP            </span></span>
+<span id="cb6-21"><a href="#cb6-21"></a><span class="co">#&gt; 4 0013s00000zFdu… KEEP Test Account With Chil… 0033s000012Nkzz… KEEP            </span></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co">#&gt; 5 0013s00000zFdu… KEEP Test Account With Chil… 0033s000012Nl00… KEEP            </span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co">#&gt; # … with 1,508 more rows</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a></span>
+<span id="cb6-25"><a href="#cb6-25"></a>aggregate_query_recs &lt;-<span class="st"> </span>nested_query_recs <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="st">  </span><span class="kw">group_by</span>(Id) <span class="op">%&gt;%</span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="st">  </span><span class="kw">summarize</span>(<span class="dt">.groups =</span> <span class="st">&#39;drop&#39;</span>, </span>
+<span id="cb6-28"><a href="#cb6-28"></a>            <span class="dt">contacts_n =</span> <span class="kw">sum</span>(<span class="op">!</span><span class="kw">is.na</span>(Contact.Id)))</span>
+<span id="cb6-29"><a href="#cb6-29"></a>aggregate_query_recs</span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt; # A tibble: 14 x 2</span></span>
+<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt;   Id                 contacts_n</span></span>
+<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt;   &lt;chr&gt;                   &lt;int&gt;</span></span>
+<span id="cb6-33"><a href="#cb6-33"></a><span class="co">#&gt; 1 0013s00000zFdugAAC        300</span></span>
+<span id="cb6-34"><a href="#cb6-34"></a><span class="co">#&gt; 2 0013s00000zFgA6AAK          0</span></span>
+<span id="cb6-35"><a href="#cb6-35"></a><span class="co">#&gt; 3 0013s000010x6GcAAI         99</span></span>
+<span id="cb6-36"><a href="#cb6-36"></a><span class="co">#&gt; 4 0013s000010xA6AAAU         99</span></span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt; 5 0013s000010xAiOAAU        999</span></span>
+<span id="cb6-38"><a href="#cb6-38"></a><span class="co">#&gt; # … with 9 more rows</span></span></code></pre></div>
+<p>The second reason to not use the Bulk APIs is that there is a performance overhead associated with every bulk (asynchronous) job that involves checking the status of the job until it succeeds or fails before retrieving the results.</p>
+<p>The example below is provided so that you can take this code as an example to run your own performance test of queries that return 10K, 100K, 1M+ records to see where the Bulk APIs outperform the REST API.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>qry_compare &lt;-<span class="st"> </span><span class="cf">function</span>(api_type){</span>
+<span id="cb7-2"><a href="#cb7-2"></a>  soql &lt;-<span class="st"> </span><span class="kw">sprintf</span>(<span class="st">&quot;SELECT Id, LastName, Account.Id, Account.Name, Owner.Id</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="st">                   FROM Contact</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a><span class="st">                   WHERE Account.Id = &#39;%s&#39;&quot;</span>, </span>
+<span id="cb7-5"><a href="#cb7-5"></a>                   new_account<span class="op">$</span>id)</span>
+<span id="cb7-6"><a href="#cb7-6"></a>  <span class="kw">sf_query</span>(soql, <span class="dt">api_type =</span> api_type)</span>
+<span id="cb7-7"><a href="#cb7-7"></a>}</span>
+<span id="cb7-8"><a href="#cb7-8"></a></span>
+<span id="cb7-9"><a href="#cb7-9"></a>res &lt;-<span class="st"> </span>microbenchmark<span class="op">::</span><span class="kw">microbenchmark</span>(</span>
+<span id="cb7-10"><a href="#cb7-10"></a>  <span class="kw">qry_compare</span>(<span class="st">&quot;REST&quot;</span>),</span>
+<span id="cb7-11"><a href="#cb7-11"></a>  <span class="kw">qry_compare</span>(<span class="st">&quot;Bulk 1.0&quot;</span>),</span>
+<span id="cb7-12"><a href="#cb7-12"></a>  <span class="kw">qry_compare</span>(<span class="st">&quot;Bulk 2.0&quot;</span>),</span>
+<span id="cb7-13"><a href="#cb7-13"></a>  <span class="dt">times =</span> <span class="dv">5</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a>)</span></code></pre></div>
+<p>Note that the Bulk 1.0 API requires users to specify the target object along with their submitted SOQL. This is because it is needed when creating the bulk job that will manage and execute the query.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>queried_records &lt;-<span class="st"> </span><span class="kw">sf_query</span>(soql, <span class="dt">api_type =</span> <span class="st">&quot;Bulk 1.0&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="co">#&gt; Guessed &#39;Contact&#39; as the object_name from supplied SOQL.</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co">#&gt; Please set `object_name` explicitly if this is incorrect because it is required by the Bulk APIs.</span></span></code></pre></div>
+<p>As you can see above the {salesforcer} package will try to infer the object in the query if not explicitly provided. If it does not guess correctly, then please specify.</p>
+<p><strong>Cleanup after performance tests</strong></p>
+<p>By keeping track of the account ids used in our tests, it is fairly easy to find and delete these test records from our Org to save space.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># cleanup performance test Contact records ...</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>contacts_to_delete &lt;-<span class="st"> </span><span class="kw">sf_query</span>(</span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="kw">sprintf</span>(<span class="st">&quot;SELECT Id </span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="st">          FROM Contact </span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="st">          WHERE Account.Id = &#39;%s&#39;&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>          new_account<span class="op">$</span>id)</span>
+<span id="cb9-7"><a href="#cb9-7"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="kw">sf_delete</span>(contacts_to_delete<span class="op">$</span>Id, <span class="st">&quot;Contact&quot;</span>, <span class="dt">api_type=</span><span class="st">&quot;Bulk 2.0&quot;</span>)</span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#&gt; # A tibble: 999 x 4</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#&gt;   Id                 sf__Id             sf__Created sf__Error</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;              &lt;lgl&gt;       &lt;lgl&gt;    </span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#&gt; 1 0033s000013YBaNAAW 0033s000013YBaNAAW FALSE       NA       </span></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="co">#&gt; 2 0033s000013YBaOAAW 0033s000013YBaOAAW FALSE       NA       </span></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co">#&gt; 3 0033s000013YBaPAAW 0033s000013YBaPAAW FALSE       NA       </span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="co">#&gt; 4 0033s000013YBaQAAW 0033s000013YBaQAAW FALSE       NA       </span></span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="co">#&gt; 5 0033s000013YBaRAAW 0033s000013YBaRAAW FALSE       NA       </span></span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="co">#&gt; # … with 994 more rows</span></span>
+<span id="cb9-18"><a href="#cb9-18"></a></span>
+<span id="cb9-19"><a href="#cb9-19"></a><span class="co"># ... and finally delete the account</span></span>
+<span id="cb9-20"><a href="#cb9-20"></a><span class="kw">sf_delete</span>(new_account<span class="op">$</span>id)</span>
+<span id="cb9-21"><a href="#cb9-21"></a><span class="co">#&gt; # A tibble: 1 x 2</span></span>
+<span id="cb9-22"><a href="#cb9-22"></a><span class="co">#&gt;   id                 success</span></span>
+<span id="cb9-23"><a href="#cb9-23"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
+<span id="cb9-24"><a href="#cb9-24"></a><span class="co">#&gt; 1 0013s000010xAiOAAU TRUE</span></span></code></pre></div>
+</div>
+<div id="relationship-queries" class="section level2">
+<h2>Relationship queries</h2>
+<p>Salesforce supports retrieving fields from related objects when querying another object. This is similar to performing a JOIN in SQL, but without having to specify the join keys because Salesforce already knows the relationship between the two objects. There are two types of relationship queries (1. child-to-parent lookups and 2. parent-to-child nested queries) detailed in the sections below.</p>
+<div id="child-to-parent-lookup-queries" class="section level3">
+<h3>child-to-parent “lookup” queries</h3>
+<p>The first type of relationship query and the most common is child to parent. For example, the Contact object (child) to their parent, the Account object. In order to pull down parent object fields with your child record query, you just need to prefix any fields from the related object by concatenating the name of the object with the field name separated by a period. In the example below we are retrieving all Contact object records that have a relationship to an Account.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># child-to-parent relationship (e.g. Account.Name from Contact record)</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="kw">sf_query</span>(</span>
+<span id="cb10-3"><a href="#cb10-3"></a>  <span class="st">&quot;SELECT Id, FirstName, Account.Name</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="st">  FROM Contact</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="st">  WHERE Account.Id != null&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a>)</span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="co">#&gt; # A tibble: 513 x 3</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co">#&gt;   Id                 FirstName Account.Name                        </span></span>
+<span id="cb10-9"><a href="#cb10-9"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;     &lt;chr&gt;                               </span></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co">#&gt; 1 0033s000012Nl0rAAC KEEP      KEEP Test Account With Child Records</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co">#&gt; 2 0033s000012Nl0sAAC KEEP      KEEP Test Account With Child Records</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="co">#&gt; 3 0033s000012Nl0tAAC KEEP      KEEP Test Account With Child Records</span></span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="co">#&gt; 4 0033s000012Nl0uAAC KEEP      KEEP Test Account With Child Records</span></span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="co">#&gt; 5 0033s000012Nl0vAAC KEEP      KEEP Test Account With Child Records</span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="co">#&gt; # … with 508 more rows</span></span></code></pre></div>
+<p>Sometimes you may notice that the requested relationship fields do not appear in the query results. This is because the SOAP and REST APIs do not return any related object information if it does not exist on the record and there is no reliable way to extract and rebuild the empty columns based on the query string. In the example below, if there were Account information an additional column titled <code>&quot;Account.Name&quot;</code> would appear in the results.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># child-to-parent relationship (e.g. Account.Name from Contact record)</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="kw">sf_query</span>(</span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="st">&quot;SELECT Id, FirstName, Account.Name</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="st">  FROM Contact</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="st">  WHERE Account.Id = null&quot;</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a>)</span>
+<span id="cb11-7"><a href="#cb11-7"></a><span class="co">#&gt; # A tibble: 689 x 2</span></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="co">#&gt;   Id                 FirstName</span></span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;    </span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co">#&gt; 1 0033s000013YAdhAAG Test     </span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="co">#&gt; 2 0033s000013YB7iAAG Test     </span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="co">#&gt; 3 0033s000013YAnLAAW Test     </span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="co">#&gt; 4 0033s000013YAnMAAW Test     </span></span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="co">#&gt; 5 0033s000013YBFbAAO Test     </span></span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="co">#&gt; # … with 684 more rows</span></span></code></pre></div>
+<p>Note, that the Bulk 1.0 and Bulk 2.0 APIs will return <code>&quot;Account.Name&quot;</code> as a column of all <code>NA</code> values for this query because they return results differently.</p>
+<p>Finally, one aspect to note is that the Bulk 2.0 API does not support child-to-parent-grandparent relationships as seen in the example below:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">try</span>(</span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="kw">sf_query</span>(<span class="st">&quot;SELECT Id, FirstName, Account.Owner.Id</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="st">            FROM Contact&quot;</span>, </span>
+<span id="cb12-4"><a href="#cb12-4"></a>           <span class="dt">api_type =</span> <span class="st">&quot;Bulk 2.0&quot;</span>)</span>
+<span id="cb12-5"><a href="#cb12-5"></a>)</span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#&gt; Error in sf_query_bulk_v2(soql = soql, object_name = object_name, queryall = queryall,  : </span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co">#&gt;   Failure during batch processing: FeatureNotEnabled : Cannot serialize value for &#39;Owner&#39; in CSV format</span></span></code></pre></div>
+</div>
+<div id="parent-to-child-nested-queries" class="section level3">
+<h3>parent-to-child “nested” queries</h3>
+<p>Instead of “looking up” a related field, users can write queries that retrieve the individual records related to a parent. For example, if you would like all of the Accounts and their Contacts you can write the query like so:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">sf_query</span>(</span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="st">&quot;SELECT Id, Name, </span></span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="st">    (SELECT Id, FirstName FROM Contacts)</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="st">  FROM Account&quot;</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>)</span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="co">#&gt; # A tibble: 514 x 4</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="co">#&gt;   Id              Name                         Contact.FirstName Contact.Id     </span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="co">#&gt;   &lt;chr&gt;           &lt;chr&gt;                        &lt;chr&gt;             &lt;chr&gt;          </span></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="co">#&gt; 1 0013s00000zFgA… KEEP Test Account With Chil… &lt;NA&gt;              &lt;NA&gt;           </span></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="co">#&gt; 2 0013s00000zFdu… KEEP Test Account With Chil… KEEP              0033s000012Nl0…</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="co">#&gt; 3 0013s00000zFdu… KEEP Test Account With Chil… KEEP              0033s000012Nkz…</span></span>
+<span id="cb13-12"><a href="#cb13-12"></a><span class="co">#&gt; 4 0013s00000zFdu… KEEP Test Account With Chil… KEEP              0033s000012Nkz…</span></span>
+<span id="cb13-13"><a href="#cb13-13"></a><span class="co">#&gt; 5 0013s00000zFdu… KEEP Test Account With Chil… KEEP              0033s000012Nkz…</span></span>
+<span id="cb13-14"><a href="#cb13-14"></a><span class="co">#&gt; # … with 509 more rows</span></span></code></pre></div>
+<p>At first glance this query may appear the same as a lookup query on the Contact object that includes the account id and name. However, the small difference is that every Account is included, regardless of whether or not they have a Contact. This can be helpful when you want to ensure a query contains all of the parent records and their child records, if they exist. Also, note that the plural object name is used inside the nested query (“Contacts” instead of “Contact”).</p>
+<p>Finally, a parent-to-child nested query can also contain a child-to-parent lookup relationship within it. Below is an example where the Owner Id on the Contact is included so you can know who is responsible for the Contacts under each Account.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">sf_query</span>(</span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="st">&quot;SELECT Name, Owner.Id, </span></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="st">    (SELECT Id, FirstName, Owner.Id FROM Contacts)</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="st">   FROM Account&quot;</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a>)</span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="co">#&gt; # A tibble: 514 x 5</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="co">#&gt;   Name              Contact.FirstName Contact.Id    Contact.Owner.Id Owner.Id   </span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="co">#&gt;   &lt;chr&gt;             &lt;chr&gt;             &lt;chr&gt;         &lt;chr&gt;            &lt;chr&gt;      </span></span>
+<span id="cb14-9"><a href="#cb14-9"></a><span class="co">#&gt; 1 KEEP Test Accoun… &lt;NA&gt;              &lt;NA&gt;          &lt;NA&gt;             0056A00000…</span></span>
+<span id="cb14-10"><a href="#cb14-10"></a><span class="co">#&gt; 2 KEEP Test Accoun… KEEP              0033s000012N… 0056A000000MPRj… 0056A00000…</span></span>
+<span id="cb14-11"><a href="#cb14-11"></a><span class="co">#&gt; 3 KEEP Test Accoun… KEEP              0033s000012N… 0056A000000MPRj… 0056A00000…</span></span>
+<span id="cb14-12"><a href="#cb14-12"></a><span class="co">#&gt; 4 KEEP Test Accoun… KEEP              0033s000012N… 0056A000000MPRj… 0056A00000…</span></span>
+<span id="cb14-13"><a href="#cb14-13"></a><span class="co">#&gt; 5 KEEP Test Accoun… KEEP              0033s000012N… 0056A000000MPRj… 0056A00000…</span></span>
+<span id="cb14-14"><a href="#cb14-14"></a><span class="co">#&gt; # … with 509 more rows</span></span></code></pre></div>
+</div>
+</div>
+<div id="troubleshooting" class="section level2">
+<h2>Troubleshooting</h2>
+<p>If you are having an issue with a query please submit in the {salesforcer} GitHub repository at: <a target="_blank" href="https://github.com/StevenMMortimer/salesforcer/issues">https://github.com/StevenMMortimer/salesforcer/issues</a>. As a maintainer, queries are tough to debug because every Salesforce Org is unique. Custom objects or relationships created in your Salesforce Org may be different or even impossible to test in another Org. When filing your issue please make an attempt to understand the query and debug a little bit on your own. Here are a few suggestions:</p>
+<ol style="list-style-type: decimal">
+<li><p>Slightly modify your function call to <code>sf_query()</code> to observe the results. Here are a few prompting questions that may assist you:</p>
+<ul>
+<li><p>What do you see when you set <code>verbose=TRUE</code> argument?</p></li>
+<li><p>What happens if you change the <code>control</code> argument, specifically the batch size?</p></li>
+<li><p>What happens if you try using a different API (e.g. “SOAP” vs “REST” or “Bulk 1.0” vs “Bulk 2.0”)?</p></li>
+<li><p>What happens if you change your query slightly?</p></li>
+<li><p>Do you need a parent-to-child nested relationship query or will a child-to-parent lookup suffice?</p></li>
+</ul></li>
+<li><p>Check out Salesforce’s <a href="https://workbench.developerforce.com/login.php">Workbench</a> tool to see how it builds out queries.</p></li>
+<li><p>Double check Salesforce’s <a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql.htm">SOQL reference guide</a> to see whether your query is supported or limited in some way.</p></li>
+<li><p>Review query unit tests at: <a target="_blank" href="https://github.com/StevenMMortimer/salesforcer/blob/master/tests/testthat/test-query.R">https://github.com/StevenMMortimer/salesforcer/blob/master/tests/testthat/test-query.R</a>. These unit tests were written to cover a variety of use cases and to track any changes made between newly released versions of the Salesforce API (typically 4 each year). These tests are an excellent source of examples that may be helpful in troubleshooting your own query.</p></li>
+<li><p>Roll up your sleeves and dive into the source code for the {salesforcer} package. The main scripts to review are:</p>
+<ul>
+<li><p><a target="_blank" href="https://github.com/StevenMMortimer/salesforcer/blob/master/R/query.R">https://github.com/StevenMMortimer/salesforcer/blob/master/R/query.R</a></p></li>
+<li><p><a target="_blank" href="https://github.com/StevenMMortimer/salesforcer/blob/master/R/utils-query.R">https://github.com/StevenMMortimer/salesforcer/blob/master/R/utils-query.R</a></p></li>
+</ul></li>
+</ol>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

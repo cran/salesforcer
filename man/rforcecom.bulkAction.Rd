@@ -2,7 +2,8 @@
 % Please edit documentation in R/compatibility.R
 \name{rforcecom.bulkAction}
 \alias{rforcecom.bulkAction}
-\title{Run Bulk Action}
+\title{The \code{salesforcer} backwards compatible version of the RForcecom function
+\code{rforcecom.bulkAction}}
 \usage{
 rforcecom.bulkAction(
   session,
@@ -18,39 +19,52 @@ rforcecom.bulkAction(
 )
 }
 \arguments{
-\item{session}{a named character vector defining parameters of the api connection as returned by \link{rforcecom.login}}
+\item{session}{\code{list}; a list containing \code{"sessionID"},
+\code{"instanceURL"}, and \code{"apiVersion"} as returned by
+\code{\link[RForcecom]{rforcecom.login}}. This argument is ignored in all
+backward compatible calls because the authorization credentials are stored
+in an environment internal to the salesforcer package, so it is no longer
+necessary to pass the session in each function call.}
 
 \item{operation}{a character string defining the type of operation being performed}
 
-\item{data}{a matrix or data.frame that can be coerced into .csv file for submitting as batch request}
+\item{data}{a matrix or data.frame that can be coerced into a CSV file for submitting as batch request}
 
 \item{object}{a character string defining the target salesforce object that the operation will be performed on}
 
-\item{external_id_fieldname}{character; string identifying a custom field on the 
-object that has been set as an "External ID" field. This field is used to reference 
+\item{external_id_fieldname}{\code{character}; string identifying a custom field on the
+object that has been set as an "External ID" field. This field is used to reference
 objects during upserts to determine if the record already exists in Salesforce or not.}
 
-\item{multiBatch}{a boolean value defining whether or not submit data in batches to the api}
+\item{multiBatch}{a boolean value defining whether or not submit data in batches to the API}
 
 \item{batchSize}{an integer value defining the number of records to submit if multiBatch is true.
-The max value is 10000 in accordance with salesforce limits.}
+The max value is 10,000 in accordance with Salesforce limits.}
 
 \item{interval_seconds}{an integer defining the seconds between attempts to check for job completion}
 
 \item{max_attempts}{an integer defining then max number attempts to check for job completion before stopping}
 
-\item{verbose}{logical; do you want informative messages?}
+\item{verbose}{\code{logical}; an indicator of whether to print additional
+detail for each API call, which is useful for debugging. More specifically, when
+set to \code{TRUE} the URL, header, and body will be printed for each request,
+along with additional diagnostic information where available.}
 }
 \value{
 A \code{tbl_df} of the results of the bulk job
 }
 \description{
+\lifecycle{soft-deprecated}
+
 This function is a convenience wrapper for submitting bulk API jobs
 }
 \examples{
 \dontrun{
 # update Account object
-updates <- rforcecom.bulkAction(session, operation='update', data=my_data, object='Account')
+updates <- rforcecom.bulkAction(session, 
+                                operation = 'update', 
+                                data = my_data, 
+                                object = 'Account')
 }
 }
 \references{

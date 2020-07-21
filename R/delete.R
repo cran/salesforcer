@@ -1,7 +1,11 @@
 #' Delete Records
 #' 
+#' @description
+#' \lifecycle{maturing}
+#' 
 #' Deletes one or more records from your organization’s data.
 #' 
+#' @importFrom lifecycle deprecate_warn is_present deprecated
 #' @importFrom httr content
 #' @importFrom readr type_convert cols
 #' @importFrom dplyr bind_rows as_tibble
@@ -12,9 +16,11 @@
 #' that can be passed in the request
 #' @template object_name
 #' @template api_type
+#' @template guess_types
 #' @template control
 #' @param ... arguments passed to \code{\link{sf_control}} or further downstream 
 #' to \code{\link{sf_bulk_operation}}
+#' @template all_or_none
 #' @template verbose
 #' @return \code{tbl_df} of records with success indicator
 #' @note Because the SOAP and REST calls chunk data into batches of 200 records 
@@ -34,54 +40,72 @@
 #' }
 #' @export
 sf_delete <- function(ids,
-                      object_name,
+                      object_name = NULL,
                       api_type = c("REST", "SOAP", "Bulk 1.0", "Bulk 2.0"),
+                      guess_types = TRUE,
                       control = list(...), ...,
+                      all_or_none = deprecated(),
                       verbose = FALSE){
 
   api_type <- match.arg(api_type)
   
   # determine how to pass along the control args 
-  all_args <- list(...)
   control_args <- return_matching_controls(control)
   control_args$api_type <- api_type
   control_args$operation <- "delete"
-  if("all_or_none" %in% names(all_args)){
-    # warn then set it in the control list
-    warning(paste0("The `all_or_none` argument has been deprecated.\n", 
-                   "Please pass AllOrNoneHeader argument or use the `sf_control` function."), 
-            call. = FALSE)
-    control_args$AllOrNoneHeader = list(allOrNone = tolower(all_args$all_or_none))
+  
+  if(is_present(all_or_none)) {
+    deprecate_warn("0.1.3", "sf_delete(all_or_none = )", "sf_delete(AllOrNoneHeader = )", 
+                   details = paste0("You can pass the all or none header directly ", 
+                                    "as shown above or via the `control` argument."))
+    control_args$AllOrNoneHeader <- list(allOrNone = tolower(all_or_none))
   }
   
   if(api_type == "SOAP"){
     resultset <- sf_delete_soap(ids = ids, 
                                 object_name = object_name,
+                                guess_types = guess_types,
                                 control = control_args,
                                 verbose = verbose)
   } else if(api_type == "REST"){
     resultset <- sf_delete_rest(ids = ids, 
                                 object_name = object_name,
+                                guess_types = guess_types,
                                 control = control_args,
                                 verbose = verbose)
   } else if(api_type == "Bulk 1.0"){
     resultset <- sf_delete_bulk_v1(ids = ids, 
                                    object_name = object_name, 
+                                   guess_types = guess_types,
                                    control = control_args, 
                                    verbose = verbose, ...)
   } else if(api_type == "Bulk 2.0"){
-    resultset <- sf_delete_bulk_v2(ids=ids, 
-                                   object_name = object_name, 
+    resultset <- sf_delete_bulk_v2(ids = ids, 
+                                   object_name = object_name,
+                                   guess_types = guess_types,
                                    control = control_args, 
                                    verbose = verbose, ...)
   } else {
-    stop("Unknown API type.")
+    catch_unknown_api(api_type)
   }
   return(resultset)
 }
 
+
+#' Delete records using SOAP API
+#' 
+#' @importFrom readr cols type_convert
+#' @importFrom httr content
+#' @importFrom xml2 xml_ns_strip xml_find_all
+#' @importFrom purrr map_df
+#' @importFrom dplyr bind_rows
+#' @importFrom stats quantile
+#' @importFrom utils head
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
 sf_delete_soap <- function(ids, 
-                           object_name,
+                           object_name = NULL,
+                           guess_types = TRUE,
                            control, ...,
                            verbose = FALSE){
   
@@ -99,7 +123,7 @@ sf_delete_soap <- function(ids,
     message("Submitting data in ", max(batch_id)+1, " Batches")
   }
   message_flag <- unique(as.integer(quantile(0:max(batch_id), c(0.25,0.5,0.75,1))))
-  resultset <- NULL
+  resultset <- tibble()
   for(batch in seq(0, max(batch_id))){
     if(verbose){
       batch_msg_flg <- batch %in% message_flag
@@ -125,20 +149,33 @@ sf_delete_soap <- function(ids,
                                 request_body)
     }
     catch_errors(httr_response)
-    response_parsed <- content(httr_response, encoding="UTF-8")
+    response_parsed <- content(httr_response, as="parsed", encoding="UTF-8")
     this_set <- response_parsed %>%
       xml_ns_strip() %>%
-      xml_find_all('.//result') %>%
-      map_df(xml_nodeset_to_df)
+      xml_find_all('.//result') %>% 
+      map_df(extract_records_from_xml_node)
     resultset <- bind_rows(resultset, this_set)
   }
-  resultset <- resultset %>%
-    type_convert(col_types = cols())
+  
+  resultset <- resultset %>% 
+    sf_reorder_cols() %>% 
+    sf_guess_cols(guess_types)
+  
   return(resultset)
 }
 
+#' Delete records using REST API
+#' 
+#' @importFrom purrr map_df
+#' @importFrom dplyr bind_rows
+#' @importFrom readr cols type_convert col_guess
+#' @importFrom stats quantile
+#' @importFrom utils head
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
 sf_delete_rest <- function(ids, 
-                           object_name,
+                           object_name = NULL,
+                           guess_types = TRUE,
                            control, ...,
                            verbose = FALSE){
   ids <- sf_input_data_validation(ids, operation='delete')
@@ -178,23 +215,32 @@ sf_delete_rest <- function(ids,
                                 httr_response$request$headers)
     }
     catch_errors(httr_response)
-    response_parsed <- content(httr_response, "text", encoding="UTF-8")
-    resultset <- bind_rows(resultset, fromJSON(response_parsed))
+    response_parsed <- content(httr_response, as="parsed", encoding="UTF-8")
+    resultset <- c(resultset, response_parsed)
   }
+
   resultset <- resultset %>%
-    as_tibble() %>%
-    type_convert(col_types = cols())
+    map_df(flatten_tbl_df) %>%
+    sf_reorder_cols() %>% 
+    sf_guess_cols(guess_types)
+  
   return(resultset)
 }
 
+#' Delete records using Bulk 1.0 API
+#' 
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
 sf_delete_bulk_v1 <- function(ids, 
                               object_name,
+                              guess_types = TRUE,
                               control, ...,
                               verbose = FALSE){
   ids <- sf_input_data_validation(ids, operation = 'delete')
   control <- do.call("sf_control", control)
   resultset <- sf_bulk_operation(input_data = ids, 
                                  object_name = object_name,
+                                 guess_types = guess_types,
                                  operation = "delete",
                                  api_type = "Bulk 1.0",
                                  control = control, ...,
@@ -202,14 +248,20 @@ sf_delete_bulk_v1 <- function(ids,
   return(resultset)  
 }
 
+#' Delete records using Bulk 2.0 API
+#' 
+#' @note This function is meant to be used internally. Only use when debugging.
+#' @keywords internal
 sf_delete_bulk_v2 <- function(ids, 
                               object_name,
+                              guess_types = TRUE,
                               control, ...,
                               verbose = FALSE){
   ids <- sf_input_data_validation(ids, operation = 'delete')  
   control <- do.call("sf_control", control)
   resultset <- sf_bulk_operation(input_data = ids, 
                                  object_name = object_name, 
+                                 guess_types = guess_types,
                                  operation = "delete", 
                                  api_type = "Bulk 2.0",
                                  control = control, ...,
