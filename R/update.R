@@ -1,13 +1,12 @@
 #' Update Records
 #' 
 #' @description
-#' \lifecycle{maturing}
+#' `r lifecycle::badge("maturing")`
 #' 
 #' Updates one or more records to your organization’s data.
 #' 
 #' @importFrom lifecycle deprecate_warn is_present deprecated
-#' @param input_data \code{named vector}, \code{matrix}, \code{data.frame}, or 
-#' \code{tbl_df}; data can be coerced into a \code{data.frame}
+#' @template input_data
 #' @template object_name
 #' @template api_type
 #' @template guess_types
@@ -50,7 +49,8 @@ sf_update <- function(input_data,
   control_args$operation <- "update"
   
   if(is_present(all_or_none)) {
-    deprecate_warn("0.1.3", "sf_update(all_or_none = )", "sf_update(AllOrNoneHeader = )", 
+    deprecate_warn("0.1.3", "salesforcer::sf_update(all_or_none = )", 
+                   "sf_update(AllOrNoneHeader = )", 
                    details = paste0("You can pass the all or none header directly ", 
                                     "as shown above or via the `control` argument."))
     control_args$AllOrNoneHeader <- list(allOrNone = tolower(all_or_none))
@@ -137,8 +137,8 @@ sf_update_soap <- function(input_data,
                                         root = r)
     request_body <- as(xml_dat, "character")
     httr_response <- rPOST(url = base_soap_url,
-                           headers = c("SOAPAction"="update",
-                                       "Content-Type"="text/xml"),
+                           headers = c("SOAPAction" = "update",
+                                       "Content-Type" = "text/xml"),
                            body = request_body)
     if(verbose){
       make_verbose_httr_message(httr_response$request$method,
@@ -152,7 +152,7 @@ sf_update_soap <- function(input_data,
       xml_ns_strip() %>%
       xml_find_all('.//result') %>% 
       map_df(extract_records_from_xml_node)
-    resultset <- bind_rows(resultset, this_set)
+    resultset <- safe_bind_rows(list(resultset, this_set))
   }
   
   resultset <- resultset %>% 

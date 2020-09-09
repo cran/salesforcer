@@ -1,7 +1,7 @@
 #' Perform SOSL Search
 #' 
 #' @description
-#' \lifecycle{maturing}
+#' `r lifecycle::badge("maturing")`
 #' 
 #' Searches for records in your organization’s data.
 #' 
@@ -10,10 +10,10 @@
 #' @importFrom purrr map_df 
 #' @importFrom xml2 xml_ns_strip xml_find_all
 #' @importFrom httr content
-#' @param search_string character; string to search using parameterized search 
+#' @param search_string \code{character}; string to search using parameterized search 
 #' or SOSL. Note that is_sosl must be set to TRUE and the string valid in order 
 #' to perform a search using SOSL.
-#' @param is_sosl logical; indicating whether or not to try the string as SOSL
+#' @param is_sosl \code{logical}; indicating whether or not to try the string as SOSL
 #' @template guess_types
 #' @template api_type
 #' @param parameterized_search_options \code{list}; a list of parameters for 
@@ -71,7 +71,7 @@ sf_search <- function(search_string,
     } else {
       parameterized_search_control <- do.call("parameterized_search_control",
                                               parameterized_search_options)
-      parameterized_search_control <- c(list(q=search_string), parameterized_search_control)
+      parameterized_search_control <- c(list(q = search_string), parameterized_search_control)
       target_url <- make_parameterized_search_url()
       httr_response <- rPOST(url = target_url,
                              headers = c("Accept"="application/json", 
@@ -154,16 +154,19 @@ sf_search <- function(search_string,
 #' A function for allowing finer grained control over how a search is performed
 #' when not using SOSL
 #' 
-#' @param objects character; objects to search and return in the response. Multiple 
+#' @param objects \code{character}; objects to search and return in the response. Multiple 
 #' objects can be provided as a character vector
-#' @param fields_scope character; scope of fields to search in order to limit the resources 
+#' @param fields_scope \code{character}; scope of fields to search in order to limit the resources 
 #' used and improve performance
-#' @param fields character; one or more fields to return in the response for each 
+#' @param fields \code{character}; one or more fields to return in the response for each 
 #' sobject specified. If no fields are specified only the Ids of the matching records 
 #' are returned.
-#' @param overall_limit numeric; the maximum number of results to return across 
-#' all sobject parameters specified.
-#' @param spell_correction logical; specifies whether spell correction should be
+#' @param overall_limit \code{numeric}; the maximum number of results to return across 
+#' all objects in the search.
+#' @param default_limit \code{numeric}; the maximum number of results to return for 
+#' each of the specified objects. This parameter is ignored if the \code{objects} argument 
+#' is left \code{NULL}.
+#' @param spell_correction \code{logical}; specifies whether spell correction should be
 #' enabled for a user’s search.
 #' @return \code{list} of parameters passed onto sf_search
 #' @references \url{https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_search_parameterized.htm#resources_search_parameterized}
@@ -182,18 +185,20 @@ parameterized_search_control <- function(objects = NULL,
                                          fields_scope = c("ALL", "NAME", "EMAIL", "PHONE" ,"SIDEBAR"),
                                          fields = NULL,
                                          overall_limit = 2000,
+                                         default_limit = 200,
                                          spell_correction = TRUE){
   
   which_fields_scope <- match.arg(fields_scope)
   
   if(!is.null(fields) & is.null(objects)){
-    stop("You must specify the objects if you are limiting the fields to return.")
+    stop("You must specify the objects if you are limiting the fields to return.", call. = FALSE)
   }
   result <- list()
   result$`in` <- which_fields_scope
-  if(!is.null(fields)) result$fields <- fields
+  if(!is.null(fields)) result$fields <- I(fields)
   if(!is.null(objects)) result$sobjects <- lapply(objects, FUN=function(x){list(name=x)})
   result$overallLimit <- as.integer(overall_limit)
-  result$spellCorrection <- tolower(spell_correction)
+  if(!is.null(objects)) result$defaultLimit <- default_limit
+  result$spellCorrection <- spell_correction
   return(result)
 }

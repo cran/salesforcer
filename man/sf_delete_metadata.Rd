@@ -24,7 +24,7 @@ look at the documentation for \code{\link{sf_control}}.}
 
 \item{...}{arguments passed to \code{\link{sf_control}}}
 
-\item{all_or_none}{logical; allows a call to roll back all changes unless all
+\item{all_or_none}{\code{logical}; allows a call to roll back all changes unless all
 records are processed successfully.}
 
 \item{verbose}{\code{logical}; an indicator of whether to print additional
@@ -36,7 +36,7 @@ along with additional diagnostic information where available.}
 A \code{data.frame} containing the creation result for each submitted metadata component
 }
 \description{
-\lifecycle{experimental}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
 
 This function takes a request of named elements in Salesforce and deletes them.
 }

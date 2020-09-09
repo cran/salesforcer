@@ -1,7 +1,7 @@
 #' Rename Metadata Elements in Salesforce
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' This function takes an old and new name for a 
 #' metadata element in Salesforce and applies the new name
@@ -13,9 +13,9 @@
 #' @importFrom purrr map_df
 #' @references \url{https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/}
 #' @template metadata_type
-#' @param old_fullname character; string corresponding to the fullName of the element you would 
+#' @param old_fullname \code{character}; string corresponding to the fullName of the element you would 
 #' like to rename
-#' @param new_fullname character; string corresponding to the new fullName you would like 
+#' @param new_fullname \code{character}; string corresponding to the new fullName you would like 
 #' to apply the targeted element
 #' @template verbose
 #' @return A \code{data.frame} containing the creation result for each submitted metadata component

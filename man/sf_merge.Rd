@@ -16,10 +16,10 @@ sf_merge(
 )
 }
 \arguments{
-\item{master_id}{character; a Salesforce generated Id that identifies the master record,
+\item{master_id}{\code{character}; a Salesforce generated Id that identifies the master record,
 which is the record to which the victim records will be merged into}
 
-\item{victim_ids}{character; one or two Salesforce Ids of records to be merged into
+\item{victim_ids}{\code{character}; one or two Salesforce Ids of records to be merged into
 the master record. Up to three records can be merged in a single request, including
 the master record. This limit is the same as the limit enforced by the Salesforce user
 interface. To merge more than 3 records, successively merge records by running
@@ -51,7 +51,7 @@ along with additional diagnostic information where available.}
 \code{tbl_df} of records with success indicator
 }
 \description{
-\lifecycle{experimental}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
 
 This function combines records of the same object type into one of the records,
 known as the master record. The other records, known as the victim records, will

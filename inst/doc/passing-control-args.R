@@ -19,6 +19,10 @@ sf_auth(username = username,
         password = password,
         security_token = security_token)
 
+## ----load-package, eval=FALSE-------------------------------------------------
+#  library(salesforcer)
+#  sf_auth()
+
 ## ----sample-create------------------------------------------------------------
 new_contact <- c(FirstName = "Jenny", 
                  LastName = "Williams", 

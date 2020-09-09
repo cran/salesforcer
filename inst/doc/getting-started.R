@@ -21,7 +21,7 @@ sf_auth(username = username,
         security_token = security_token)
 
 ## ----load-package, eval=FALSE-------------------------------------------------
-#  suppressWarnings(suppressMessages(library(dplyr)))
+#  library(dplyr, warn.conflicts = FALSE)
 #  library(salesforcer)
 #  sf_auth()
 

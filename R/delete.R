@@ -1,7 +1,7 @@
 #' Delete Records
 #' 
 #' @description
-#' \lifecycle{maturing}
+#' `r lifecycle::badge("maturing")`
 #' 
 #' Deletes one or more records from your organization’s data.
 #' 
@@ -11,9 +11,7 @@
 #' @importFrom dplyr bind_rows as_tibble
 #' @importFrom xml2 xml_ns_strip xml_find_all
 #' @importFrom purrr map_df
-#' @param ids \code{vector}, \code{matrix}, \code{data.frame}, or 
-#' \code{tbl_df}; if not a vector, there must be a column called Id (case-insensitive) 
-#' that can be passed in the request
+#' @template ids
 #' @template object_name
 #' @template api_type
 #' @template guess_types
@@ -55,7 +53,8 @@ sf_delete <- function(ids,
   control_args$operation <- "delete"
   
   if(is_present(all_or_none)) {
-    deprecate_warn("0.1.3", "sf_delete(all_or_none = )", "sf_delete(AllOrNoneHeader = )", 
+    deprecate_warn("0.1.3", "salesforcer::sf_delete(all_or_none = )", 
+                   "sf_delete(AllOrNoneHeader = )", 
                    details = paste0("You can pass the all or none header directly ", 
                                     "as shown above or via the `control` argument."))
     control_args$AllOrNoneHeader <- list(allOrNone = tolower(all_or_none))
@@ -154,7 +153,7 @@ sf_delete_soap <- function(ids,
       xml_ns_strip() %>%
       xml_find_all('.//result') %>% 
       map_df(extract_records_from_xml_node)
-    resultset <- bind_rows(resultset, this_set)
+    resultset <- safe_bind_rows(list(resultset, this_set))
   }
   
   resultset <- resultset %>% 

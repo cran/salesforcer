@@ -20,10 +20,10 @@ should be returned}
 name must have a .zip extension. The default behavior will be to save in the current
 working directory as "package.zip"}
 
-\item{check_interval}{numeric; specifying the seconds to wait between retrieve
+\item{check_interval}{\code{numeric}; specifying the seconds to wait between retrieve
 status requests to check if complete}
 
-\item{max_tries}{numeric; specifying the maximum number of times to check
+\item{max_tries}{\code{numeric}; specifying the maximum number of times to check
 whether the retrieve package.zip is complete before the function times out}
 
 \item{verbose}{\code{logical}; an indicator of whether to print additional
@@ -35,7 +35,7 @@ along with additional diagnostic information where available.}
 A \code{list} of details from the created retrieve request
 }
 \description{
-\lifecycle{experimental}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
 
 This function makes a request to retrieve metadata
 as a package XML files that can be modified and later

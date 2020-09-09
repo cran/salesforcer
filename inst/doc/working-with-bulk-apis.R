@@ -21,7 +21,7 @@ sf_auth(username = username,
         security_token = security_token)
 
 ## ----load-package, eval=FALSE-------------------------------------------------
-#  suppressWarnings(suppressMessages(library(dplyr)))
+#  library(dplyr, warn.conflicts = FALSE)
 #  library(salesforcer)
 #  sf_auth()
 
@@ -98,7 +98,8 @@ bulk2_query <- function(){sf_query(soql, api_type="Bulk 2.0")} # Bulk 2.0 doesn'
 res <- microbenchmark::microbenchmark(
   bulk1_query(),
   bulk2_query(), 
-  times=8
+  times=8, 
+  unit = "s"
 )
 res
 

@@ -17,10 +17,10 @@ sf_retrieve(
 }
 \arguments{
 \item{ids}{\code{vector}, \code{matrix}, \code{data.frame}, or
-\code{tbl_df}; if not a vector, there must be a column called Id (case-insensitive)
-that can be passed in the request}
+\code{tbl_df}; if not a vector, there must be a column called Id (case
+insensitive) that can be passed in the request.}
 
-\item{fields}{character; one or more strings indicating the fields to be returned
+\item{fields}{\code{character}; one or more strings indicating the fields to be returned
 on the records}
 
 \item{object_name}{\code{character}; the name of the Salesforce object that the
@@ -52,7 +52,7 @@ along with additional diagnostic information where available.}
 \code{tibble}
 }
 \description{
-\lifecycle{maturing}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#maturing'><img src='figures/lifecycle-maturing.svg' alt='Maturing lifecycle'></a>}}{\strong{Maturing}}
 
 Retrieves one or more new records to your organization’s data.
 }

@@ -15,11 +15,11 @@ sf_search(
 )
 }
 \arguments{
-\item{search_string}{character; string to search using parameterized search
+\item{search_string}{\code{character}; string to search using parameterized search
 or SOSL. Note that is_sosl must be set to TRUE and the string valid in order
 to perform a search using SOSL.}
 
-\item{is_sosl}{logical; indicating whether or not to try the string as SOSL}
+\item{is_sosl}{\code{logical}; indicating whether or not to try the string as SOSL}
 
 \item{guess_types}{\code{logical}; indicating whether or not to use \code{col_guess()}
 to try and cast the data returned in the recordset. If \code{TRUE} then
@@ -47,7 +47,7 @@ if it is not supplied directly.}
 \code{tibble}
 }
 \description{
-\lifecycle{maturing}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#maturing'><img src='figures/lifecycle-maturing.svg' alt='Maturing lifecycle'></a>}}{\strong{Maturing}}
 
 Searches for records in your organization’s data.
 }

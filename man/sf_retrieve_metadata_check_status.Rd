@@ -12,9 +12,9 @@ sf_retrieve_metadata_check_status(
 )
 }
 \arguments{
-\item{id}{character; string id returned from \link{sf_retrieve_metadata}}
+\item{id}{\code{character}; string id returned from \link{sf_retrieve_metadata}}
 
-\item{include_zip}{logical; Set to false to check the status of the retrieval without
+\item{include_zip}{\code{logical}; Set to false to check the status of the retrieval without
 attempting to retrieve the zip file. If omitted, this argument defaults to true.}
 
 \item{filename}{a file path to save the zip file in the event that it is downloaded. The
@@ -30,7 +30,7 @@ along with additional diagnostic information where available.}
 A \code{list} of the response
 }
 \description{
-\lifecycle{experimental}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
 
 This function returns details about an initiated retrieveMetadata request
 and saves the results into a zip file

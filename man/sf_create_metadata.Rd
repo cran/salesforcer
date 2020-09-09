@@ -25,7 +25,7 @@ look at the documentation for \code{\link{sf_control}}.}
 
 \item{...}{arguments passed to \code{\link{sf_control}}}
 
-\item{all_or_none}{logical; allows a call to roll back all changes unless all
+\item{all_or_none}{\code{logical}; allows a call to roll back all changes unless all
 records are processed successfully.}
 
 \item{verbose}{\code{logical}; an indicator of whether to print additional
@@ -37,7 +37,7 @@ along with additional diagnostic information where available.}
 A \code{tbl_df} containing the creation result for each submitted metadata component
 }
 \description{
-\lifecycle{experimental}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
 
 This function takes a list of Metadata components and sends them
 to Salesforce for creation

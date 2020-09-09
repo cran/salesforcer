@@ -7,7 +7,7 @@
 sf_reset_password(user_id, control = list(...), ..., verbose = FALSE)
 }
 \arguments{
-\item{user_id}{character; the unique Salesforce Id assigned to the User}
+\item{user_id}{\code{character}; the unique Salesforce Id assigned to the User}
 
 \item{control}{\code{list}; a list of parameters for controlling the behavior of
 the API call being used. For more information of what parameters are available
@@ -24,7 +24,7 @@ along with additional diagnostic information where available.}
 \code{list}
 }
 \description{
-\lifecycle{experimental}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
 
 Changes a user’s password to a temporary, system-generated value.
 }

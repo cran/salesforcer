@@ -18,12 +18,12 @@ necessary to pass the session in each function call.}
 \item{soqlQuery}{\code{character}; a string defining a SOQL query
 (e.g. "SELECT Id, Name FROM Account").}
 
-\item{queryAll}{logical; indicating if the query recordset should include
+\item{queryAll}{\code{logical}; indicating if the query recordset should include
 deleted and archived records (available only when querying Task and Event records)}
 }
 \value{
 Result dataset.
 }
 \description{
-\lifecycle{soft-deprecated}
+\ifelse{html}{\figure{lifecycle-soft-deprecated.svg}{options: alt='Soft-deprecated lifecycle'}}{\strong{Soft-deprecated}}
 }

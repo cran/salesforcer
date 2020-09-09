@@ -50,7 +50,7 @@ look at the documentation for \code{\link{sf_control}}.}
 \item{...}{arguments passed to \code{\link{sf_control}} or further downstream
 to \code{\link{sf_query_bulk}}.}
 
-\item{page_size}{numeric; a number between 200 and 2000 indicating the number of
+\item{page_size}{\code{numeric}; a number between 200 and 2000 indicating the number of
 records per page that are returned. Speed benchmarks should be done to better
 understand the speed implications of choosing high or low values of this argument.}
 
@@ -79,7 +79,7 @@ along with additional diagnostic information where available.}
 \code{tbl_df} of records
 }
 \description{
-\lifecycle{maturing}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#maturing'><img src='figures/lifecycle-maturing.svg' alt='Maturing lifecycle'></a>}}{\strong{Maturing}}
 
 Executes a query against the specified object and returns data that matches
 the specified criteria.

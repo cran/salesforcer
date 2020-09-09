@@ -17,7 +17,9 @@ sf_update(
 }
 \arguments{
 \item{input_data}{\code{named vector}, \code{matrix}, \code{data.frame}, or
-\code{tbl_df}; data can be coerced into a \code{data.frame}}
+\code{tbl_df}; data can be coerced into a \code{data.frame}. If performing an
+\code{update}, \code{upsert}, or \code{delete} operation, then one column or
+field must be the \code{Id} of the record to modify or delete.}
 
 \item{object_name}{\code{character}; the name of the Salesforce object that the
 function is operating against (e.g. "Account", "Contact", "CustomObject__c").}
@@ -40,7 +42,7 @@ look at the documentation for \code{\link{sf_control}}.}
 \item{...}{arguments passed to \code{\link{sf_control}} or further downstream
 to \code{\link{sf_bulk_operation}}}
 
-\item{all_or_none}{logical; allows a call to roll back all changes unless all
+\item{all_or_none}{\code{logical}; allows a call to roll back all changes unless all
 records are processed successfully.}
 
 \item{verbose}{\code{logical}; an indicator of whether to print additional
@@ -52,7 +54,7 @@ along with additional diagnostic information where available.}
 \code{tbl_df} of records with success indicator
 }
 \description{
-\lifecycle{maturing}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#maturing'><img src='figures/lifecycle-maturing.svg' alt='Maturing lifecycle'></a>}}{\strong{Maturing}}
 
 Updates one or more records to your organization’s data.
 }

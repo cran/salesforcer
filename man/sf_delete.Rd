@@ -17,8 +17,8 @@ sf_delete(
 }
 \arguments{
 \item{ids}{\code{vector}, \code{matrix}, \code{data.frame}, or
-\code{tbl_df}; if not a vector, there must be a column called Id (case-insensitive)
-that can be passed in the request}
+\code{tbl_df}; if not a vector, there must be a column called Id (case
+insensitive) that can be passed in the request.}
 
 \item{object_name}{\code{character}; the name of the Salesforce object that the
 function is operating against (e.g. "Account", "Contact", "CustomObject__c").}
@@ -41,7 +41,7 @@ look at the documentation for \code{\link{sf_control}}.}
 \item{...}{arguments passed to \code{\link{sf_control}} or further downstream
 to \code{\link{sf_bulk_operation}}}
 
-\item{all_or_none}{logical; allows a call to roll back all changes unless all
+\item{all_or_none}{\code{logical}; allows a call to roll back all changes unless all
 records are processed successfully.}
 
 \item{verbose}{\code{logical}; an indicator of whether to print additional
@@ -53,7 +53,7 @@ along with additional diagnostic information where available.}
 \code{tbl_df} of records with success indicator
 }
 \description{
-\lifecycle{maturing}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#maturing'><img src='figures/lifecycle-maturing.svg' alt='Maturing lifecycle'></a>}}{\strong{Maturing}}
 
 Deletes one or more records from your organization’s data.
 }

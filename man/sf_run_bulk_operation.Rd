@@ -44,7 +44,7 @@ sf_bulk_operation(
 \item{object_name}{\code{character}; the name of the Salesforce object that the
 function is operating against (e.g. "Account", "Contact", "CustomObject__c").}
 
-\item{operation}{character; string defining the type of operation being performed}
+\item{operation}{\code{character}; string defining the type of operation being performed}
 
 \item{external_id_fieldname}{\code{character}; string identifying a custom field on the
 object that has been set as an "External ID" field. This field is used to reference
@@ -70,7 +70,7 @@ for job completion.}
 \item{max_attempts}{\code{integer}; defines then max number attempts to check for job
 completion before stopping.}
 
-\item{wait_for_results}{logical; indicating whether to wait for the operation to complete
+\item{wait_for_results}{\code{logical}; indicating whether to wait for the operation to complete
 so that the batch results of individual records can be obtained}
 
 \item{control}{\code{list}; a list of parameters for controlling the behavior of
@@ -89,7 +89,7 @@ along with additional diagnostic information where available.}
 A \code{tbl_df} of the results of the bulk job
 }
 \description{
-\lifecycle{maturing}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#maturing'><img src='figures/lifecycle-maturing.svg' alt='Maturing lifecycle'></a>}}{\strong{Maturing}}
 
 This function is a convenience wrapper for submitting bulk API jobs
 }

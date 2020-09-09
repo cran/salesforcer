@@ -10,7 +10,6 @@ options(tibble.print_min = 5L, tibble.print_max = 5L)
 
 ## ----auth, include = FALSE----------------------------------------------------
 suppressWarnings(suppressMessages(library(dplyr)))
-library(here)
 library(salesforcer)
 
 username <- Sys.getenv("SALESFORCER_USERNAME")
@@ -22,8 +21,7 @@ sf_auth(username = username,
         security_token = security_token)
 
 ## ----load-package, eval=FALSE-------------------------------------------------
-#  library(dplyr)
-#  library(here)
+#  library(dplyr, warn.conflicts = FALSE)
 #  library(salesforcer)
 #  sf_auth()
 
@@ -77,13 +75,33 @@ queried_attachments <- queried_attachments %>%
 
 # download all of the attachments for a single ParentId record to their own folder
 download_result <- mapply(sf_download_attachment, 
-                          queried_attachments$Body, 
-                          queried_attachments$Name, 
-                          queried_attachments$Path)
+                          body = queried_attachments$Body, 
+                          name = queried_attachments$Name, 
+                          path = queried_attachments$Path)
 download_result
 
 ## ----cleanup-1, include = FALSE-----------------------------------------------
 sf_delete(queried_attachments$Id)
+
+## -----------------------------------------------------------------------------
+# upload a PDF to a particular record as an Attachment
+file_path <- system.file("extdata",
+                         "data-wrangling-cheatsheet.pdf",
+                         package = "salesforcer")
+parent_record_id <- "0036A000002C6MmQAK" # replace with your own ParentId!
+attachment_details <- tibble(Body = file_path, ParentId = parent_record_id)
+create_result <- sf_create_attachment(attachment_details)
+
+# download, zip, and re-upload the PDF
+pdf_path <- sf_download_attachment(sf_id = create_result$id[1])
+zipped_path <- paste0(pdf_path, ".zip")
+zip(zipped_path, pdf_path, flags = "-qq") # quiet zipping messages
+attachment_details <- tibble(Id = create_result$id, Body = zipped_path)
+sf_update_attachment(attachment_details)
+
+## ----cleanup-2----------------------------------------------------------------
+sf_delete_attachment(ids = create_result$id)
+# sf_delete(ids = create_result$id) # would also work
 
 ## -----------------------------------------------------------------------------
 # create the attachment metadata required (Name, Body, ParentId)
@@ -95,7 +113,7 @@ attachment_details <- queried_attachments %>%
 result <- sf_create_attachment(attachment_details, api_type="Bulk 1.0")
 result
 
-## ----cleanup-2, include = FALSE-----------------------------------------------
+## ----cleanup-3, include = FALSE-----------------------------------------------
 for (pid in unique(queried_attachments$ParentId)){
   unlink(file.path(temp_dir, pid), recursive=TRUE) # remove directories...
 }
@@ -114,7 +132,7 @@ document_details <- tibble(Name = "Data Wrangling Cheatsheet - Test 1",
 result <- sf_create_attachment(document_details, object_name = "Document")
 result
 
-## ----cleanup-3, include = FALSE-----------------------------------------------
+## ----cleanup-4, include = FALSE-----------------------------------------------
 sf_delete(result$id)
 
 ## -----------------------------------------------------------------------------
@@ -127,6 +145,6 @@ document_details <- tibble(Name = "Data Wrangling Cheatsheet - Test 2",
 result <- sf_create_attachment(document_details, object_name = "Document")
 result
 
-## ----cleanup-4, include = FALSE-----------------------------------------------
+## ----cleanup-5, include = FALSE-----------------------------------------------
 sf_delete(result$id)
 

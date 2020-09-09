@@ -4,15 +4,16 @@
 \alias{sf_list_reports}
 \title{List reports}
 \usage{
-sf_list_reports(recent = TRUE, as_tbl = TRUE, verbose = FALSE)
+sf_list_reports(recent = FALSE, as_tbl = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{recent}{\code{logical}; an indicator of whether to return the 200 most
 recently viewed reports or to invoke a query on the \code{Report} object to
-return all reports in the Org. By default, this argument is set to \code{TRUE}
-meaning that only the most recently viewed reports are returned because this
-is the default behavior of the reports list endpoint in the Reports and
-Dashboards REST API.}
+return all reports in the Org. By default, this argument is set to \code{FALSE}
+meaning that all of the reports, not just the most recently viewed reports
+are returned. Note that the default behavior of the reports list endpoint in
+the Reports and Dashboards REST API is only the most recently viewed up to
+200 reports.}
 
 \item{as_tbl}{\code{logical}; an indicator of whether to convert the parsed
 JSON into a \code{tbl_df}.}
@@ -27,28 +28,51 @@ along with additional diagnostic information where available.}
 argument \code{as_tbl}
 }
 \description{
-\lifecycle{experimental}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
 
-Displays a list of up to 200 tabular, matrix, or summary reports that you
-recently viewed. To get a full list of reports by format, name, and other
+Displays a list of full list of reports based on the \code{Report} object. If
+\code{recent} is up to 200 tabular, matrix, or summary reports that you
+recently viewed. To get additional details on reports by format, name, and other
 fields, use a SOQL query on the Report object.
 }
 \note{
-This function will only return up to 200 of recently viewed reports. For
-a COMPLETE list you must use \code{\link{sf_query}} on the report object.
+This function will only return up to 200 of recently viewed reports when the
+\code{recent} argument is set to \code{TRUE}. For a complete details you must
+use \code{\link{sf_query}} on the report object.
 }
+\section{Salesforce Documentation}{
+
+\itemize{
+\item \href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_recentreportslist.htm}{Documentation}
+\item \href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_list_recentreports.htm#example_recent_reportslist}{Example}
+}
+}
+
 \examples{
 \dontrun{
-# return up to 200 recently viewed reports
+# to return all possible reports, which is queried from the Report object
 reports <- sf_list_reports()
 
 # return the results as a list
 reports_as_list <- sf_list_reports(as_tbl=FALSE)
 
-# to return all possible reports, which is queried from the Report object
-all_reports <- sf_list_reports(recent=FALSE)
+# return up to 200 recently viewed reports
+all_reports <- sf_list_reports(recent=TRUE)
 }
 }
 \seealso{
-\href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_recentreportslist.htm}{Salesforce Documentation}, \href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_list_recentreports.htm#example_recent_reportslist}{Salesforce Example}
+Other Report functions: 
+\code{\link{sf_copy_report}()},
+\code{\link{sf_create_report}()},
+\code{\link{sf_delete_report}()},
+\code{\link{sf_describe_report_type}()},
+\code{\link{sf_describe_report}()},
+\code{\link{sf_execute_report}()},
+\code{\link{sf_list_report_fields}()},
+\code{\link{sf_list_report_filter_operators}()},
+\code{\link{sf_list_report_types}()},
+\code{\link{sf_query_report}()},
+\code{\link{sf_run_report}()},
+\code{\link{sf_update_report}()}
 }
+\concept{Report functions}

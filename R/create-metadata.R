@@ -1,7 +1,7 @@
 #' Create Object or Field Metadata in Salesforce
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' This function takes a list of Metadata components and sends them 
 #' to Salesforce for creation
@@ -90,8 +90,7 @@ sf_create_metadata <- function(metadata_type,
   control_args$operation <- "insert"
   
   if(is_present(all_or_none)) {
-    deprecate_warn("0.1.3", 
-                   "sf_create_metadata(all_or_none = )", 
+    deprecate_warn("0.1.3", "salesforcer::sf_create_metadata(all_or_none = )", 
                    "sf_create_metadata(AllOrNoneHeader = )", 
                    details = paste0("You can pass the all or none header directly ", 
                                     "as shown above or via the `control` argument."))

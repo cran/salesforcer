@@ -59,7 +59,7 @@ along with additional diagnostic information where available.}
 data from the "T!T" entry in the fact map.
 }
 \description{
-\lifecycle{experimental}
+\ifelse{html}{\out{<a href='https://www.tidyverse.org/lifecycle/#experimental'><img src='figures/lifecycle-experimental.svg' alt='Experimental lifecycle'></a>}}{\strong{Experimental}}
 
 Retrieves results for an instance of a report run asynchronously with or without
 filters. Depending on your asynchronous report run request, data can be at the
@@ -88,6 +88,15 @@ in the second-level grouping.}
 in the second-level grouping.}
 }
 }
+\section{Salesforce Documentation}{
+
+\itemize{
+\item \href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_instance_resource_results.htm}{Documentation}
+\item \href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_get_reportdata.htm#example_instance_reportresults}{Example}
+\item \href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_factmap_example.htm}{Factmap Documentation}
+}
+}
+
 \examples{
 \dontrun{
 # execute a report asynchronously in your Org
@@ -102,10 +111,13 @@ instance_status <- instance_list[[which(instance_list$id == results$id), "status
 # ... if so, then grab the results
 if(instance_status == "Success"){
   report_data <- sf_get_report_instance_results(report_id = this_report_id, 
-                                            report_instance_id = results$id)
+                                                report_instance_id = results$id)
 }
 }
 }
 \seealso{
-\href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_instance_resource_results.htm}{Salesforce Documentation}, \href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_get_reportdata.htm#example_instance_reportresults}{Salesforce Example}, \href{https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_factmap_example.htm}{Factmap Documentation}
+Other Report Instance functions: 
+\code{\link{sf_delete_report_instance}()},
+\code{\link{sf_list_report_instances}()}
 }
+\concept{Report Instance functions}

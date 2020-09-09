@@ -24,7 +24,7 @@
 #' \code{\link[RForcecom]{rforcecom.login}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @param username Your username for login to the Salesforce.com. In many cases, username is your E-mail address.
 #' @param password Your password for login to the Salesforce.com. Note: DO NOT FORGET your Security Token. (Ex.) If your password is "Pass1234" and your security token is "XYZXYZXYZXYZ", you should set "Pass1234XYZXYZXYZXYZ".
@@ -37,7 +37,7 @@
 #' @export
 rforcecom.login <- function(username, password, loginURL="https://login.salesforce.com/", apiVersion="35.0"){
   
-  deprecate_soft("0.1.0", "rforcecom.login()", "sf_auth()")  
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.login()", "sf_auth()")  
   
   if(!is.null(loginURL)){
     options(salesforcer.login_url = loginURL)
@@ -64,13 +64,13 @@ rforcecom.login <- function(username, password, loginURL="https://login.salesfor
 #' \code{\link[RForcecom]{rforcecom.getServerTimestamp}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @template session
 #' @export
 rforcecom.getServerTimestamp <- function(session){
   
-  deprecate_soft("0.1.0", "rforcecom.getServerTimestamp()", "sf_server_timestamp()")  
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.getServerTimestamp()", "sf_server_timestamp()")  
   
   result <- sf_server_timestamp()
   # format like rforcecom.getServerTimestamp()
@@ -82,7 +82,7 @@ rforcecom.getServerTimestamp <- function(session){
 #' \code{\link[RForcecom]{rforcecom.getObjectDescription}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @importFrom purrr map_df
 #' @template session 
@@ -92,7 +92,7 @@ rforcecom.getServerTimestamp <- function(session){
 #' @export
 rforcecom.getObjectDescription <- function(session, objectName){
   
-  deprecate_soft("0.1.0", "rforcecom.getObjectDescription()", "sf_describe_objects()")
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.getObjectDescription()", "sf_describe_objects()")
   
   obj_dat <- sf_describe_objects(object_names = objectName, 
                                  api_type="SOAP")[[1]]
@@ -107,7 +107,7 @@ rforcecom.getObjectDescription <- function(session, objectName){
 #' \code{\link[RForcecom]{rforcecom.create}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @importFrom dplyr select mutate
 #' @template session
@@ -117,7 +117,7 @@ rforcecom.getObjectDescription <- function(session, objectName){
 #' @export
 rforcecom.create <- function(session, objectName, fields){
   
-  deprecate_soft("0.1.0", "rforcecom.create()", "sf_create()")
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.create()", "sf_create()")
   
   fields <- as.data.frame(as.list(fields), stringsAsFactors = FALSE)
   created_records <- sf_create(input_data = fields, object_name = objectName)
@@ -133,7 +133,7 @@ rforcecom.create <- function(session, objectName, fields){
 #' \code{\link[RForcecom]{rforcecom.retrieve}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @template session 
 #' @template objectName
@@ -155,7 +155,7 @@ rforcecom.retrieve <- function(session, objectName,
                                offset=NULL, order=NULL,
                                inverse=NULL, nullsLast=NULL){
   
-  deprecate_soft("0.1.0", "rforcecom.retrieve()", "sf_retrieve()")
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.retrieve()", "sf_retrieve()")
   
   # Make SOQL
   fieldList <- paste(fields, collapse=", ")
@@ -198,7 +198,7 @@ rforcecom.retrieve <- function(session, objectName,
 #' \code{\link[RForcecom]{rforcecom.update}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @template session
 #' @template objectName
@@ -208,7 +208,7 @@ rforcecom.retrieve <- function(session, objectName,
 #' @export
 rforcecom.update <- function(session, objectName, id, fields){
   
-  deprecate_soft("0.1.0", "rforcecom.update()", "sf_update()")
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.update()", "sf_update()")
 
   fields <- as.data.frame(as.list(fields), stringsAsFactors = FALSE)
   fields$id <- id
@@ -221,7 +221,7 @@ rforcecom.update <- function(session, objectName, id, fields){
 #' \code{\link[RForcecom]{rforcecom.delete}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @template session
 #' @template objectName
@@ -230,7 +230,7 @@ rforcecom.update <- function(session, objectName, id, fields){
 #' @export
 rforcecom.delete <- function(session, objectName, id){
   
-  deprecate_soft("0.1.0", "rforcecom.delete()", "sf_delete()")
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.delete()", "sf_delete()")
   
   invisible(sf_delete(id, object_name = objectName))
   # rforcecom.delete returns NULL if successful??
@@ -241,7 +241,7 @@ rforcecom.delete <- function(session, objectName, id){
 #' \code{\link[RForcecom]{rforcecom.upsert}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @template session
 #' @template objectName
@@ -254,7 +254,7 @@ rforcecom.upsert <- function(session, objectName,
                              externalIdField, externalId, 
                              fields){
   
-  deprecate_soft("0.1.0", "rforcecom.upsert()", "sf_upsert()")
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.upsert()", "sf_upsert()")
 
   fields[externalIdField] <- externalId
   fields <- as.data.frame(as.list(fields), stringsAsFactors = FALSE)
@@ -269,14 +269,14 @@ rforcecom.upsert <- function(session, objectName,
 #' \code{\link[RForcecom]{rforcecom.search}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @template session 
 #' @param queryString Query strings to search. (ex: "United", "Electoronics")
 #' @export
 rforcecom.search <- function(session, queryString){
   
-  deprecate_soft("0.1.0", "rforcecom.search()", "sf_search()")
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.search()", "sf_search()")
   
   queryString <- paste0("FIND {", queryString, "}", sep="")
   resultset <- sf_search(search_string = queryString, is_sosl=TRUE)
@@ -287,17 +287,17 @@ rforcecom.search <- function(session, queryString){
 #' \code{\link[RForcecom]{rforcecom.query}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @template session
 #' @template soqlQuery
-#' @param queryAll  logical; indicating if the query recordset should include 
+#' @param queryAll  \code{logical}; indicating if the query recordset should include 
 #' deleted and archived records (available only when querying Task and Event records)
 #' @return Result dataset.
 #' @export
 rforcecom.query <- function(session, soqlQuery, queryAll=FALSE){
   
-  deprecate_soft("0.1.0", "rforcecom.query()", "sf_query()")  
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.query()", "sf_query()")  
   
   sf_query(soql=soqlQuery, queryall=queryAll)
 }
@@ -306,11 +306,11 @@ rforcecom.query <- function(session, soqlQuery, queryAll=FALSE){
 #' \code{\link[RForcecom]{rforcecom.bulkQuery}}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' @template session
 #' @template soqlQuery
-#' @param object character; the name of one Salesforce objects that the 
+#' @param object \code{character}; the name of one Salesforce objects that the 
 #' function is operating against (e.g. "Account", "Contact", "CustomObject__c")
 #' @param interval_seconds an integer defining the seconds between attempts to check for job completion
 #' @param max_attempts an integer defining then max number attempts to check for job completion before stopping
@@ -324,7 +324,7 @@ rforcecom.bulkQuery <- function(session,
                                 max_attempts=100, 
                                 verbose=FALSE){
   
-  deprecate_soft("0.1.0", "rforcecom.bulkQuery()", "sf_query()")  
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.bulkQuery()", "sf_query()")  
   
   sf_query(soql = soqlQuery, 
            object_name = object,
@@ -337,7 +337,7 @@ rforcecom.bulkQuery <- function(session,
 #' \code{rforcecom.bulkAction}
 #' 
 #' @description
-#' \lifecycle{soft-deprecated}
+#' `r lifecycle::badge("soft-deprecated")`
 #' 
 #' This function is a convenience wrapper for submitting bulk API jobs
 #'
@@ -375,7 +375,7 @@ rforcecom.bulkAction <- function(session,
                                  max_attempts=100,
                                  verbose=FALSE){
   
-  deprecate_soft("0.1.0", "rforcecom.bulkAction()", "sf_bulk_operation()")
+  deprecate_soft("0.1.0", "salesforcer::rforcecom.bulkAction()", "sf_bulk_operation()")
   
   operation <- match.arg(operation)
   res <- sf_bulk_operation(input_data = data, 

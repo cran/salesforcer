@@ -26,10 +26,9 @@ test_that("testing sf_list_reports()", {
   reports_list <- sf_list_reports(as_tbl=FALSE)
   expect_is(reports_list, "list")
   
-  # recent=FALSE
-  reports_tbl <- sf_list_reports(recent=FALSE)
+  # recent=TRUE
+  reports_tbl <- sf_list_reports(recent=TRUE)
   expect_is(reports_tbl, "tbl_df")
-  expect_true(common_report_id %in% reports_tbl$id) 
 })
 
 test_that("testing sf_describe_report()", {
@@ -368,7 +367,7 @@ test_that("testing sf_run_report()", {
                                     report_boolean_logic = "1 AND 2",
                                     report_filters = list(filter1, filter2))
   expect_is(filtered_results, "tbl_df")
-  expect_equal(nrow(filtered_results), 1)
+  expect_gte(nrow(filtered_results), 1)
   expect_named(filtered_results, report_col_names)
   expect_is(filtered_results$`test number`, "numeric")    
   

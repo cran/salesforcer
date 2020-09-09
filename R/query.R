@@ -1,7 +1,7 @@
 #' Perform SOQL Query
 #' 
 #' @description
-#' \lifecycle{maturing}
+#' `r lifecycle::badge("maturing")`
 #' 
 #' Executes a query against the specified object and returns data that matches 
 #' the specified criteria.
@@ -61,7 +61,8 @@ sf_query <- function(soql,
   control_args$operation <- if(queryall) "queryall" else "query"
   
   if(is_present(page_size)) {
-    deprecate_warn("0.1.3", "sf_query(page_size = )", "sf_query(QueryOptions = )", 
+    deprecate_warn("0.1.3", "salesforcer::sf_query(page_size = )", 
+                   "sf_query(QueryOptions = )", 
                    details = paste0("You can pass the page/batch size directly ", 
                                     "as shown above or via the `control` argument."))
     control_args$QueryOptions <- list(batchSize = as.integer(page_size))
@@ -124,7 +125,7 @@ sf_query <- function(soql,
   return(resultset)
 }
 
-#' @importFrom dplyr tibble bind_rows mutate_all
+#' @importFrom dplyr tibble mutate_all
 #' @importFrom httr content
 #' @importFrom purrr map map_df modify map_lgl pluck
 sf_query_rest <- function(soql,
@@ -203,14 +204,14 @@ sf_query_rest <- function(soql,
                                                  object_name_append = TRUE,
                                                  object_name_as_col = object_name_as_col, 
                                                  verbose = verbose)
-                child_records <- bind_rows(child_records, next_child_recs)
+                child_records <- safe_bind_rows(list(child_records, next_child_recs))
               }
               y <- combine_parent_and_child_resultsets(parent_record, child_records)
             } else {
               y <- list_extract_parent_and_child_result(x)
             }
             return(y)
-          }
+          } 
         )
       } else {
         resultset <- response_parsed$records %>% 
@@ -244,7 +245,7 @@ sf_query_rest <- function(soql,
                                   object_name_append = object_name_append,
                                   object_name_as_col = object_name_as_col,
                                   verbose = verbose)
-    resultset <- bind_query_resultsets(resultset, next_records)
+    resultset <- safe_bind_rows(list(resultset, next_records))
   }
 
   resultset <- resultset %>% 
@@ -254,7 +255,7 @@ sf_query_rest <- function(soql,
   return(resultset)
 }
 
-#' @importFrom dplyr tibble bind_rows mutate_all
+#' @importFrom dplyr tibble mutate_all
 #' @importFrom httr content
 #' @importFrom purrr map_df modify_if
 #' @importFrom xml2 xml_find_first xml_find_all xml_text xml_ns_strip
@@ -338,7 +339,7 @@ sf_query_soap <- function(soql,
                                              object_name_append = TRUE,
                                              object_name_as_col = object_name_as_col,
                                              verbose = verbose)
-            child_records <- bind_rows(child_records, next_child_recs)
+            child_records <- safe_bind_rows(list(child_records, next_child_recs))
           }
           y <- combine_parent_and_child_resultsets(parent_record, child_records) 
         } else {
@@ -400,7 +401,7 @@ sf_query_soap <- function(soql,
                                   object_name_append = object_name_append,
                                   object_name_as_col = object_name_as_col,
                                   verbose = verbose)
-    resultset <- bind_query_resultsets(resultset, next_records)
+    resultset <- safe_bind_rows(list(resultset, next_records))
   }
 
   resultset <- resultset %>% 

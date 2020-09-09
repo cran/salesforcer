@@ -9,8 +9,7 @@ knitr::opts_chunk$set(
 options(tibble.print_min = 5L, tibble.print_max = 5L)
 
 ## ----auth, include = FALSE----------------------------------------------------
-suppressWarnings(suppressMessages(library(dplyr)))
-suppressWarnings(suppressMessages(library(here)))
+library(dplyr, warn.conflicts = FALSE)
 library(salesforcer)
 
 username <- Sys.getenv("SALESFORCER_USERNAME")

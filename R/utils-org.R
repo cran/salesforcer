@@ -1,7 +1,7 @@
 #' Return Current User Info
 #' 
 #' @description
-#' \lifecycle{maturing}
+#' `r lifecycle::badge("maturing")`
 #' 
 #' Retrieves personal information for the user associated with the current session.
 #' 
@@ -68,12 +68,12 @@ sf_user_info <- function(api_type=c("SOAP", "Chatter"), verbose=FALSE){
 #' Set User Password
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' Sets the specified user’s password to the specified value.
 #' 
-#' @param user_id character; the unique Salesforce Id assigned to the User
-#' @param password character; a new password that you would like to set for the 
+#' @param user_id \code{character}; the unique Salesforce Id assigned to the User
+#' @param password \code{character}; a new password that you would like to set for the 
 #' supplied user that complies to your organizations password requirements
 #' @template verbose
 #' @return \code{list}
@@ -107,13 +107,13 @@ sf_set_password <- function(user_id, password, verbose=FALSE){
 #' Reset User Password
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' Changes a user’s password to a temporary, system-generated value.
 #' 
 #' @importFrom httr content
 #' @importFrom xml2 xml_ns_strip xml_find_all xml_text
-#' @param user_id character; the unique Salesforce Id assigned to the User
+#' @param user_id \code{character}; the unique Salesforce Id assigned to the User
 #' @template control
 #' @param ... arguments passed to \code{\link{sf_control}}
 #' @template verbose
@@ -164,7 +164,7 @@ sf_reset_password <- function(user_id,
 #' Salesforce Server Timestamp
 #' 
 #' @description
-#' \lifecycle{stable}
+#' `r lifecycle::badge("stable")`
 #' 
 #' Retrieves the current system timestamp from the API.
 #' 
@@ -190,7 +190,7 @@ sf_server_timestamp <- function(){
 #' List REST API Versions
 #' 
 #' @description
-#' \lifecycle{stable}
+#' `r lifecycle::badge("stable")`
 #' 
 #' Lists summary information about each Salesforce version currently available, 
 #' including the version, label, and a link to each version\'s root
@@ -213,7 +213,7 @@ sf_list_rest_api_versions <- function(){
 #' List the Resources for an API
 #' 
 #' @description
-#' \lifecycle{stable}
+#' `r lifecycle::badge("stable")`
 #' 
 #' Lists available resources for the specified API version, including resource 
 #' name and URI.
@@ -236,7 +236,7 @@ sf_list_resources <- function(){
 #' List the Limits for an API
 #' 
 #' @description
-#' \lifecycle{stable}
+#' `r lifecycle::badge("stable")`
 #' 
 #' Lists information about limits in your org.
 #' 
@@ -287,7 +287,7 @@ sf_list_api_limits <- function(){
 #' List Organization Objects and their Metadata
 #' 
 #' @description
-#' \lifecycle{stable}
+#' `r lifecycle::badge("stable")`
 #' 
 #' Lists the available objects and their metadata for your organization’s data.
 #' 
@@ -309,7 +309,7 @@ sf_list_objects <- function(){
 #' Find Duplicate Records
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' Performs rule-based searches for duplicate records.
 #' 
@@ -408,7 +408,7 @@ sf_find_duplicates <- function(search_criteria,
 #' Find Duplicate Records By Id
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' Performs rule-based searches for duplicate records.
 #' 
@@ -500,7 +500,7 @@ sf_find_duplicates_by_id <- function(sf_id,
 #' Convert Leads
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' Converts Leads each into an Account, Contact, as well as (optionally) an Opportunity.
 #' 
@@ -648,7 +648,7 @@ sf_convert_lead <- function(input_data,
       xml_ns_strip() %>%
       xml_find_all('.//result') %>% 
       map_df(extract_records_from_xml_node)
-    resultset <- bind_rows(resultset, this_set)
+    resultset <- safe_bind_rows(list(resultset, this_set))
   }
   
   resultset <- resultset %>%
@@ -661,7 +661,7 @@ sf_convert_lead <- function(input_data,
 #' Merge Records
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' This function combines records of the same object type into one of the records, 
 #' known as the master record. The other records, known as the victim records, will
@@ -673,9 +673,9 @@ sf_convert_lead <- function(input_data,
 #' @importFrom xml2 xml_ns_strip xml_find_all as_list
 #' @importFrom purrr map_df
 #' @importFrom dplyr tibble
-#' @param master_id character; a Salesforce generated Id that identifies the master record, 
+#' @param master_id \code{character}; a Salesforce generated Id that identifies the master record, 
 #' which is the record to which the victim records will be merged into
-#' @param victim_ids character; one or two Salesforce Ids of records to be merged into 
+#' @param victim_ids \code{character}; one or two Salesforce Ids of records to be merged into 
 #' the master record. Up to three records can be merged in a single request, including 
 #' the master record. This limit is the same as the limit enforced by the Salesforce user 
 #' interface. To merge more than 3 records, successively merge records by running 
@@ -775,7 +775,7 @@ sf_merge <- function(master_id,
 #' Get Deleted Records from a Timeframe
 #' 
 #' @description
-#' \lifecycle{maturing}
+#' `r lifecycle::badge("maturing")`
 #' 
 #' Retrieves the list of individual records that have been deleted within the given 
 #' timespan for the specified object.
@@ -847,7 +847,7 @@ sf_get_deleted <- function(object_name,
 #' Get Updated Records from a Timeframe
 #' 
 #' @description
-#' \lifecycle{maturing}
+#' `r lifecycle::badge("maturing")`
 #' 
 #' Retrieves the list of individual records that have been inserted or updated 
 #' within the given timespan in the specified object.
@@ -921,7 +921,7 @@ sf_get_updated <- function(object_name,
 #' Undelete Records
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' Undeletes records from the Recycle Bin.
 #' 
@@ -1006,7 +1006,7 @@ sf_undelete <- function(ids,
       xml_ns_strip() %>%
       xml_find_all('.//result') %>%
       map_df(xml_nodeset_to_df)
-    resultset <- bind_rows(resultset, this_set)
+    resultset <- safe_bind_rows(list(resultset, this_set))
   }
   resultset <- resultset %>%
     type_convert(col_types = cols())
@@ -1016,7 +1016,7 @@ sf_undelete <- function(ids,
 #' Empty Recycle Bin
 #' 
 #' @description
-#' \lifecycle{experimental}
+#' `r lifecycle::badge("experimental")`
 #' 
 #' Delete records from the recycle bin immediately and permanently.
 #'
@@ -1107,7 +1107,7 @@ sf_empty_recycle_bin <- function(ids,
       xml_ns_strip() %>%
       xml_find_all('.//result') %>%
       map_df(xml_nodeset_to_df)
-    resultset <- bind_rows(resultset, this_set)
+    resultset <- safe_bind_rows(list(resultset, this_set))
   }
   resultset <- resultset %>%
     type_convert(col_types = cols())
