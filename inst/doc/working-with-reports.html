@@ -30,8 +30,24 @@ document.addEventListener('DOMContentLoaded', function(e) {
 });
 </script>
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -118,6 +134,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -360,15 +377,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>results &lt;-<span class="st"> </span><span class="kw">sf_run_report</span>(my_report_id)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>results</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 14 x 8</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">#&gt;   `Contact ID` `First Name` `test number` `Contact Owner` `Account ID`</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;       </span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">#&gt; 1 0036A000002… Rose                    NA Steven Mortimer 0016A000003…</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">#&gt; 2 0036A000002… Sean                    NA Steven Mortimer 0016A000003…</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="co">#&gt; 3 0036A000002… Jack                    99 Steven Mortimer 0016A000003…</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="co">#&gt; 4 0036A000002… Tim                     NA Steven Mortimer 0016A000003…</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="co">#&gt; 5 0036A000002… John                    23 Steven Mortimer 0016A000003…</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="co">#&gt; # … with 9 more rows, and 3 more variables: `Account Name` &lt;chr&gt;, `Billing</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="co">#&gt; #   City` &lt;chr&gt;, `Account Owner` &lt;chr&gt;</span></span></code></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">#&gt;   `Contact ID`    `First Name` `test number` `Contact Owner` `Account ID`   </span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;           &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;          </span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">#&gt; 1 0036A000002C6Mm Edna                    NA Steven Mortimer 0016A0000035mJE</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">#&gt; 2 0036A000002C6Ml Liz                     NA Steven Mortimer 0016A0000035mJD</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="co">#&gt; 3 0036A000002C6Mk Tom                     NA Steven Mortimer 0016A0000035mJD</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="co">#&gt; 4 0036A000002C6MX Sean                    NA Steven Mortimer 0016A0000035mJ4</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="co">#&gt; 5 0036A000002C6MW Rose                    NA Steven Mortimer 0016A0000035mJ4</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="co">#&gt; # … with 9 more rows, and 3 more variables: Account Name &lt;chr&gt;,</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="co">#&gt; #   Billing City &lt;chr&gt;, Account Owner &lt;chr&gt;</span></span></code></pre></div>
 <p>Note that the <code>sf_run_report()</code> function will, by default, run the report asynchronously. This means that a report instance will be requested and then the function will wait to retrieve the results. The advantage to using an asynchronous report is that the results of such a report are stored for 24 hours and can be retrieved again saving CPU resources, if needed. A more in-depth discussion on synchronous vs. asynchronous reports is available here <a target="_blank" href="https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_get_reportdata.htm">https://developer.salesforce.com/docs/atlas.en-us.api_analytics.meta/api_analytics/sforce_analytics_rest_api_get_reportdata.htm</a>. However, for reports with a relatively small number of records a synchronous report may be faster without having to do the round trip of creating then querying a report instance.</p>
 </div>
 <div id="filtering-a-report-on-the-fly" class="section level2">
@@ -390,15 +407,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>                                   <span class="dt">report_filters =</span> <span class="kw">list</span>(filter1, filter2))</span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>results_using_AND</span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 14 x 8</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a><span class="co">#&gt;   `Contact ID` `First Name` `test number` `Contact Owner` `Account ID`</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;       </span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a><span class="co">#&gt; 1 0036A000002… Rose                    NA Steven Mortimer 0016A000003…</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="co">#&gt; 2 0036A000002… Sean                    NA Steven Mortimer 0016A000003…</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="co">#&gt; 3 0036A000002… Jack                    99 Steven Mortimer 0016A000003…</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="co">#&gt; 4 0036A000002… Tim                     NA Steven Mortimer 0016A000003…</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="co">#&gt; 5 0036A000002… John                    23 Steven Mortimer 0016A000003…</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a><span class="co">#&gt; # … with 9 more rows, and 3 more variables: `Account Name` &lt;chr&gt;, `Billing</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a><span class="co">#&gt; #   City` &lt;chr&gt;, `Account Owner` &lt;chr&gt;</span></span></code></pre></div>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a><span class="co">#&gt;   `Contact ID`    `First Name` `test number` `Contact Owner` `Account ID`   </span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;           &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;          </span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a><span class="co">#&gt; 1 0036A000002C6MW Rose                    NA Steven Mortimer 0016A0000035mJ4</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a><span class="co">#&gt; 2 0036A000002C6MX Sean                    NA Steven Mortimer 0016A0000035mJ4</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a><span class="co">#&gt; 3 0036A000002C6MY Jack                    99 Steven Mortimer 0016A0000035mJ5</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a><span class="co">#&gt; 4 0036A000002C6Mb Tim                     NA Steven Mortimer 0016A0000035mJ8</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a><span class="co">#&gt; 5 0036A000002C6Mc John                    23 Steven Mortimer 0016A0000035mJ8</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a><span class="co">#&gt; # … with 9 more rows, and 3 more variables: Account Name &lt;chr&gt;,</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a><span class="co">#&gt; #   Billing City &lt;chr&gt;, Account Owner &lt;chr&gt;</span></span></code></pre></div>
 <p>This second example shows how to return only the Top N number of records and combine the filter using the logical “OR” instead of “AND”.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="co"># combine filter1 and filter2 using &#39;OR&#39; which means that records must meet one </span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co"># of the filters but also throw in a row limit based on a specific sort order</span></span>
@@ -410,15 +427,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>                                  <span class="dt">top_n =</span> <span class="dv">5</span>)</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a>results_using_OR</span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 5 x 8</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="co">#&gt;   `Contact ID` `First Name` `test number` `Contact Owner` `Account ID`</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;        &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;       </span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000012… KEEP                  1000 Steven Mortimer 0013s00000z…</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000012… KEEP                  1000 Steven Mortimer 0013s00000z…</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="co">#&gt; 3 0033s000012… KEEP                  1000 Steven Mortimer 0013s00000z…</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co">#&gt; 4 0033s000012… KEEP                  1000 Steven Mortimer 0013s00000z…</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a><span class="co">#&gt; 5 0033s000012… KEEP                  1000 Steven Mortimer 0013s00000z…</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a><span class="co">#&gt; # … with 3 more variables: `Account Name` &lt;chr&gt;, `Billing City` &lt;chr&gt;, `Account</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a><span class="co">#&gt; #   Owner` &lt;chr&gt;</span></span></code></pre></div>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a><span class="co">#&gt;   `Contact ID`    `First Name` `test number` `Contact Owner` `Account ID`   </span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;           &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;          </span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000012Nl0A KEEP                  1000 Steven Mortimer 0013s00000zFdug</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000012Nl0E KEEP                  1000 Steven Mortimer 0013s00000zFdug</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a><span class="co">#&gt; 3 0033s000012Nl0B KEEP                  1000 Steven Mortimer 0013s00000zFdug</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co">#&gt; 4 0033s000012Nl0C KEEP                  1000 Steven Mortimer 0013s00000zFdug</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a><span class="co">#&gt; 5 0033s000012Nl0D KEEP                  1000 Steven Mortimer 0013s00000zFdug</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a><span class="co">#&gt; # … with 3 more variables: Account Name &lt;chr&gt;, Billing City &lt;chr&gt;,</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a><span class="co">#&gt; #   Account Owner &lt;chr&gt;</span></span></code></pre></div>
 <p>I was able to determine some of the potential ways to filter by first reviewing the <code>reportFilters</code> element in the existing report metadata and also reviewing the list of report filter operators.</p>
 <p>First, you can always take the report filter specification from the report metadata and tailor it to your needs. Below is an example showing how to get that metadata for our report. You can select specific elements to better understand the structure of the report.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>report_details &lt;-<span class="st"> </span><span class="kw">sf_describe_report</span>(my_report_id)</span>
@@ -460,13 +477,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>Second, Salesforce has a few API endpoints that tell you the fields on the report or the report type, more generally, and all the ways you can declare a filter on a particular field type and. The <code>reportTypeMetadata</code> element returned on the report description also has detailed information on how to filter the report. For example, it already contains the start and end dates that would be applied when using the “LAST_MONTH” filter value on a date field.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>report_details<span class="op">$</span>reportTypeMetadata<span class="op">$</span>standardDateFilterDurationGroups[[<span class="dv">6</span>]]<span class="op">$</span>standardDateFilterDurations[[<span class="dv">1</span>]]</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">#&gt; $endDate</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;2020-08-31&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;2021-06-30&quot;</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">#&gt; $label</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;Last Month&quot;</span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="co">#&gt; $startDate</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;2020-08-01&quot;</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;2021-06-01&quot;</span></span>
 <span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a><span class="co">#&gt; </span></span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a><span class="co">#&gt; $value</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;LAST_MONTH&quot;</span></span></code></pre></div>

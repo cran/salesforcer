@@ -30,8 +30,24 @@ document.addEventListener('DOMContentLoaded', function(e) {
 });
 </script>
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -118,6 +134,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -382,7 +399,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">#&gt; 2 IsDeleted      Deleted          0      xsd:boolean boolean  </span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co">#&gt; 3 MasterRecordId Master Record ID 18     tns:ID      reference</span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co">#&gt; 4 Name           Account Name     255    xsd:string  string   </span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co">#&gt; 5 Type           Account Type     40     xsd:string  picklist </span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co">#&gt; 5 Type           Account Type     255    xsd:string  picklist </span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co">#&gt; # … with 63 more rows</span></span>
 <span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a></span>
 <span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="co"># show the picklist selection options for the Account Type field</span></span>

@@ -30,8 +30,24 @@ document.addEventListener('DOMContentLoaded', function(e) {
 });
 </script>
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -118,6 +134,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -373,11 +390,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 6 x 2</span></span>
 <span id="cb2-25"><a href="#cb2-25" aria-hidden="true"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb2-26"><a href="#cb2-26" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000aG2asEAC TRUE   </span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a><span class="co">#&gt; 2 00P3s00000aG2axEAC TRUE   </span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a><span class="co">#&gt; 3 00P3s00000aG2b2EAC TRUE   </span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a><span class="co">#&gt; 4 00P3s00000aG2b7EAC TRUE   </span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a><span class="co">#&gt; 5 00P3s00000aG2bCEAS TRUE   </span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000d24zsEAA TRUE   </span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true"></a><span class="co">#&gt; 2 00P3s00000d24zxEAA TRUE   </span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true"></a><span class="co">#&gt; 3 00P3s00000d2502EAA TRUE   </span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true"></a><span class="co">#&gt; 4 00P3s00000d2507EAA TRUE   </span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true"></a><span class="co">#&gt; 5 00P3s00000d250CEAQ TRUE   </span></span>
 <span id="cb2-32"><a href="#cb2-32" aria-hidden="true"></a><span class="co">#&gt; # … with 1 more row</span></span></code></pre></div>
 </div>
 <div id="downloading-attachments" class="section level2">
@@ -392,11 +409,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 6 x 4</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co">#&gt;   Id            Body                                     Name      ParentId     </span></span>
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;                                    &lt;chr&gt;     &lt;chr&gt;        </span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000aG… /services/data/v48.0/sobjects/Attachmen… logo.png  0016A0000035…</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co">#&gt; 2 00P3s00000aG… /services/data/v48.0/sobjects/Attachmen… cloud.png 0016A0000035…</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="co">#&gt; 3 00P3s00000aG… /services/data/v48.0/sobjects/Attachmen… old-logo… 0016A0000035…</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="co">#&gt; 4 00P3s00000aG… /services/data/v48.0/sobjects/Attachmen… cloud.png 0016A0000035…</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a><span class="co">#&gt; 5 00P3s00000aG… /services/data/v48.0/sobjects/Attachmen… old-logo… 0016A0000035…</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000d2… /services/data/v52.0/sobjects/Attachmen… old-logo… 0016A0000035…</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co">#&gt; 2 00P3s00000d2… /services/data/v52.0/sobjects/Attachmen… logo.png  0016A0000035…</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="co">#&gt; 3 00P3s00000d2… /services/data/v52.0/sobjects/Attachmen… cloud.png 0016A0000035…</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="co">#&gt; 4 00P3s00000d2… /services/data/v52.0/sobjects/Attachmen… cloud.png 0016A0000035…</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a><span class="co">#&gt; 5 00P3s00000d2… /services/data/v52.0/sobjects/Attachmen… logo.png  0016A0000035…</span></span>
 <span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a><span class="co">#&gt; # … with 1 more row</span></span></code></pre></div>
 <p>Before downloading the attachments using the Body it is important to consider whether the attachment names are repeated or duplicates. If so, then the attachments with the same exact name will be overwritten on the local filesystem as they are downloaded. To avoid this problem there are two common strategies:</p>
 <ol style="list-style-type: decimal">
@@ -424,18 +441,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>                          <span class="dt">name =</span> queried_attachments<span class="op">$</span>Name, </span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>                          <span class="dt">path =</span> queried_attachments<span class="op">$</span>Path)</span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>download_result</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v48.0/sobjects/Attachment/00P3s00000aG2axEAC/Body </span></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a><span class="co">#&gt;     &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpk8xfcT/0016A0000035mJ4QAI/logo.png&quot; </span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v48.0/sobjects/Attachment/00P3s00000aG2asEAC/Body </span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a><span class="co">#&gt;    &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpk8xfcT/0016A0000035mJ4QAI/cloud.png&quot; </span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v48.0/sobjects/Attachment/00P3s00000aG2b2EAC/Body </span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a><span class="co">#&gt; &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpk8xfcT/0016A0000035mJ4QAI/old-logo.png&quot; </span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v48.0/sobjects/Attachment/00P3s00000aG2b7EAC/Body </span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="co">#&gt;    &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpk8xfcT/0016A0000035mJ5QAI/cloud.png&quot; </span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v48.0/sobjects/Attachment/00P3s00000aG2bHEAS/Body </span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a><span class="co">#&gt; &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpk8xfcT/0016A0000035mJ5QAI/old-logo.png&quot; </span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v48.0/sobjects/Attachment/00P3s00000aG2bCEAS/Body </span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a><span class="co">#&gt;     &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpk8xfcT/0016A0000035mJ5QAI/logo.png&quot;</span></span></code></pre></div>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v52.0/sobjects/Attachment/00P3s00000d2502EAA/Body </span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a><span class="co">#&gt; &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpd3brpR/0016A0000035mJ4QAI/old-logo.png&quot; </span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v52.0/sobjects/Attachment/00P3s00000d24zxEAA/Body </span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a><span class="co">#&gt;     &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpd3brpR/0016A0000035mJ4QAI/logo.png&quot; </span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v52.0/sobjects/Attachment/00P3s00000d24zsEAA/Body </span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a><span class="co">#&gt;    &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpd3brpR/0016A0000035mJ4QAI/cloud.png&quot; </span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v52.0/sobjects/Attachment/00P3s00000d2507EAA/Body </span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="co">#&gt;    &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpd3brpR/0016A0000035mJ5QAI/cloud.png&quot; </span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v52.0/sobjects/Attachment/00P3s00000d250CEAQ/Body </span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a><span class="co">#&gt;     &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpd3brpR/0016A0000035mJ5QAI/logo.png&quot; </span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a><span class="co">#&gt;                               /services/data/v52.0/sobjects/Attachment/00P3s00000d250HEAQ/Body </span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a><span class="co">#&gt; &quot;/var/folders/s2/1mxmzrg52tx7l0pg8lq1320w0000gn/T//Rtmpd3brpR/0016A0000035mJ5QAI/old-logo.png&quot;</span></span></code></pre></div>
 </div>
 <div id="updating-attachments" class="section level2">
 <h2>Updating Attachments</h2>
@@ -458,13 +475,13 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 1 x 2</span></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000aG2bMEAS TRUE</span></span></code></pre></div>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000d250MEAQ TRUE</span></span></code></pre></div>
 <p>There is a function <code>sf_delete_attachment()</code>, which simply wraps <code>sf_delete()</code> so feel free to use for clarity in your code that you’re working with attachments use <code>sf_delete()</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">sf_delete_attachment</span>(<span class="dt">ids =</span> create_result<span class="op">$</span>id)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 1 x 2</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000aG2bMEAS TRUE</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000d250MEAQ TRUE</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co"># sf_delete(ids = create_result$id) # would also work</span></span></code></pre></div>
 <p><strong>Uploading large batches of attachments using the Bulk API</strong></p>
 <p>The SOAP and REST APIs are good for working with a few attachments at a time. However, the Bulk API can be invoked using api_type=“Bulk 1.0” to automatically take a <code>data.frame</code> or <code>tbl_df</code> of Attachment field data and create a ZIP file with CSV manifest that is required by that API to upload. In the example above, we downloaded the three attachments each belonging to two different parent records. Assuming that I have run that code and the files are in that my computer I can demonstrate that all of them can be uploaded at once using the Bulk 1.0 API.</p>
@@ -477,11 +494,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 6 x 4</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="co">#&gt;   Id                 Success Created Error</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;   &lt;lgl&gt;   &lt;lgl&gt;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000aG2bREAS TRUE    TRUE    NA   </span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="co">#&gt; 2 00P3s00000aG2bSEAS TRUE    TRUE    NA   </span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a><span class="co">#&gt; 3 00P3s00000aG2bTEAS TRUE    TRUE    NA   </span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a><span class="co">#&gt; 4 00P3s00000aG2bUEAS TRUE    TRUE    NA   </span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a><span class="co">#&gt; 5 00P3s00000aG2bVEAS TRUE    TRUE    NA   </span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="co">#&gt; 1 00P3s00000d250REAQ TRUE    TRUE    NA   </span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="co">#&gt; 2 00P3s00000d250SEAQ TRUE    TRUE    NA   </span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a><span class="co">#&gt; 3 00P3s00000d250TEAQ TRUE    TRUE    NA   </span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a><span class="co">#&gt; 4 00P3s00000d250UEAQ TRUE    TRUE    NA   </span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a><span class="co">#&gt; 5 00P3s00000d250VEAQ TRUE    TRUE    NA   </span></span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a><span class="co">#&gt; # … with 1 more row</span></span></code></pre></div>
 <p><strong>NOTE</strong>: As of v48.0 (Spring ’20), it does not appear that the Bulk 2.0 API supports working with Attachments, so the Bulk 1.0 API must be used for bulk functionality.</p>
 <p>Finally, you are able to update Attachments with the Bulk API just as shown above in the REST/SOAP API examples.</p>
@@ -503,7 +520,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 1 x 2</span></span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a><span class="co">#&gt; 1 0153s000001w1x0AAA TRUE</span></span></code></pre></div>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true"></a><span class="co">#&gt; 1 0153s0000028G1cAAE TRUE</span></span></code></pre></div>
 <p>With Documents, users are also able to save storage by specifying a <code>Url</code> instead of a a file path where the <code>Body</code> content is stored locally. Specifying the <code>Url</code> field will reference the URL instead of uploading into the Salesforce org, thereby saving space if limited in your organization.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>cheatsheet_url &lt;-<span class="st"> &quot;https://rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf&quot;</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>document_details &lt;-<span class="st"> </span><span class="kw">tibble</span>(<span class="dt">Name =</span> <span class="st">&quot;Data Wrangling Cheatsheet - Test 2&quot;</span>,</span>
@@ -516,7 +533,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 1 x 2</span></span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a><span class="co">#&gt; 1 0153s000001w1x5AAA TRUE</span></span></code></pre></div>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a><span class="co">#&gt; 1 0153s0000028G1hAAE TRUE</span></span></code></pre></div>
 </div>
 <div id="reference-links" class="section level2">
 <h2>Reference Links</h2>

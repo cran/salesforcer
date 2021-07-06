@@ -30,8 +30,24 @@ document.addEventListener('DOMContentLoaded', function(e) {
 });
 </script>
 
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
 
-<style type="text/css">code{white-space: pre;}</style>
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
 <style type="text/css" data-origin="pandoc">
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
@@ -118,6 +134,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 })();
 </script>
+
 
 
 
@@ -378,8 +395,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 2 x 2</span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000014AlA4AAK TRUE   </span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000014AlA5AAK TRUE</span></span></code></pre></div>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000017uOvYAAU TRUE   </span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000017uOvZAAU TRUE</span></span></code></pre></div>
 </div>
 <div id="retrieving-records" class="section level2">
 <h2>Retrieving records</h2>
@@ -391,8 +408,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 2 x 4</span></span>
 <span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a><span class="co">#&gt;   sObject Id                 FirstName LastName        </span></span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;              &lt;chr&gt;     &lt;chr&gt;           </span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="co">#&gt; 1 Contact 0033s000014AlA4AAK Test      Contact-Create-1</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; 2 Contact 0033s000014AlA5AAK Test      Contact-Create-2</span></span></code></pre></div>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="co">#&gt; 1 Contact 0033s000017uOvYAAU Test      Contact-Create-1</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a><span class="co">#&gt; 2 Contact 0033s000017uOvZAAU Test      Contact-Create-2</span></span></code></pre></div>
 </div>
 <div id="querying-records" class="section level2">
 <h2>Querying records</h2>
@@ -410,8 +427,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 2 x 3</span></span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a><span class="co">#&gt;   Id                 FirstName LastName        </span></span>
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;chr&gt;     &lt;chr&gt;           </span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000014AlA4AAK Test      Contact-Create-1</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000014AlA5AAK Test      Contact-Create-2</span></span></code></pre></div>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000017uOvYAAU Test      Contact-Create-1</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000017uOvZAAU Test      Contact-Create-2</span></span></code></pre></div>
 <p><strong>NOTE</strong>: In the example above, you’ll notice that the <code>&quot;Account.Name&quot;</code> column does not appear in the results. This is because the SOAP and REST APIs only return an empty Account object for the record if there is no relationship to an account ( see <a rel="noopener noreferrer" target="_blank" href="https://github.com/StevenMMortimer/salesforcer/issues/78">#78</a>). There is no reliable way to extract and rebuild the empty columns based on the query string. If there were Account information, an additional column titled <code>&quot;Account.Name&quot;</code> would appear in the results. Note, that the Bulk 1.0 and Bulk 2.0 APIs will return <code>&quot;Account.Name&quot;</code> as a column of all <code>NA</code> values for this query because they return results differently.</p>
 </div>
 <div id="updating-records" class="section level2">
@@ -426,8 +443,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 2 x 2</span></span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000014AlA4AAK TRUE   </span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000014AlA5AAK TRUE</span></span></code></pre></div>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000017uOvYAAU TRUE   </span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000017uOvZAAU TRUE</span></span></code></pre></div>
 </div>
 <div id="deleting-records" class="section level2">
 <h2>Deleting records</h2>
@@ -437,8 +454,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 2 x 2</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="co">#&gt;   id                 success</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;  </span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000014AlA4AAK TRUE   </span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000014AlA5AAK TRUE</span></span></code></pre></div>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000017uOvYAAU TRUE   </span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000017uOvZAAU TRUE</span></span></code></pre></div>
 </div>
 <div id="upserting-records" class="section level2">
 <h2>Upserting records</h2>
@@ -464,9 +481,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a><span class="co">#&gt; # A tibble: 3 x 3</span></span>
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a><span class="co">#&gt;   id                 success created</span></span>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true"></a><span class="co">#&gt;   &lt;chr&gt;              &lt;lgl&gt;   &lt;lgl&gt;  </span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000014Al9vAAC TRUE    FALSE  </span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000014Al9wAAC TRUE    FALSE  </span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true"></a><span class="co">#&gt; 3 0033s000014Al1IAAS TRUE    TRUE</span></span></code></pre></div>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true"></a><span class="co">#&gt; 1 0033s000017uOvdAAE TRUE    FALSE  </span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true"></a><span class="co">#&gt; 2 0033s000017uOveAAE TRUE    FALSE  </span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true"></a><span class="co">#&gt; 3 0033s000017uOviAAE TRUE    TRUE</span></span></code></pre></div>
 </div>
 <div id="check-out-the-tests" class="section level2">
 <h2>Check out the Tests</h2>

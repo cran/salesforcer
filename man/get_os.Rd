@@ -7,7 +7,7 @@
 get_os()
 }
 \value{
-A character string
+\code{character}; a string indicating the current operating system.
 }
 \description{
 This function determines whether the system running the R code
@@ -22,6 +22,6 @@ get_os()
 }
 }
 \seealso{
-\url{https://conjugateprior.org/2015/06/identifying-the-os-from-r}
+\url{https://conjugateprior.org/2015/06/identifying-the-os-from-r/}
 }
 \keyword{internal}
