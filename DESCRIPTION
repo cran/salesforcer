@@ -1,7 +1,7 @@
 Package: salesforcer
 Title: An Implementation of 'Salesforce' APIs Using Tidy Principles
-Version: 1.0.0
-Date: 2021-07-04
+Version: 1.0.1
+Date: 2022-02-28
 Description: Functions connecting to the 'Salesforce' Platform APIs (REST, SOAP, 
     Bulk 1.0, Bulk 2.0, Metadata, Reports and Dashboards) 
     <https://trailhead.salesforce.com/en/content/learn/modules/api_basics/api_basics_overview>. 
@@ -45,13 +45,13 @@ VignetteBuilder: knitr
 ByteCompile: true
 Encoding: UTF-8
 Language: en-US
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 NeedsCompilation: no
-Packaged: 2021-07-06 06:21:36 UTC; steven.mortimer
+Packaged: 2022-03-01 21:31:36 UTC; steven.mortimer
 Author: Steven M. Mortimer [aut, cre],
   Takekatsu Hiramura [ctb],
   Jennifer Bryan [ctb, cph],
   Joanna Zhao [ctb, cph]
 Maintainer: Steven M. Mortimer <mortimer.steven.m@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-07-06 09:10:03 UTC
+Date/Publication: 2022-03-01 21:50:02 UTC

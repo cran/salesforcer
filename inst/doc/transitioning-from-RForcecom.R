@@ -8,49 +8,32 @@ knitr::opts_chunk$set(
 )
 options(tibble.print_min = 5L, tibble.print_max = 5L)
 
-## ----auth, eval=FALSE---------------------------------------------------------
-#  library(dplyr, warn.conflicts = FALSE)
-#  library(salesforcer)
-
 ## ----auth-background, include = FALSE-----------------------------------------
-library(dplyr, warn.conflicts = FALSE)
+suppressWarnings(suppressMessages(library(dplyr)))
+suppressWarnings(suppressMessages(library(here)))
 library(salesforcer)
+token_path <- Sys.getenv("SALESFORCER_TOKEN_PATH")
+sf_auth(token = paste0(token_path, "salesforcer_token.rds"))
 
-username <- Sys.getenv("SALESFORCER_USERNAME")
-password <- Sys.getenv("SALESFORCER_PASSWORD")
-security_token <- Sys.getenv("SALESFORCER_SECURITY_TOKEN")
+## ----load-package, eval=FALSE-------------------------------------------------
+#  library(salesforcer)
+#  sf_auth()
 
-sf_auth(username = username,
-        password = password,
-        security_token = security_token)
-
-## ---- warning=FALSE-----------------------------------------------------------
-# the RForcecom way
-# RForcecom::rforcecom.login(username, paste0(password, security_token), 
-#                            apiVersion=getOption("salesforcer.api_version"))
-# replicated in salesforcer package
-session <- salesforcer::rforcecom.login(username, 
-                                         paste0(password, security_token), 
-                                         apiVersion = getOption("salesforcer.api_version"))
-session['sessionID'] <- "{MASKED}"
-session
-
-## ---- include=FALSE-----------------------------------------------------------
-# keep using the session, just rename it to "session"
-session <- salesforcer::rforcecom.login(username, 
-                                        paste0(password, security_token), 
-                                        apiVersion = getOption("salesforcer.api_version"))
-
-## ---- warning=FALSE-----------------------------------------------------------
-object <- "Contact"
-fields <- c(FirstName="Test", LastName="Contact-Create-Compatibility")
-
-# the RForcecom way
-# RForcecom::rforcecom.create(session, objectName=object, fields)
-
-# replicated in salesforcer package
-result <- salesforcer::rforcecom.create(session, objectName=object, fields)
-result
+## ---- warning=FALSE, eval=FALSE-----------------------------------------------
+#  
+#  # Beginning February 1, 2022, basic authentication will no longer work. You must
+#  # log in to Salesforce using MFA (generating an OAuth 2.0 token typically from
+#  # the browser).
+#  
+#  # the RForcecom way
+#  # RForcecom::rforcecom.login(username, paste0(password, security_token),
+#  #                            apiVersion=getOption("salesforcer.api_version"))
+#  # replicated in salesforcer package
+#  session <- salesforcer::rforcecom.login(username,
+#                                           paste0(password, security_token),
+#                                           apiVersion = getOption("salesforcer.api_version"))
+#  session['sessionID'] <- "{MASKED}"
+#  session
 
 ## ---- warning=FALSE-----------------------------------------------------------
 n <- 2
@@ -76,10 +59,6 @@ this_soql <- "SELECT Id, Email FROM Contact LIMIT 5"
 # the RForcecom way
 # RForcecom::rforcecom.query(session, soqlQuery = this_soql)
 
-# replicated in salesforcer package
-result <- salesforcer::rforcecom.query(session, soqlQuery = this_soql)
-result
-
 # the better way in salesforcer to query
 salesforcer_results <- sf_query(this_soql)
 salesforcer_results
@@ -87,9 +66,6 @@ salesforcer_results
 ## ---- warning=FALSE-----------------------------------------------------------
 # the RForcecom way
 # RForcecom::rforcecom.getObjectDescription(session, objectName='Account')
-
-# backwards compatible in the salesforcer package
-result <- salesforcer::rforcecom.getObjectDescription(session, objectName='Account')
 
 # the better way in salesforcer to get object fields
 result2 <- salesforcer::sf_describe_object_fields('Account')

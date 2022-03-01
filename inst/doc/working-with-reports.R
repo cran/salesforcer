@@ -10,15 +10,10 @@ options(tibble.print_min = 5L, tibble.print_max = 5L)
 
 ## ----auth, include = FALSE----------------------------------------------------
 suppressWarnings(suppressMessages(library(dplyr)))
+suppressWarnings(suppressMessages(library(here)))
 library(salesforcer)
-
-username <- Sys.getenv("SALESFORCER_USERNAME")
-password <- Sys.getenv("SALESFORCER_PASSWORD")
-security_token <- Sys.getenv("SALESFORCER_SECURITY_TOKEN")
-
-sf_auth(username = username,
-        password = password,
-        security_token = security_token)
+token_path <- Sys.getenv("SALESFORCER_TOKEN_PATH")
+sf_auth(token = paste0(token_path, "salesforcer_token.rds"))
 
 ## ----load-package, eval=FALSE-------------------------------------------------
 #  library(dplyr, warn.conflicts = FALSE)
