@@ -1,4 +1,4 @@
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -100,6 +100,6 @@ upserted_records <- sf_upsert(input_data=upserted_contacts,
                               external_id_fieldname="My_External_Id__c")
 upserted_records
 
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 deleted_records <- sf_delete(upserted_records$id, object_name = "Contact")
 

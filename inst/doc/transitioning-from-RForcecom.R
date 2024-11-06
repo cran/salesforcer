@@ -1,4 +1,4 @@
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -19,7 +19,7 @@ sf_auth(token = paste0(token_path, "salesforcer_token.rds"))
 #  library(salesforcer)
 #  sf_auth()
 
-## ---- warning=FALSE, eval=FALSE-----------------------------------------------
+## ----warning=FALSE, eval=FALSE------------------------------------------------
 #  
 #  # Beginning February 1, 2022, basic authentication will no longer work. You must
 #  # log in to Salesforce using MFA (generating an OAuth 2.0 token typically from
@@ -35,7 +35,7 @@ sf_auth(token = paste0(token_path, "salesforcer_token.rds"))
 #  session['sessionID'] <- "{MASKED}"
 #  session
 
-## ---- warning=FALSE-----------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 n <- 2
 new_contacts <- tibble(FirstName = rep("Test", n),
                        LastName = paste0("Contact-Create-", 1:n))
@@ -53,7 +53,7 @@ new_contacts <- tibble(FirstName = rep("Test", n),
 salesforcer_results <- sf_create(new_contacts, object_name="Contact")
 salesforcer_results
 
-## ---- warning=FALSE-----------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 this_soql <- "SELECT Id, Email FROM Contact LIMIT 5"
 
 # the RForcecom way
@@ -63,7 +63,7 @@ this_soql <- "SELECT Id, Email FROM Contact LIMIT 5"
 salesforcer_results <- sf_query(this_soql)
 salesforcer_results
 
-## ---- warning=FALSE-----------------------------------------------------------
+## ----warning=FALSE------------------------------------------------------------
 # the RForcecom way
 # RForcecom::rforcecom.getObjectDescription(session, objectName='Account')
 

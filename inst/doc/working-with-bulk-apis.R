@@ -1,4 +1,4 @@
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -40,7 +40,7 @@ bulk_created_records <- sf_create(new_contacts[3:4,],
                                   api_type="Bulk 1.0")
 bulk_created_records
 
-## ---- include=FALSE-----------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------
 n <- 2
 prefix <- paste0("Bulk-", as.integer(runif(1,1,100000)), "-")
 new_contacts <- tibble(FirstName = rep("Test", n),
@@ -85,7 +85,7 @@ created_records_v2 <- sf_create(new_contacts[11:20,],
                                 api_type = "Bulk 2.0")
 created_records_v2
 
-## ---- warning=FALSE, message=FALSE--------------------------------------------
+## ----warning=FALSE, message=FALSE---------------------------------------------
 soql <- "SELECT Id, Name FROM Contact"
 bulk1_query <- function(){sf_query(soql, "Contact", api_type="Bulk 1.0")}
 bulk2_query <- function(){sf_query(soql, api_type="Bulk 2.0")} # Bulk 2.0 doesn't need object name
@@ -103,7 +103,7 @@ suppressWarnings(suppressMessages(
     ggplot2::scale_y_continuous(name="Time [seconds]", n.breaks=6)
 ))
 
-## ---- include=FALSE-----------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------
 sf_delete(c(created_records_v1$Id, created_records_v2$sf__Id), 
           object_name = "Contact", api_type="Bulk 2.0")
 

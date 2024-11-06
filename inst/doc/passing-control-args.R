@@ -1,4 +1,4 @@
-## ---- echo = FALSE------------------------------------------------------------
+## ----echo = FALSE-------------------------------------------------------------
 NOT_CRAN <- identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -54,7 +54,7 @@ record4 <- sf_create(new_contact,
                      api_type = "REST")
 record4
 
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 deleted_records <- sf_delete(c(record1$id, record2$id))
 
 ## ----sample-query-------------------------------------------------------------
